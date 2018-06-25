@@ -8,15 +8,11 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 491574}
-  - component: {fileID: 11413658}
+  - component: {fileID: 114331511490725068}
   - component: {fileID: 11420432}
   - component: {fileID: 11482548}
-  - component: {fileID: 11405916}
-  - component: {fileID: 11415038}
-  - component: {fileID: 11422416}
-  - component: {fileID: 11487390}
   m_Layer: 0
-  m_Name: VRPawn
+  m_Name: MyVRPawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -605,60 +601,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &11405916
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1768714887, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TransformSyncMode: 1
-  m_SendInterval: 0.033333335
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_SyncSpin: 0
-  m_MovementTheshold: 0.001
-  m_VelocityThreshold: 0.0001
-  m_SnapThreshold: 5
-  m_InterpolateRotation: 1
-  m_InterpolateMovement: 1
---- !u!114 &11413658
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 979158f32cf50434c906f0950a37d2d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Head: {fileID: 498524}
-  LeftController: {fileID: 416724}
-  RightController: {fileID: 452716}
---- !u!114 &11415038
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1267208747, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Target: {fileID: 498524}
-  m_ChildIndex: 0
-  m_SendInterval: 0.033333335
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_MovementThreshold: 0.001
-  m_InterpolateRotation: 0.5
-  m_InterpolateMovement: 0.5
 --- !u!114 &11420432
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -674,25 +616,6 @@ MonoBehaviour:
   right: {fileID: 170830}
   objects: []
   assignAllBeforeIdentified: 0
---- !u!114 &11422416
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1267208747, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Target: {fileID: 416724}
-  m_ChildIndex: 1
-  m_SendInterval: 0.033333335
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_MovementThreshold: 0.001
-  m_InterpolateRotation: 0.5
-  m_InterpolateMovement: 0.5
 --- !u!114 &11426884
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -720,43 +643,24 @@ MonoBehaviour:
   m_SceneId:
     m_Value: 0
   m_AssetId:
-    i0: 251
-    i1: 43
-    i2: 253
-    i3: 56
-    i4: 183
-    i5: 178
-    i6: 175
-    i7: 212
-    i8: 40
-    i9: 195
-    i10: 146
-    i11: 82
-    i12: 89
-    i13: 52
-    i14: 86
-    i15: 233
+    i0: 154
+    i1: 236
+    i2: 71
+    i3: 66
+    i4: 207
+    i5: 168
+    i6: 209
+    i7: 100
+    i8: 26
+    i9: 218
+    i10: 178
+    i11: 137
+    i12: 30
+    i13: 127
+    i14: 112
+    i15: 242
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &11487390
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1267208747, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Target: {fileID: 452716}
-  m_ChildIndex: 2
-  m_SendInterval: 0.033333335
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_MovementThreshold: 0.001
-  m_InterpolateRotation: 0.5
-  m_InterpolateMovement: 0.5
 --- !u!114 &11497496
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -830,3 +734,17 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 102416}
   m_IsPrefabParent: 1
+--- !u!114 &114331511490725068
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 102416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde92885f00bf564f85fe8df66801339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Head: {fileID: 498524}
+  LeftController: {fileID: 416724}
+  RightController: {fileID: 452716}

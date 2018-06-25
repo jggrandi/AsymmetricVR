@@ -15,7 +15,7 @@ namespace Valve.VR.InteractionSystem
 {
 	//-------------------------------------------------------------------------
 	public static class Util
-	{
+    {
 		public const float FeetToMeters = 0.3048f;
 		public const float FeetToCentimeters = 30.48f;
 		public const float InchesToMeters = 0.0254f;

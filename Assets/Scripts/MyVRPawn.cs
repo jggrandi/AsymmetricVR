@@ -2,10 +2,9 @@
 using UnityEngine.Networking;
 using System.Collections;
 using System.Linq;
-
 namespace Valve.VR.InteractionSystem
 {
-    public class VRPawn : NetworkBehaviour
+    public class MyVRPawn : NetworkBehaviour
     {
 
         public Transform Head;
@@ -41,7 +40,6 @@ namespace Valve.VR.InteractionSystem
 
         private void Update()
         {
-            if (!isLocalPlayer) return;
             this.transform.position = player.transform.position;
 
         }
