@@ -545,6 +545,11 @@ Prefab:
       propertyPath: m_PlayerPrefab
       value: 
       objectReference: {fileID: 102416, guid: fb2bfd38b7b2afd428c39252593456e9, type: 2}
+    - target: {fileID: 11418718, guid: cdd03d2b1d937894da576570fded8115, type: 2}
+      propertyPath: m_SpawnPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1987509334669584, guid: 1a971d30dde21d24bba26c63bc2ddf2c,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cdd03d2b1d937894da576570fded8115, type: 2}
   m_IsPrefabParent: 0

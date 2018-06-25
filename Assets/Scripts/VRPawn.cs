@@ -11,9 +11,21 @@ namespace Valve.VR.InteractionSystem
         public Transform Head;
         public Transform LeftController;
         public Transform RightController;
-
+        public GameObject GhostHeadPrefab;
+        private GameObject GhostHead;
         Player player = null;
 
+
+        [Command]
+        void CmdSpawn() {
+            RpcSpawn();
+            //NetworkServer.Spawn(GhostHead);
+        }
+        [ClientRpc]
+        void RpcSpawn()
+        {
+            GhostHead = (GameObject)Instantiate(GhostHeadPrefab, Head.position, Head.rotation);
+        }
 
         void Start()
         {
@@ -32,11 +44,14 @@ namespace Valve.VR.InteractionSystem
                 GetComponentsInChildren<SteamVR_TrackedObject>(true).ToList().ForEach(x => x.enabled = true);
                 Head.GetComponentsInChildren<MeshRenderer>(true).ToList().ForEach(x => x.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly);
                 gameObject.name = "VRPawn (LocalPlayer)";
+                
+                CmdSpawn();
             }
             else
             {
                 gameObject.name = "VRPawn (RemotePlayer)";
             }
+            
         }
 
         private void Update()
@@ -44,6 +59,10 @@ namespace Valve.VR.InteractionSystem
             if (!isLocalPlayer) return;
             this.transform.position = player.transform.position;
 
+            if (GhostHead == null) return;
+            GhostHead.transform.position = Vector3.Lerp(GhostHead.transform.position, Head.position, 0.01f);
+            GhostHead.transform.rotation = Quaternion.Slerp(GhostHead.transform.rotation, Head.rotation, 0.1f);
+            //GhostHead.gameObject.SetActive(false);
         }
 
         void OnDestroy()

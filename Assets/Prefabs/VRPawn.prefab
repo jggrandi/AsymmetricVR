@@ -640,6 +640,8 @@ MonoBehaviour:
   Head: {fileID: 498524}
   LeftController: {fileID: 416724}
   RightController: {fileID: 452716}
+  GhostHeadPrefab: {fileID: 1987509334669584, guid: 1a971d30dde21d24bba26c63bc2ddf2c,
+    type: 2}
 --- !u!114 &11415038
 MonoBehaviour:
   m_ObjectHideFlags: 1
