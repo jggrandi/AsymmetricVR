@@ -15,18 +15,6 @@ namespace Valve.VR.InteractionSystem
         private GameObject GhostHead;
         Player player = null;
 
-
-        [Command]
-        void CmdSpawn() {
-            RpcSpawn();
-            //NetworkServer.Spawn(GhostHead);
-        }
-        [ClientRpc]
-        void RpcSpawn()
-        {
-            GhostHead = (GameObject)Instantiate(GhostHeadPrefab, Head.position, Head.rotation);
-        }
-
         void Start()
         {
             if (isLocalPlayer)
@@ -43,9 +31,12 @@ namespace Valve.VR.InteractionSystem
                 GetComponentInChildren<SteamVR_ControllerManager>().enabled = true;
                 GetComponentsInChildren<SteamVR_TrackedObject>(true).ToList().ForEach(x => x.enabled = true);
                 Head.GetComponentsInChildren<MeshRenderer>(true).ToList().ForEach(x => x.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly);
-                gameObject.name = "VRPawn (LocalPlayer)";
                 
-                CmdSpawn();
+                Head.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
+                LeftController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
+                RightController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
+                gameObject.name = "VRPawn (LocalPlayer)";
+
             }
             else
             {
@@ -57,11 +48,13 @@ namespace Valve.VR.InteractionSystem
         private void Update()
         {
             if (!isLocalPlayer) return;
-            this.transform.position = player.transform.position;
+            
+            this.transform.position = Vector3.Lerp(this.transform.position, player.transform.position, 0.01f);
 
-            if (GhostHead == null) return;
-            GhostHead.transform.position = Vector3.Lerp(GhostHead.transform.position, Head.position, 0.01f);
-            GhostHead.transform.rotation = Quaternion.Slerp(GhostHead.transform.rotation, Head.rotation, 0.1f);
+
+            //if (GhostHead == null) return;
+            //GhostHead.transform.position = Vector3.Lerp(GhostHead.transform.position, Head.position, 0.01f);
+            //GhostHead.transform.rotation = Quaternion.Slerp(GhostHead.transform.rotation, Head.rotation, 0.1f);
             //GhostHead.gameObject.SetActive(false);
         }
 
