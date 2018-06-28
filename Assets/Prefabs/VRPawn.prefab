@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 11413658}
   - component: {fileID: 11420432}
   - component: {fileID: 11482548}
+  - component: {fileID: 114344220860090310}
   - component: {fileID: 11405916}
   - component: {fileID: 11415038}
   - component: {fileID: 11422416}
@@ -640,8 +641,6 @@ MonoBehaviour:
   Head: {fileID: 498524}
   LeftController: {fileID: 416724}
   RightController: {fileID: 452716}
-  GhostHeadPrefab: {fileID: 1987509334669584, guid: 1a971d30dde21d24bba26c63bc2ddf2c,
-    type: 2}
 --- !u!114 &11415038
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -832,3 +831,15 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 102416}
   m_IsPrefabParent: 1
+--- !u!114 &114344220860090310
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 102416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a81b3e8d7aa65f488910a9f8f601098, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allObjects: {fileID: 0}
