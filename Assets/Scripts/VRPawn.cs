@@ -12,13 +12,37 @@ namespace Valve.VR.InteractionSystem
         public Transform LeftController;
         public Transform RightController;
         public GameObject GhostHeadPrefab;
-        private GameObject GhostHead;
+        
         Player player = null;
+
+        public GameObject allObjects;
+
+        [Command]
+        void CmdSyncTransform(int index, Vector3 objPos, Quaternion objRot)
+        {
+            var g = ObjectManager.Get(index);
+            g.transform.position = objPos;
+            g.transform.rotation = objRot;
+            RpcSyncTransform(index, objPos, objRot);
+            //Debug.Log("Server");
+        }
+
+        [ClientRpc]
+        void RpcSyncTransform(int index, Vector3 objPos, Quaternion objRot)
+        {
+            var g = ObjectManager.Get(index);
+            g.transform.position = objPos;
+            g.transform.rotation = objRot;
+            //Debug.Log("Client");
+        }
+
+
 
         void Start()
         {
             if (isLocalPlayer)
             {
+                //Debug.Log("VAICARAI");
                 player = InteractionSystem.Player.instance;
 
                 if (player == null)
@@ -27,6 +51,7 @@ namespace Valve.VR.InteractionSystem
                     Destroy(this.gameObject);
                     return;
                 }
+                allObjects = GameObject.Find("InteractableObjects");
 
                 GetComponentInChildren<SteamVR_ControllerManager>().enabled = true;
                 GetComponentsInChildren<SteamVR_TrackedObject>(true).ToList().ForEach(x => x.enabled = true);
@@ -50,7 +75,12 @@ namespace Valve.VR.InteractionSystem
             if (!isLocalPlayer) return;
             
             this.transform.position = Vector3.Lerp(this.transform.position, player.transform.position, 0.01f);
-
+            //Debug.Log("AAA");
+            for (int i = 0; i < allObjects.transform.childCount; i++)
+            {
+                var objTransform = allObjects.transform.GetChild(i);
+                CmdSyncTransform(i, objTransform.position, objTransform.rotation );
+            }
 
             //if (GhostHead == null) return;
             //GhostHead.transform.position = Vector3.Lerp(GhostHead.transform.position, Head.position, 0.01f);
