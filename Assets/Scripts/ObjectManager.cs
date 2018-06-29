@@ -7,6 +7,8 @@ public class ObjectManager : MonoBehaviour {
     public List<GameObject> list;
     public static ObjectManager manager;
 
+    public GameObject objSelected;
+
     public GameObject allObjects;
 
     public static GameObject Get(int i)
@@ -18,6 +20,23 @@ public class ObjectManager : MonoBehaviour {
     {
         manager.list[i] = obj;
     }
+
+    public static GameObject GetSelected()
+    {
+        return manager.objSelected;
+    }
+
+    public static void SetSelected( GameObject obj)
+    {
+        manager.objSelected = obj;
+    }
+
+    public static void DeleteSelected()
+    {
+        if (manager.objSelected != null)
+            manager.objSelected = null;
+    }
+
 
     // Use this for initialization
     void Start () {

@@ -10,15 +10,15 @@ public class HandleTransformations : NetworkBehaviour {
     [Command]
     void CmdSyncTransform(int index, Vector3 objPos, Quaternion objRot, bool gravity)
     {
-        var g = ObjectManager.Get(index);
-        g.transform.position = objPos;
-        g.transform.rotation = objRot;
-        g.transform.GetComponent<Rigidbody>().useGravity = gravity;
+        //var g = ObjectManager.Get(index);
+        //g.transform.position = objPos;
+        //g.transform.rotation = objRot;
+        //g.transform.GetComponent<Rigidbody>().useGravity = gravity;
 
 
         //g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.2f);
         //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, objRot, 0.2f);
-        RpcSyncTransform(index, g.transform.position, g.transform.rotation,gravity);
+        RpcSyncTransform(index, objPos, objRot,gravity);
         //Debug.Log("Server");
     }
 
@@ -27,8 +27,11 @@ public class HandleTransformations : NetworkBehaviour {
     {
         var g = ObjectManager.Get(index);
         g.transform.GetComponent<Rigidbody>().useGravity = gravity;
-        g.transform.position = objPos;
-        g.transform.rotation = objRot;
+
+        g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.02f);
+        g.transform.rotation = Quaternion.Slerp(g.transform.rotation, objRot, 0.02f);
+        //g.transform.position = objPos;
+        //g.transform.rotation = objRot;
         //Debug.Log("Client");
     }
 
@@ -44,10 +47,13 @@ public class HandleTransformations : NetworkBehaviour {
     void Update () {
         if (!isLocalPlayer) return;
 
-        for (int i=0; i < allObjects.transform.childCount; i++)
+        for (int i = 0; i < allObjects.transform.childCount; i++)
         {
             var objTransform = allObjects.transform.GetChild(i);
-            CmdSyncTransform(i, objTransform.position, objTransform.rotation, objTransform.GetComponent<Rigidbody>().useGravity);
+            if (ObjectManager.GetSelected() == null) return;
+            
+            if (objTransform.name == ObjectManager.GetSelected().name)
+                CmdSyncTransform(i, objTransform.position, objTransform.rotation, objTransform.GetComponent<Rigidbody>().useGravity);
         }
 
 

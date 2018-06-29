@@ -77,6 +77,9 @@ public class Grab : MonoBehaviour {
                 imaginary.transform.rotation = this.transform.rotation;
                 imaginary.transform.parent = hand.transform;
 
+                //Save object selected
+                ObjectManager.SetSelected(this.gameObject);
+
                 //Disable the logic object gravity so we can move it around freely
                 var Rb = gameObject.GetComponent<Rigidbody>();
                 Rb.useGravity = false;
@@ -145,7 +148,7 @@ public class Grab : MonoBehaviour {
             this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
             //}
 
-
+            ObjectManager.DeleteSelected();
             //Destroy(logicObject.GetComponent<NotifyCollision>());
 
             //if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() == null) {
