@@ -4,4 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Stacking Scene.unity
+    guid: c193a5caad04c73468c4ef2f2f793331
+  m_configObjects: {}

@@ -36,16 +36,15 @@ public class HandleTransformations : NetworkBehaviour {
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
-
         allObjects = GameObject.Find("InteractableObjects");
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+
+    // Update is called once per frame
+    void Update () {
         if (!isLocalPlayer) return;
 
-        
-        for(int i=0; i < allObjects.transform.childCount; i++)
+        for (int i=0; i < allObjects.transform.childCount; i++)
         {
             var objTransform = allObjects.transform.GetChild(i);
             CmdSyncTransform(i, objTransform.position, objTransform.rotation, objTransform.GetComponent<Rigidbody>().useGravity);
