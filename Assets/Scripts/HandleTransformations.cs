@@ -25,9 +25,10 @@ public class HandleTransformations : NetworkBehaviour {
     [ClientRpc]
     void RpcSyncTransform(int index, Vector3 objPos, Quaternion objRot, bool gravity)
     {
+        if (isLocalPlayer) return;
         var g = ObjectManager.Get(index);
         var selected = ObjectManager.GetSelected();
-
+        
         if(selected != null && g.name == selected.name)
         {
             g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.02f);
