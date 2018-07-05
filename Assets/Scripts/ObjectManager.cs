@@ -1,15 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using Valve.VR.InteractionSystem;
 
-public class ObjectManager : MonoBehaviour {
+public class ObjectManager : NetworkBehaviour {
 
     public List<GameObject> list;
     public static ObjectManager manager;
 
     public GameObject objSelected;
 
-    public GameObject allObjects;
+    public GameObject allInteractable;
+
+    public GameObject ghostPrefab;
 
     public static GameObject Get(int i)
     {
@@ -40,18 +44,27 @@ public class ObjectManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        allObjects = GameObject.Find("InteractableObjects");
-
-        for(int i=0; i < allObjects.transform.childCount; i++)
+        if (!isLocalPlayer) return;
+        allInteractable = GameObject.Find("InteractableObjects");
+        var ghosts = gameObject.transform.Find("InteractableGhosts");
+        for (int i = 0; i < allInteractable.transform.childCount; i++)
         {
-            list.Add(allObjects.transform.GetChild(i).gameObject);
+            var obj = allInteractable.transform.GetChild(i).gameObject;
+            list.Add(obj);
+            ghosts.GetChild(i).GetComponent<ObjReference>().ObjRef = obj.transform;
+           
         }
-
         manager = this;
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    public override void OnStartClient()
+    {
+
+    }
+
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 }

@@ -23,7 +23,7 @@ namespace Valve.VR.InteractionSystem
 
                 if (player == null)
                 {
-                    Debug.LogError("Teleport: No Player instance found in map.");
+                    Debug.LogError("No Player instance found in map.");
                     Destroy(this.gameObject);
                     return;
                 }
@@ -49,7 +49,7 @@ namespace Valve.VR.InteractionSystem
         {
             if (!isLocalPlayer) return;
             
-            this.transform.position = Vector3.Lerp(this.transform.position, player.transform.position, 0.01f);
+            this.transform.position = Vector3.Lerp(this.transform.position, player.transform.position, 0.05f);
         }
 
         void OnDestroy()
