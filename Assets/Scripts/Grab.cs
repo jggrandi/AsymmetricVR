@@ -27,6 +27,16 @@ public class Grab : MonoBehaviour {
     private GameObject drawnPoints;
     private GameObject center;
 
+    private bool attached = false;
+
+
+    //-------------------------------------------------
+    void SetImaginaryTransformation()
+    {
+        //Sets the god-object position to the same as the visual representation
+        imaginary.transform.position = this.transform.position;
+        imaginary.transform.rotation = this.transform.rotation;
+    }
 
     //-------------------------------------------------
     void Awake() {
@@ -45,7 +55,16 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void OnHandHoverBegin(Hand hand) {
         //if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
+        Debug.Log("OnHandHoverBegin");
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
+        //if (!attached)
+        //{
+        //    if (hand.GetStandardInteractionButton())
+        //    {       
+        //        //SetImaginaryTransformation();
+        //        hand.AttachObject(gameObject, attachmentFlags);
+        //    }
+        //}
 
     }
 
@@ -53,30 +72,46 @@ public class Grab : MonoBehaviour {
     // Called when a Hand stops hovering over this object
     //-------------------------------------------------
     private void OnHandHoverEnd(Hand hand) {
-
+        Debug.Log("OnHandHoverEnd");
         //if (hand.otherHand && hand.otherHand.currentAttachedObject)
         //    if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
         this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
 
     }
 
+
+
+ 
+    //-------------------------------------------------
+    private void OnHandFocusAcquired(Hand hand)
+    {
+        gameObject.SetActive(true);
+    }
+
+    //-------------------------------------------------
+    private void OnHandFocusLost(Hand hand)
+    {
+        gameObject.SetActive(false);
+    }
+
     //-------------------------------------------------
     // Called every Update() while a Hand is hovering over this object
     //-------------------------------------------------
-    private void HandHoverUpdate(Hand hand) {
+    private void HandHoverUpdate(Hand hand)
+    {
 
-        if (hand.GetStandardInteractionButtonDown()) {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
-            if (hand.currentAttachedObject != gameObject) {
+        if (hand.GetStandardInteractionButtonDown())
+        {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
+            if (hand.currentAttachedObject != gameObject)
+            {
 
+                attached = true;
 
                 //Instantiate and imaginary god-object
                 imaginary = Instantiate(imaginaryPrefab);
+                SetImaginaryTransformation();
 
-                //Sets the god-object position to the same as the visual representation
-                imaginary.transform.position = this.transform.position;
-                imaginary.transform.rotation = this.transform.rotation;
-                imaginary.transform.parent = hand.transform;
-
+                hand.HoverLock(null);
                 //Save object selected
                 ObjectManager2.SetSelected(this.gameObject);
 
@@ -84,9 +119,7 @@ public class Grab : MonoBehaviour {
                 var Rb = gameObject.GetComponent<Rigidbody>();
                 Rb.useGravity = false;
                 Rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                //Add a script that inform us if the object is colliding
-                //logicObject.AddComponent<NotifyCollision>();
-
+                Rb.isKinematic = true;
 
                 var simpleSpring = imaginary.GetComponent<SimpleSpring>();
                 //Attaches a simple spring joint from the god-objce to the logic representation
@@ -94,77 +127,39 @@ public class Grab : MonoBehaviour {
                 simpleSpring.pivot = imaginary;
                 simpleSpring.offset = gameObject.transform.rotation;
 
-
-                //hand.controller.TriggerHapticPulse();
                 this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
-                //Find the equivalent logic obj
-                //logicObject = GameObject.Find(this.transform.name + " Logic");
 
-
-
-                // Check if the other hand has objects attached. 
-                // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
-                // If it is been grabbed, we need to remove the joint that is fixing it to the other hand and attach to this hand.
-                //if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null) { //if the other hand is grabbing an object
-                //    //Find this object in the other hand
-                //    var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
-                //    DetachFromOtherHand(logicObject, otherHandObj);
-                //}
-                //qntObjsAbove = 0;
-                //AttachAboveObjects(logicObject.GetComponent<Stackable>(), ref qntObjsAbove);
 
 
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
-                hand.HoverLock(GetComponent<Interactable>());
+                //hand.HoverLock(GetComponent<Interactable>());
 
                 // Attach this object to the hand
                 hand.AttachObject(imaginary, attachmentFlags);
-
-
-
-
 
 
             }
         }
         if (hand.GetStandardInteractionButtonUp())// || hand.controller.GetPressUp(Valve.VR.EVRButtonId.k_EButton_Grip) && hand.currentAttachedObject != null)
         {
-            Destroy(imaginary);
-            //var getLogicObjectCollision = logicObject.GetComponent<NotifyCollision>();
-            //Stack to the other hand
-            //If the objects is colliding when it is released AND it is not colliding with the podium AND the stack that the object is being attached is not colliding with the podium 
-            //if (getLogicObjectCollision != null && getLogicObjectCollision.isColliding && !getLogicObjectCollision.collidedObj.gameObject.name.Equals("Podium") && !FindPodium(getLogicObjectCollision.collidedObj.gameObject.GetComponent<Stackable>())) {
-            //    logicObject.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
-            //    AttachObjectToStack(logicObject, getLogicObjectCollision.collidedObj.gameObject);
-            //    logicObject.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            //} else {
-            //Resets original settings of the logic object
-            //DetachAboveObjects(logicObject);
+
+            attached = false;
+            hand.HoverUnlock(null);
+            
+            ObjectManager2.DeleteSelected();
+
             var Rb = gameObject.GetComponent<Rigidbody>();
             Rb.GetComponent<Rigidbody>().useGravity = true;
             Rb.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
+            Rb.isKinematic = false;
             this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
-            //}
 
-            ObjectManager2.DeleteSelected();
-            //Destroy(logicObject.GetComponent<NotifyCollision>());
-
-            //if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() == null) {
-            //    var allObjects = GameObject.FindObjectsOfType<Stackable>();
-            //    foreach (var obj in allObjects)
-            //        Destroy(obj.VisualRepresentation.GetComponent<Grab>().drawnPoints);
-            //}
-
-            //Destroy(center);
-
-
-            // Detach this object from the hand
             hand.DetachObject(imaginary);
-            
+            Destroy(imaginary);
             // Call this to undo HoverLock
-            hand.HoverUnlock(GetComponent<Interactable>());
+            //hand.HoverUnlock(GetComponent<Interactable>());
             //logicObject.transform.Translate(Vector3.zero);
         }
     }
