@@ -13,7 +13,7 @@ namespace Valve.VR.InteractionSystem
 
 
         [Command]
-        void CmdSyncTransform(int index, Vector3 objtransstep)
+        void CmdSyncTransform(int index, Vector3 objtransstep, Quaternion objrotstep)
         {
             //var g = ObjectManager2.Get(index);
             //g.transform.localPosition += objtransstep;
@@ -23,18 +23,19 @@ namespace Valve.VR.InteractionSystem
 
             //g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.02f);
             //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, objRot, 0.02f);
-            RpcSyncTransform(index, objtransstep);
+            RpcSyncTransform(index, objtransstep, objrotstep);
             //Debug.Log("Server");
         }
 
         [ClientRpc]
-        void RpcSyncTransform(int index, Vector3 objetransstep)
+        void RpcSyncTransform(int index, Vector3 objetransstep, Quaternion objrotstep)
         {
-            //if (isLocalPlayer) return;
+            if (isLocalPlayer) return;
             var g = ObjectManager2.Get(index);
             var selected = ObjectManager2.GetSelected();
 
-            g.transform.localPosition += objetransstep;
+            g.transform.position += objetransstep;
+            g.transform.rotation = objrotstep * g.transform.rotation;
 
             //if (selected != null && g.name == selected.name)
             //{
@@ -108,7 +109,8 @@ namespace Valve.VR.InteractionSystem
                 {
                     var transformantionStep = go.transform.parent.GetComponent<GetTransformStep>();
                     var posStep = transformantionStep.positionStep;
-                    CmdSyncTransform(i, posStep);
+                    var rotStep = transformantionStep.rotationStep;
+                    CmdSyncTransform(i, posStep,rotStep);
                 }
 
             }

@@ -54,7 +54,8 @@ public class SimpleSpring : MonoBehaviour {
         //logic.transform.rotation = pivot.transform.rotation;
 
 
-        logic.transform.localPosition += step.positionStep;
+        logic.transform.position += step.positionStep;
+        logic.transform.rotation = step.rotationStep * logic.transform.rotation;
 
 
     }

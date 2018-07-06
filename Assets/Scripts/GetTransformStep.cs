@@ -16,7 +16,7 @@ public class GetTransformStep : MonoBehaviour {
     public Quaternion rotationStep;
 
     //public GameObject objTransformed;
-
+    //public GameObject cubao;
     // Use this for initialization
     void Start () {
         rotationMatrix = Matrix4x4.identity;
@@ -25,6 +25,8 @@ public class GetTransformStep : MonoBehaviour {
         translationMatrix = Matrix4x4.identity;
         translation = new Vector4(0f, 0f, 0f, 1f);
 
+
+        //cubao = GameObject.Find("CUBAO");
         //objTransformed = GameObject.Find("CubeAQUI");
     }
 	
@@ -32,7 +34,7 @@ public class GetTransformStep : MonoBehaviour {
 	void Update () {
 
         rotationMatrix = Matrix4x4.Rotate( this.gameObject.transform.rotation);
-        translationMatrix = Matrix4x4.Translate(this.gameObject.transform.localPosition);
+        translationMatrix = Matrix4x4.Translate(this.gameObject.transform.position);
 
         translationMatrixStep = Matrix4x4.Inverse(translationMatrixPrev);
         translationMatrixStep = translationMatrix * translationMatrixStep;
@@ -45,8 +47,9 @@ public class GetTransformStep : MonoBehaviour {
 
         rotationStep = Utils.GetRotationn(rotationMatrixStep);
 
+        //cubao.transform.position += positionStep;
+        //cubao.transform.rotation = rotationStep * cubao.transform.rotation;
 
-        
         //objTransformed.transform.localPosition += Utils.GetPositionn(translationMatrixStep);
         //objTransformed.transform.Rotate(objTransformed.transform.localRotation.eulerAngles + Utils.GetRotationn(rotationMatrixStep).eulerAngles);
 
