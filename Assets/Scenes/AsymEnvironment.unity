@@ -635,8 +635,6 @@ MonoBehaviour:
   imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
     type: 2}
   hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
-  stackList: []
-  qntObjsAbove: 0
 --- !u!54 &799654727
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -854,8 +852,6 @@ MonoBehaviour:
   imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
     type: 2}
   hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
-  stackList: []
-  qntObjsAbove: 0
 --- !u!54 &1132998006
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1134,8 +1130,6 @@ MonoBehaviour:
   imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
     type: 2}
   hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
-  stackList: []
-  qntObjsAbove: 0
 --- !u!54 &1232739730
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1539,6 +1533,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 107946, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
+      propertyPath: m_Name
+      value: VRPlayer
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114000011983135080, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
@@ -1885,8 +1883,6 @@ MonoBehaviour:
   imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
     type: 2}
   hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
-  stackList: []
-  qntObjsAbove: 0
 --- !u!54 &2119373688
 Rigidbody:
   m_ObjectHideFlags: 0

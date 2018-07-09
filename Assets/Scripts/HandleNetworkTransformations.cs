@@ -5,62 +5,28 @@ using UnityEngine.Networking;
 
 namespace Valve.VR.InteractionSystem
 {
-    public class HandleTransformations : NetworkBehaviour
+    public class HandleNetworkTransformations : NetworkBehaviour
     {
         Player player = null;
 
         public GameObject allObjects;
 
-
         [Command]
         void CmdSyncTransform(int index, Vector3 objtransstep, Quaternion objrotstep)
         {
-            //var g = ObjectManager2.Get(index);
-            //g.transform.localPosition += objtransstep;
-            //g.transform.rotation = objRot;
-            //g.transform.GetComponent<Rigidbody>().useGravity = gravity;
-
-
-            //g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.02f);
-            //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, objRot, 0.02f);
             RpcSyncTransform(index, objtransstep, objrotstep);
-            //Debug.Log("Server");
         }
 
         [ClientRpc]
         void RpcSyncTransform(int index, Vector3 objetransstep, Quaternion objrotstep)
         {
             if (isLocalPlayer) return;
-            var g = ObjectManager2.Get(index);
-            var selected = ObjectManager2.GetSelected();
-
+            var g = ObjectManager.Get(index);
+            
             g.transform.position += objetransstep;
             g.transform.rotation = objrotstep * g.transform.rotation;
 
-            //if (selected != null && g.name == selected.name)
-            //{
-            //    g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.02f);
-            //    g.transform.rotation = Quaternion.Lerp(g.transform.rotation, objRot, 0.02f);
-
-            //}
-            //else
-            //{
-            //    g.transform.position = Vector3.Lerp(g.transform.position, objPos, 0.1f);
-            //    g.transform.rotation = Quaternion.Lerp(g.transform.rotation, objRot, 0.1f);
-
-            //}
-
-
-
-            //g.transform.GetComponent<Rigidbody>().useGravity = gravity;
-            //g.transform.position = objPos;
-            //g.transform.rotation = objRot;
-            //Debug.Log("Client");
-
-            // }
-
         }
-
 
         // Use this for initialization
         void Start()
@@ -89,23 +55,14 @@ namespace Valve.VR.InteractionSystem
             if (!isLocalPlayer) return;
             var go = GameObject.Find("Imaginary(Clone)");
             if (go == null) return;
-            //foreach (Hand hand in player.hands)
-            //{
-            //    if (hand.currentAttachedObject != null) continue;
-            //    //Debug.Log(hand.name + " " + hand.currentAttachedObject);
-            //}
-            //var obj = ObjectManager2.Get(0);
-
-            //gameObject.AddComponent<NetworkTransformChild>();
-
            
-            if (ObjectManager2.GetSelected() == null) return; // if localplayer is not selecting an object
+            if (ObjectManager.GetSelected() == null) return; // if localplayer is not selecting an object
 
             for (int i = 0; i < allObjects.transform.childCount; i++)
             {
                 var objTransform = allObjects.transform.GetChild(i);
 
-                if (objTransform.name == ObjectManager2.GetSelected().name)
+                if (objTransform.name == ObjectManager.GetSelected().name)
                 {
                     var transformantionStep = go.transform.parent.GetComponent<GetTransformStep>();
                     var posStep = transformantionStep.positionStep;
