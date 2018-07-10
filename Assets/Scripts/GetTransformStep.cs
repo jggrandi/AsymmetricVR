@@ -34,7 +34,7 @@ namespace Valve.VR.InteractionSystem
 
         void Update()
         {
-
+            
             rotationMatrix = Matrix4x4.Rotate(this.gameObject.transform.rotation);
             translationMatrix = Matrix4x4.Translate(this.gameObject.transform.position);
 

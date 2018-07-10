@@ -80,5 +80,12 @@ namespace Valve.VR.InteractionSystem
 
 
         }
+
+        private void Update()
+        {
+
+
+        }
+
     }
 }

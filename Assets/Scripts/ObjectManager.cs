@@ -48,6 +48,7 @@ public class ObjectManager : MonoBehaviour
         {
             list.Add(allObjects.transform.GetChild(i).gameObject);
         }
+        objSelected = allObjects.transform.GetChild(0).gameObject;
 
         manager = this;
     }
