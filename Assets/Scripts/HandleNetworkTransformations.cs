@@ -9,6 +9,8 @@ namespace Valve.VR.InteractionSystem
     {
         Player player = null;
 
+        public Hand handLeft, handRight;
+
         public GameObject allObjects;
 
         [Command]
@@ -41,6 +43,10 @@ namespace Valve.VR.InteractionSystem
                 Destroy(this.gameObject);
                 return;
             }
+
+            //handLeft = player.leftHand.att;
+            //handRight = player.leftHand;
+            
             allObjects = GameObject.Find("InteractableObjects");
         }
 

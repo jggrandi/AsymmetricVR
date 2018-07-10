@@ -2,27 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HandleLocalTransformations : MonoBehaviour {
+namespace Valve.VR.InteractionSystem
+{
+    public class HandleLocalTransformations : MonoBehaviour
+    {
 
-    public GameObject logic;
+        public GameObject logic;
+        GetTransformStep step;
 
-    GetTransformStep step;
+        // Use this for initialization
+        void Start()
+        {
+            step = gameObject.transform.parent.GetComponent<GetTransformStep>();
+        }
 
-	// Use this for initialization
-	void Start () {
+        // Update is called once per frame
+        void FixedUpdate()
+        {
 
-        step = gameObject.transform.parent.GetComponent<GetTransformStep>();
-	}
+            logic.transform.position += step.positionStep;
+            logic.transform.rotation = step.rotationStep * logic.transform.rotation;
+            var hand = this.transform.parent.GetComponent<Hand>();
+            if (hand.controller.GetPressDown(EVRButtonId.k_EButton_A) && hand.otherHand.controller.GetPressDown(EVRButtonId.k_EButton_A)){ Debug.Log("Nothing yet"); }
 
-    // Update is called once per frame
-    void FixedUpdate () {
-
-        logic.transform.position += step.positionStep;
-        logic.transform.rotation = step.rotationStep * logic.transform.rotation;
-
-
+        }
+       
     }
-
-
-
 }
+
