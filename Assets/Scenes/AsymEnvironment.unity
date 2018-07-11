@@ -544,9 +544,9 @@ GameObject:
   - component: {fileID: 799654725}
   - component: {fileID: 799654724}
   - component: {fileID: 799654723}
-  - component: {fileID: 799654728}
   - component: {fileID: 799654727}
-  - component: {fileID: 799654726}
+  - component: {fileID: 799654730}
+  - component: {fileID: 799654729}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -621,20 +621,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 799654721}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &799654726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 799654721}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adcf4f4b1900be84fb8b1eeb551de7c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
-    type: 2}
-  hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
 --- !u!54 &799654727
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -650,7 +636,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &799654728
+--- !u!114 &799654729
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -658,7 +644,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 799654721}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Script: {fileID: 11500000, guid: ad6b118bf91ab854196fb30b2a537b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionStep: {x: 0, y: 0, z: 0}
+  rotationStep: {x: 0, y: 0, z: 0, w: 0}
+  scaleStep: 0
+--- !u!114 &799654730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 799654721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &969997211
@@ -761,9 +761,9 @@ GameObject:
   - component: {fileID: 1132998004}
   - component: {fileID: 1132998003}
   - component: {fileID: 1132998002}
-  - component: {fileID: 1132998007}
   - component: {fileID: 1132998006}
-  - component: {fileID: 1132998005}
+  - component: {fileID: 1132998009}
+  - component: {fileID: 1132998008}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -838,20 +838,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1132998000}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1132998005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1132998000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adcf4f4b1900be84fb8b1eeb551de7c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
-    type: 2}
-  hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
 --- !u!54 &1132998006
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -867,7 +853,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1132998007
+--- !u!114 &1132998008
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -875,7 +861,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1132998000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Script: {fileID: 11500000, guid: ad6b118bf91ab854196fb30b2a537b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionStep: {x: 0, y: 0, z: 0}
+  rotationStep: {x: 0, y: 0, z: 0, w: 0}
+  scaleStep: 0
+--- !u!114 &1132998009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1132998000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1154929215
@@ -1039,9 +1039,9 @@ GameObject:
   - component: {fileID: 1232739728}
   - component: {fileID: 1232739727}
   - component: {fileID: 1232739726}
-  - component: {fileID: 1232739731}
   - component: {fileID: 1232739730}
-  - component: {fileID: 1232739729}
+  - component: {fileID: 1232739733}
+  - component: {fileID: 1232739732}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -1116,20 +1116,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1232739724}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1232739729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1232739724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adcf4f4b1900be84fb8b1eeb551de7c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
-    type: 2}
-  hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
 --- !u!54 &1232739730
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1145,7 +1131,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1232739731
+--- !u!114 &1232739732
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1153,7 +1139,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1232739724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Script: {fileID: 11500000, guid: ad6b118bf91ab854196fb30b2a537b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionStep: {x: 0, y: 0, z: 0}
+  rotationStep: {x: 0, y: 0, z: 0, w: 0}
+  scaleStep: 0
+--- !u!114 &1232739733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1232739724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1565833039
@@ -1291,7 +1291,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1623813267}
   - component: {fileID: 1623813266}
-  - component: {fileID: 1623813268}
   m_Layer: 0
   m_Name: MainHandler
   m_TagString: Untagged
@@ -1311,7 +1310,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   list: []
-  objSelected: {fileID: 0}
   allObjects: {fileID: 0}
 --- !u!4 &1623813267
 Transform:
@@ -1326,17 +1324,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1623813268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1623813265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1911802529
 Prefab:
   m_ObjectHideFlags: 0
@@ -1622,9 +1609,9 @@ GameObject:
   - component: {fileID: 2119373686}
   - component: {fileID: 2119373685}
   - component: {fileID: 2119373684}
-  - component: {fileID: 2119373689}
   - component: {fileID: 2119373688}
-  - component: {fileID: 2119373687}
+  - component: {fileID: 2119373691}
+  - component: {fileID: 2119373690}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -1699,20 +1686,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2119373682}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2119373687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2119373682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adcf4f4b1900be84fb8b1eeb551de7c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
-    type: 2}
-  hoverMat: {fileID: 2100000, guid: 670101cd3a8ecb143b6ebdeb8ed8eb2f, type: 2}
 --- !u!54 &2119373688
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1728,7 +1701,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2119373689
+--- !u!114 &2119373690
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1736,6 +1709,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2119373682}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Script: {fileID: 11500000, guid: ad6b118bf91ab854196fb30b2a537b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionStep: {x: 0, y: 0, z: 0}
+  rotationStep: {x: 0, y: 0, z: 0, w: 0}
+  scaleStep: 0
+--- !u!114 &2119373691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2119373682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -62,21 +62,30 @@ namespace Valve.VR.InteractionSystem
             var go = GameObject.Find("Imaginary(Clone)");
             if (go == null) return;
            
-            if (ObjectManager.GetSelected() == null) return; // if localplayer is not selecting an object
+            //if (ObjectManager.GetSelected() == null) return; // if localplayer is not selecting an object
 
-            for (int i = 0; i < allObjects.transform.childCount; i++)
-            {
-                var objTransform = allObjects.transform.GetChild(i);
+            //var objTransformStep = ObjectManager.GetSelected().GetComponent<GetTransformStep>();
+            //var objIndex = ObjectManager.GetIndexSelected();
+            //var posStep = objTransformStep.positionStep;
+            //var rotStep = objTransformStep.rotationStep;
+            //CmdSyncTransform(objIndex, posStep, rotStep);
 
-                if (objTransform.name == ObjectManager.GetSelected().name)
-                {
-                    var transformantionStep = go.transform.parent.GetComponent<GetTransformStep>();
-                    var posStep = transformantionStep.positionStep;
-                    var rotStep = transformantionStep.rotationStep;
-                    CmdSyncTransform(i, posStep,rotStep);
-                }
 
-            }
+
+
+            //for (int i = 0; i < allObjects.transform.childCount; i++)
+            //{
+            //    var objTransform = allObjects.transform.GetChild(i);
+
+            //    if (objTransform.name == ObjectManager.GetSelected().name)
+            //    {
+            //        var transformantionStep = go.transform.parent.GetComponent<GetTransformStep>();
+            //        var posStep = transformantionStep.positionStep;
+            //        var rotStep = transformantionStep.rotationStep;
+            //        CmdSyncTransform(i, posStep,rotStep);
+            //    }
+
+            //}
 
 
         }

@@ -83,7 +83,7 @@ namespace Valve.VR.InteractionSystem
 
                     hand.HoverLock(null);
                     //Save object selected
-                    ObjectManager.SetSelected(this.gameObject);
+                    //ObjectManager.SetSelected(this.gameObject,hand);
 
                     //Disable the logic object gravity so we can move it around freely
                     var Rb = gameObject.GetComponent<Rigidbody>();
@@ -109,7 +109,7 @@ namespace Valve.VR.InteractionSystem
             {
                 hand.HoverUnlock(null);
 
-                ObjectManager.DeleteSelected();
+                //ObjectManager.DeleteSelected();
 
                 var Rb = gameObject.GetComponent<Rigidbody>();
                 Rb.GetComponent<Rigidbody>().useGravity = true;

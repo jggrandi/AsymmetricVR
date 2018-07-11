@@ -1,15 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
+
+
+public class ObjSelected
+{
+    public int index;
+    public GameObject obj;
+    public List<Hand> hands;
+}
 
 public class ObjectManager : MonoBehaviour
 {
 
     public List<GameObject> list;
     public static ObjectManager manager;
-
-    public GameObject objSelected;
-
+    public List<ObjSelected> objsSelected;
     public GameObject allObjects;
 
     public static GameObject Get(int i)
@@ -22,20 +29,69 @@ public class ObjectManager : MonoBehaviour
         manager.list[i] = obj;
     }
 
-    public static GameObject GetSelected()
+    public static ObjSelected FindObject(GameObject obj)
     {
-        return manager.objSelected;
+        foreach(ObjSelected selected in manager.objsSelected)
+        {
+            if (GameObject.ReferenceEquals(selected.obj, obj))
+                return selected;
+        }
+        return null;
     }
 
-    public static void SetSelected(GameObject obj)
+    public static void AddToSelectedList(GameObject obj, Hand h)
     {
-        manager.objSelected = obj;
+        var index = DetermineIndexSelected(obj);
+        ObjSelected objS = new ObjSelected();
+        objS.index = index;
+        objS.obj = obj;
+        objS.hands = new List<Hand>();
+        objS.hands.Add(h);
+        manager.objsSelected.Add(objS);
     }
 
-    public static void DeleteSelected()
+
+    public static void SetSelected(GameObject obj, Hand h)
     {
-        if (manager.objSelected != null)
-            manager.objSelected = null;
+        var found = FindObject(obj);
+        if (found == null) // if it is not selected, add to list
+        {
+            AddToSelectedList(obj,h); // add the object and the hand whitch is selecting it
+        }
+        else // it is already selected, we need to verify if the hand that is selecting is other hand
+        {
+            if(!found.hands.Contains(h)) // if is not the same hand, add this hand to the obj
+                found.hands.Add(h);  
+        }
+    }
+
+
+    public static int DetermineIndexSelected(GameObject obj)
+    {
+        for(int i = 0; i < manager.list.Count; i++)
+        {
+            if (GameObject.ReferenceEquals(manager.list[i], obj))
+                return i;
+        }
+        return -1;
+    }
+
+    public static void RemoveObjFromSelectedList(ObjSelected obj)
+    {
+        if (manager.objsSelected.Contains(obj))
+            manager.objsSelected.Remove(obj);
+    }
+
+    public static void DetachObjectFromHand(GameObject obj, Hand h)
+    {
+        var found = FindObject(obj);
+        if (found == null) return; // if it is not selected, nothing to do, return
+
+        if (found.hands.Contains(h)) // if the object is being selected by this hand
+            found.hands.Remove(h);
+
+        if (found.hands.Count == 0) // there is no hand selecting the object, remove object from the selected list
+            RemoveObjFromSelectedList(found);
     }
 
 
@@ -44,12 +100,13 @@ public class ObjectManager : MonoBehaviour
     {
         allObjects = GameObject.Find("InteractableObjects");
 
+        objsSelected = new List<ObjSelected>();
+
         for (int i = 0; i < allObjects.transform.childCount; i++)
         {
             list.Add(allObjects.transform.GetChild(i).gameObject);
         }
-        objSelected = allObjects.transform.GetChild(0).gameObject;
-
+        
         manager = this;
     }
 

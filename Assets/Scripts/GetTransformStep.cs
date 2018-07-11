@@ -33,8 +33,7 @@ namespace Valve.VR.InteractionSystem
         }
 
         void Update()
-        {
-            
+        {            
             rotationMatrix = Matrix4x4.Rotate(this.gameObject.transform.rotation);
             translationMatrix = Matrix4x4.Translate(this.gameObject.transform.position);
 
@@ -45,11 +44,6 @@ namespace Valve.VR.InteractionSystem
             rotationMatrixStep = Matrix4x4.Inverse(rotationMatrixPrev);
             rotationMatrixStep = rotationMatrix * rotationMatrixStep;
             rotationStep = Utils.GetRotationn(rotationMatrixStep);
-
-
-            //Start to implement bimanual scale
-            var thishand = this.gameObject.GetComponent<Hand>();
-            
 
             translationMatrixPrev = translationMatrix;
             rotationMatrixPrev = rotationMatrix;
