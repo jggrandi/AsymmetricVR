@@ -8,7 +8,9 @@ using Valve.VR.InteractionSystem;
 
 public class HandleObjectSelection : MonoBehaviour
 {
-
+    public GameObject imaginaryPrefab;
+    private GameObject imaginary;
+    private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     // Use this for initialization
     void Start()
     {
@@ -20,16 +22,13 @@ public class HandleObjectSelection : MonoBehaviour
     {
 
     }
-    private void OnHandHoverBegin(Hand hand)
-    {
-        //hand.HoverLock(null);
-        //this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
-    }
 
-    private void OnHandHoverEnd(Hand hand)
+    //-------------------------------------------------
+    void SetImaginaryTransformation()
     {
-        // hand.HoverUnlock(null);
-        //this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
+        //Sets the imaginary object position to the same as the visual representation
+        imaginary.transform.position = this.transform.position;
+        imaginary.transform.rotation = this.transform.rotation;
     }
 
     private void HandHoverUpdate(Hand hand)
@@ -38,16 +37,17 @@ public class HandleObjectSelection : MonoBehaviour
         {
             if (hand.currentAttachedObject != gameObject)
             {
-                //hand.HoverLock(null);
-                //hand.HoverLock(gameObject.GetComponent<Interactable>());
+                imaginary = Instantiate(imaginaryPrefab);
+                SetImaginaryTransformation();
+
+                hand.HoverLock(null);
                 ObjectManager.SetSelected(gameObject, hand);
 
             }
         }
         if (hand.GetStandardInteractionButtonUp())
         {
-            //hand.HoverUnlock(null);
-            //hand.HoverUnlock(gameObject.GetComponent<Interactable>());
+            hand.HoverUnlock(null);
             ObjectManager.DetachObjectFromHand(gameObject, hand);
         }
     }

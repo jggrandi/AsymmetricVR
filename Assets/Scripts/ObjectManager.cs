@@ -94,6 +94,21 @@ public class ObjectManager : MonoBehaviour
             RemoveObjFromSelectedList(found);
     }
 
+    public static List<ObjSelected> GetAllSelected()
+    {
+        if (manager.objsSelected != null)
+            return manager.objsSelected;
+        return null;
+    }
+
+    public static ObjSelected GetSelected(int index)
+    {
+        if(index < manager.objsSelected.Count && index >= 0 )
+            return manager.objsSelected[index];
+        return null;
+    }
+
+
 
     // Use this for initialization
     void Start()

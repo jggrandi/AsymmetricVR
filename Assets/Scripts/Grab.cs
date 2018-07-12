@@ -92,7 +92,7 @@ namespace Valve.VR.InteractionSystem
                     Rb.isKinematic = true;
 
                     var handleTransform = imaginary.GetComponent<HandleLocalTransformations>();
-                    //Attaches a simple spring joint from the god-objce to the logic representation
+                    //Tie this object with the imaginary
                     handleTransform.logic = this.gameObject;
 
                     this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
