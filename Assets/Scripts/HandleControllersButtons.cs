@@ -23,19 +23,6 @@ public class HandleControllersButtons : MonoBehaviour
 
     }
 
-    //public bool GetBothControllersGraspPressed()
-    //{
-    //    leftHand = player.leftHand;
-    //    rightHand = player.rightHand;
-    //    if (leftHand == null || rightHand == null) return false;
-    //    if (leftHand.controller.GetPress(EVRButtonId.k_EButton_Grip) && rightHand.controller.GetPress(EVRButtonId.k_EButton_Grip))
-    //        return true;
-    //    return false;
-    //}
-
-    //public bool 
-
-
     public bool GetADown()
     {
         if (hand.controller.GetPressDown(EVRButtonId.k_EButton_A))

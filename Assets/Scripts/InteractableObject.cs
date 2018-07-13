@@ -6,7 +6,7 @@ using Valve.VR.InteractionSystem;
 
 [RequireComponent(typeof(Interactable))]
 
-public class HandleObjectSelection : MonoBehaviour
+public class InteractableObject : MonoBehaviour
 {
     public GameObject imaginaryPrefab;
     private GameObject imaginary;
@@ -37,19 +37,19 @@ public class HandleObjectSelection : MonoBehaviour
         {
             if (hand.currentAttachedObject != gameObject)
             {
-                imaginary = Instantiate(imaginaryPrefab);
-                SetImaginaryTransformation();
+                //imaginary = Instantiate(imaginaryPrefab);
+                //SetImaginaryTransformation();
 
                 hand.HoverLock(null);
                 ObjectManager.SetSelected(gameObject, hand);
 
             }
         }
-        if (hand.GetStandardInteractionButtonUp())
-        {
-            hand.HoverUnlock(null);
-            ObjectManager.DetachObjectFromHand(gameObject, hand);
-        }
+        //if (hand.GetStandardInteractionButtonUp())
+        //{
+        //    hand.HoverUnlock(null);
+        //    ObjectManager.DetachObjectFromHand(gameObject, hand);
+        //}
     }
 }
 

@@ -673,7 +673,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 0}
+  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
+    type: 2}
 --- !u!1 &969997211
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,7 +904,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 0}
+  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
+    type: 2}
 --- !u!1 &1154929215
 GameObject:
   m_ObjectHideFlags: 0
@@ -1194,7 +1196,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 0}
+  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
+    type: 2}
 --- !u!1 &1565833039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1330,6 +1333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1623813267}
   - component: {fileID: 1623813266}
+  - component: {fileID: 1623813268}
   m_Layer: 0
   m_Name: MainHandler
   m_TagString: Untagged
@@ -1363,6 +1367,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1623813268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1623813265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 308305aab7970e54b900022e2b06fea0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handsGrabbingQnt: 0
 --- !u!1001 &1911802529
 Prefab:
   m_ObjectHideFlags: 0
@@ -1577,19 +1593,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11450312, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
       propertyPath: showDebugText
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11450312, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
       propertyPath: spewDebugText
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11401046, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
       propertyPath: showDebugText
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11401046, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
       propertyPath: spewDebugText
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114000011983135080, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
@@ -1793,4 +1809,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d323e07f7f1442b907863a522ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imaginaryPrefab: {fileID: 0}
+  imaginaryPrefab: {fileID: 1234627331068512, guid: 28724f1d90423a7498fa770b64f3e5bd,
+    type: 2}
