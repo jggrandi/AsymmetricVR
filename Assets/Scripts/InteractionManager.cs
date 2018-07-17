@@ -7,8 +7,10 @@ public class InteractionManager : MonoBehaviour {
 
     public int handsGrabbingQnt = 0; // 0, 1 and 2 hands pressing the interaction button
     public GameObject interactableObjs = null;
-	// Use this for initialization
-	void Start () {
+
+    Vector3[] oldPointsForRotation = new Vector3[2];
+    // Use this for initialization
+    void Start () {
         interactableObjs = GameObject.Find("InteractableObjects");
 
     }
@@ -31,7 +33,12 @@ public class InteractionManager : MonoBehaviour {
             //calculate the average and stuff
             //apply transformation to the object
         }
-        if (interactingHands.Count <= 0) return; // Dont need to apply transformations
+        if (interactingHands.Count == 1){
+            oldPointsForRotation[0] = Vector3.zero; // reset grab for bimanual rotation
+            oldPointsForRotation[1] = Vector3.zero; // reset grab for bimanual rotation
+        }
+        if(interactingHands.Count <= 0)
+            return; // Dont need to apply transformations
 
         ApplyTranslation(selected, interactingHands);
         ApplyRotation(selected, interactingHands);
@@ -68,7 +75,7 @@ public class InteractionManager : MonoBehaviour {
 
     }
 
-    Vector3[] oldPointsForRotation = new Vector3[2];
+   
 
     void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
@@ -86,22 +93,23 @@ public class InteractionManager : MonoBehaviour {
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
-            //Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized);
+            Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized);
 
             averagePoint = objSelected.gameobject.transform.parent.InverseTransformPoint(averagePoint);
-            cross = objSelected.gameobject.transform.parent.InverseTransformVector(cross.normalized);
+            //cross = objSelected.gameobject.transform.parent.InverseTransformVector(cross.normalized);
 
             //objSelected.gameobject.transform.RotateAround(averagePoint, cross, amountToRot);
 
 
 
+            objSelected.gameobject.transform.rotation = q * objSelected.gameobject.transform.rotation;
 
-
-            objSelected.gameobject.transform.RotateAround(cross.normalized, amountToRot*0.01f) ;
+            //objSelected.gameobject.transform.Rotate(cross.normalized, amountToRot, Space.World) ;
 
             oldPointsForRotation[0] = interactingHands[0].transform.position;
             oldPointsForRotation[1] = interactingHands[1].transform.position;
         }
+
     }
 
     void ApplyScale(ObjSelected objSelected, List<Hand> interactingHands)
