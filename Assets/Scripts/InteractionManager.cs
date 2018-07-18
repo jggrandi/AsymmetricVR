@@ -6,14 +6,15 @@ using Valve.VR.InteractionSystem;
 public class InteractionManager : MonoBehaviour {
 
     public int handsGrabbingQnt = 0; // 0, 1 and 2 hands pressing the interaction button
-    public GameObject interactableObjs = null;
 
     Vector3[] oldPointsForRotation = new Vector3[2];
     float rotXOld = 0f;
     float oldScaleMag = 0f;
+
+    bool firstPass = true;
     // Use this for initialization
     void Start () {
-        interactableObjs = GameObject.Find("InteractableObjects");
+
 
     }
 	
@@ -35,19 +36,23 @@ public class InteractionManager : MonoBehaviour {
             //calculate the average and stuff
             //apply transformation to the object
         }
-        if (interactingHands.Count == 1){
-            oldPointsForRotation[0] = Vector3.zero; // reset grab for bimanual rotation
-            oldPointsForRotation[1] = Vector3.zero; // reset grab for bimanual rotation
-            //rotXOld = selected.gameobject.transform.rotation.x;
-            //oldScaleMag = selected.gameobject.transform.localScale.x;
+        if (interactingHands.Count == 1)
+        {
+            firstPass = true;
         }
-        if(interactingHands.Count <= 0)
+        else if (interactingHands.Count <= 0)
+        {
+            firstPass = true;
             return; // Dont need to apply transformations
+        }
 
+
+        Debug.Log(firstPass);
         ApplyTranslation(selected, interactingHands);
         ApplyRotation(selected, interactingHands);
         ApplyScale(selected, interactingHands);
-
+        if (interactingHands.Count == 2 && firstPass)
+            firstPass = false;
 
     }
 
@@ -81,18 +86,24 @@ public class InteractionManager : MonoBehaviour {
 
         else if (interactingHands.Count == 2)
         {
-            //var averagePoint = AveragePoint(interactingHands);
+
+            float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x;
+            if (firstPass)
+            {
+                oldPointsForRotation[0] = interactingHands[0].transform.position;
+                oldPointsForRotation[1] = interactingHands[1].transform.position;
+                rotXOld = rotX;
+            }
+
 
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
             Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized);
-            //objSelected.gameobject.transform.rotation = q * objSelected.gameobject.transform.rotation;
-            float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x;
+
             var difRotX = rotX - rotXOld;
-            objSelected.gameobject.transform.rotation = q  * objSelected.gameobject.transform.rotation;
-            //Debug.Log(difRotX);
+            objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation;
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
@@ -117,6 +128,10 @@ public class InteractionManager : MonoBehaviour {
 
             avgScaleMag /= interactingHands.Count;
 
+            if (firstPass)
+                oldScaleMag = avgScaleMag;    
+            
+
             var scaleStep = avgScaleMag - oldScaleMag;
             objSelected.gameobject.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
 
@@ -125,8 +140,4 @@ public class InteractionManager : MonoBehaviour {
         }
     }
 
-    public Transform GetLocalTransform()
-    {
-        return interactableObjs.transform.parent;
-    }
 }
