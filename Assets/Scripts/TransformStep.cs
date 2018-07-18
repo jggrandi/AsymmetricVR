@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 public class TransformStep : MonoBehaviour
 {
@@ -11,9 +10,9 @@ public class TransformStep : MonoBehaviour
     private Matrix4x4 translationMatrix;
     private Matrix4x4 translationMatrixStep;
     private Matrix4x4 translationMatrixPrev;
-    private Matrix4x4 scaleMatrix;
-    private Matrix4x4 scaleMatrixStep;
-    private Matrix4x4 scaleMatrixPrev;
+    private float scaling;
+    private float scalingStep;
+    private float scalingPrev;
 
     public Vector3 positionStep;
     public Quaternion rotationStep;
@@ -27,18 +26,16 @@ public class TransformStep : MonoBehaviour
         translationMatrix = Matrix4x4.identity;
         translationMatrixStep = Matrix4x4.identity;
         translationMatrixPrev = Matrix4x4.identity;
-        scaleMatrix = Matrix4x4.identity;
-        scaleMatrixStep = Matrix4x4.identity;
-        scaleMatrixPrev = Matrix4x4.identity;
-
-
+        scaling = 0f;
+        scalingStep = 0f;
+        scalingPrev = 0f;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         rotationMatrix = Matrix4x4.Rotate(this.gameObject.transform.rotation);
         translationMatrix = Matrix4x4.Translate(this.gameObject.transform.position);
-        scaleMatrix = Matrix4x4.Translate(this.gameObject.transform.localScale);
+        scaling = this.gameObject.transform.localScale.x;
 
         translationMatrixStep = Matrix4x4.Inverse(translationMatrixPrev);
         translationMatrixStep = translationMatrix * translationMatrixStep;
@@ -46,16 +43,15 @@ public class TransformStep : MonoBehaviour
         rotationMatrixStep = Matrix4x4.Inverse(rotationMatrixPrev);
         rotationMatrixStep = rotationMatrix * rotationMatrixStep;
 
-        scaleMatrixStep = Matrix4x4.Inverse(scaleMatrixPrev);
-        scaleMatrixStep = scaleMatrix * scaleMatrixStep;
+        scalingStep = scaling - scalingPrev;
 
         positionStep = Utils.GetPositionn(translationMatrixStep);
         rotationStep = Utils.GetRotationn(rotationMatrixStep);
-        scaleStep = Utils.GetScalee(scaleMatrixStep);
+        scaleStep = new Vector3(scalingStep, scalingStep, scalingStep);
 
         translationMatrixPrev = translationMatrix;
         rotationMatrixPrev = rotationMatrix;
-        scaleMatrixPrev = scaleMatrix;
+        scalingPrev = scaling;
     }
 
     void DebugMatrix(Matrix4x4 mat)

@@ -91,10 +91,12 @@ namespace Valve.VR.InteractionSystem
                     Rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                     Rb.isKinematic = true;
 
+                    /*** HandleLocalTransform does not  exist anymore
                     var handleTransform = imaginary.GetComponent<HandleLocalTransformations>();
+                    
                     //Tie this object with the imaginary
                     handleTransform.logic = this.gameObject;
-
+                    */
                     this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
 
                     // Call this to continue receiving HandHoverUpdate messages,

@@ -5,8 +5,6 @@ using Valve.VR.InteractionSystem;
 
 public class InteractionManager : MonoBehaviour {
 
-    public int handsGrabbingQnt = 0; // 0, 1 and 2 hands pressing the interaction button
-
     Vector3[] oldPointsForRotation = new Vector3[2];
     float rotXOld = 0f;
     float oldScaleMag = 0f;
@@ -19,22 +17,15 @@ public class InteractionManager : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
 
-        handsGrabbingQnt = 0;
         List<Hand> interactingHands = new List<Hand>();
         foreach (Hand h in selected.hands) // get the hands that are manipulating the object
         {
             if (h.GetComponent<Hand>().GetStandardInteractionButton())
-            {
                 interactingHands.Add(h);
-                handsGrabbingQnt++;
-            }
-            
-            //calculate the average and stuff
-            //apply transformation to the object
         }
         if (interactingHands.Count == 1)
         {
@@ -47,10 +38,10 @@ public class InteractionManager : MonoBehaviour {
         }
 
 
-        Debug.Log(firstPass);
         ApplyTranslation(selected, interactingHands);
         ApplyRotation(selected, interactingHands);
         ApplyScale(selected, interactingHands);
+
         if (interactingHands.Count == 2 && firstPass)
             firstPass = false;
 
@@ -74,9 +65,6 @@ public class InteractionManager : MonoBehaviour {
 
     }
 
-
-  
-
     void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         if(interactingHands.Count == 1)
@@ -84,11 +72,11 @@ public class InteractionManager : MonoBehaviour {
             objSelected.gameobject.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * objSelected.gameobject.transform.rotation;
         }
 
-        else if (interactingHands.Count == 2)
+        else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
-            float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x;
-            if (firstPass)
+            float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
+            if (firstPass) //if it is the fist pass grabbing with both hands, start the old variables
             {
                 oldPointsForRotation[0] = interactingHands[0].transform.position;
                 oldPointsForRotation[1] = interactingHands[1].transform.position;
@@ -100,10 +88,10 @@ public class InteractionManager : MonoBehaviour {
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
-            Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized);
+            Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
 
             var difRotX = rotX - rotXOld;
-            objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation;
+            objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation; // add all rotations to the object
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
@@ -126,9 +114,9 @@ public class InteractionManager : MonoBehaviour {
                         avgScaleMag += (h1.transform.position - h2.transform.position).magnitude;
 
 
-            avgScaleMag /= interactingHands.Count;
+            avgScaleMag /= interactingHands.Count; // to scale the object in between both hands
 
-            if (firstPass)
+            if (firstPass) // start the old variables if it is the first pass. to avoid discontinuous transformations
                 oldScaleMag = avgScaleMag;    
             
 
