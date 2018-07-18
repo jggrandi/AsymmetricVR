@@ -10,14 +10,19 @@ public class InteractionManager : MonoBehaviour {
     float oldScaleMag = 0f;
 
     bool firstPass = true;
+
+    public GameObject imaginary;
+
     // Use this for initialization
     void Start () {
-
+        imaginary = GameObject.Find("Imaginary");
 
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+        if (imaginary == null) return;
+
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
 
@@ -61,7 +66,8 @@ public class InteractionManager : MonoBehaviour {
     void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         var averagePoint = AveragePoint(interactingHands);
-        objSelected.gameobject.transform.position += averagePoint;
+        //objSelected.gameobject.transform.position += averagePoint;
+        imaginary.transform.position += averagePoint;
 
     }
 
@@ -69,7 +75,8 @@ public class InteractionManager : MonoBehaviour {
     {
         if(interactingHands.Count == 1)
         {
-            objSelected.gameobject.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * objSelected.gameobject.transform.rotation;
+            //objSelected.gameobject.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * objSelected.gameobject.transform.rotation;
+            imaginary.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * imaginary.transform.rotation;
         }
 
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
@@ -91,7 +98,8 @@ public class InteractionManager : MonoBehaviour {
             Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
 
             var difRotX = rotX - rotXOld;
-            objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation; // add all rotations to the object
+            //objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation; // add all rotations to the object
+            imaginary.transform.rotation = q * Quaternion.Euler(difRotX, 0f, 0f) * imaginary.transform.rotation; // add all rotations to the object
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
@@ -121,7 +129,8 @@ public class InteractionManager : MonoBehaviour {
             
 
             var scaleStep = avgScaleMag - oldScaleMag;
-            objSelected.gameobject.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
+            //objSelected.gameobject.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
+            imaginary.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
 
             oldScaleMag = avgScaleMag;
             //objSelected.gameobject.transform.localScale = new Vector3(averageDistance, averageDistance, averageDistance);

@@ -25,22 +25,26 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     }
 
+    public GameObject imaginary;
+
     // Use this for initialization
     void Start()
     {
-
+        imaginary = GameObject.Find("Imaginary");
 
     }
 
     public override void OnStartClient()
     {
+
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        
         if (!isLocalPlayer) return;
-
+        if (imaginary == null) return;
         if (ObjectManager.GetSelected() == null) return; // if localplayer is not selecting an object
         var objSelected = ObjectManager.GetSelected();
 
@@ -53,10 +57,17 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
         if (interactingHands.Count <= 0) return; // Dont need to apply transformations
 
-        var objSelectedTransformStep = objSelected.gameobject.GetComponent<TransformStep>();
+        //var objSelectedTransformStep = objSelected.gameobject.GetComponent<TransformStep>();
+        //var posStep = objSelectedTransformStep.positionStep;
+        //var rotStep = objSelectedTransformStep.rotationStep;
+        //var scaleStep = objSelectedTransformStep.scaleStep;
+
+        var objSelectedTransformStep = imaginary.GetComponent<TransformStep>();
         var posStep = objSelectedTransformStep.positionStep;
         var rotStep = objSelectedTransformStep.rotationStep;
         var scaleStep = objSelectedTransformStep.scaleStep;
+
+
         CmdSyncTransform(objSelected.index, posStep, rotStep,scaleStep);
         
     }
