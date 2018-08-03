@@ -20,14 +20,11 @@ public class InteractionManager : NetworkBehaviour {
     }
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
         if (!isLocalPlayer) return;
-
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
-
-
 
         List<Hand> interactingHands = new List<Hand>();
         foreach (Hand h in selected.hands) // get the hands that are manipulating the object
@@ -44,7 +41,6 @@ public class InteractionManager : NetworkBehaviour {
             firstPass = true;
             return; // Dont need to apply transformations
         }
-
 
         ApplyTranslation(selected, interactingHands);
         ApplyRotation(selected, interactingHands);
@@ -69,21 +65,14 @@ public class InteractionManager : NetworkBehaviour {
     void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         var averagePoint = AveragePoint(interactingHands);
-        this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint);
-        //objSelected.gameobject.transform.position += averagePoint;
-        //imaginary.transform.position += averagePoint;
-
+        this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint); // add position changes to the object
     }
 
     void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
-        if(interactingHands.Count == 1)
-        {
-            //objSelected.gameobject.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * objSelected.gameobject.transform.rotation;
-            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep);
-            //imaginary.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * imaginary.transform.rotation;
-        }
-
+        if(interactingHands.Count == 1) // grabbing with one hand
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep); // add single hand rotation
+            
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
@@ -95,7 +84,6 @@ public class InteractionManager : NetworkBehaviour {
                 rotXOld = rotX;
             }
 
-
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
             Vector3 cross = Vector3.Cross(direction1, direction2);
@@ -103,10 +91,8 @@ public class InteractionManager : NetworkBehaviour {
             Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
 
             var difRotX = rotX - rotXOld;
-            //objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation; // add all rotations to the object
 
-            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, q * Quaternion.Euler(difRotX, 0f, 0f));
-            //imaginary.transform.rotation = q * Quaternion.Euler(difRotX, 0f, 0f) * imaginary.transform.rotation; // add all rotations to the object
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, q * Quaternion.Euler(difRotX, 0f, 0f)); // add all rotations to the object
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
@@ -152,15 +138,9 @@ public class InteractionManager : NetworkBehaviour {
             var scaleStep = avgScaleMag - oldScaleMag;
 
             if (BothGripPressed(interactingHands))// apply scale only if the grip button of both controllers are pressed.
-            {
-                this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(objSelected.index, scaleStep);
-                //var finalScale = imaginary.transform.localScale.x + scaleStep;
-                //finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
-                //imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
-            }
+                this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(objSelected.index, scaleStep); // add scale to the object
+            
             oldScaleMag = avgScaleMag;
-            //objSelected.gameobject.transform.localScale = new Vector3(averageDistance, averageDistance, averageDistance);
-
         }
     }
 
