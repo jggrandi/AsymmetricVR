@@ -67,6 +67,19 @@ public class HandleControllersButtons : MonoBehaviour
         return toogleAppActive;
     }
 
+    public bool GetGrip()
+    {
+        if (hand.controller.GetPress(EVRButtonId.k_EButton_Grip))
+            return true;
+        return false;
+    }
+
+    public bool GetGripDown()
+    {
+        if (hand.controller.GetPressDown(EVRButtonId.k_EButton_Grip))
+            return true;
+        return false;
+    }
 
 
 }

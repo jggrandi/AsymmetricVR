@@ -26,6 +26,8 @@ public class InteractionManager : MonoBehaviour {
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
 
+
+
         List<Hand> interactingHands = new List<Hand>();
         foreach (Hand h in selected.hands) // get the hands that are manipulating the object
         {
@@ -111,30 +113,58 @@ public class InteractionManager : MonoBehaviour {
     void ApplyScale(ObjSelected objSelected, List<Hand> interactingHands)
     {
 
-        if (interactingHands.Count == 1) return; //here we will add scale with single hand
+        //if (interactingHands.Count == 1)
+        //{
+        //    Hand h1 = interactingHands[0];
+        //    if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGripDown())
+        //    {
+        //        if (firstPass) // start the old variables if it is the first pass. to avoid discontinuous transformations
+        //            oldScaleMag = h1.transform.position.magnitude;
+        //        var scaleStep = h1.transform.position.magnitude - oldScaleMag;
+        //        var finalScale = imaginary.transform.localScale.x + scaleStep;
+        //        finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+        //        imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
+
+        //        oldScaleMag = h1.transform.position.magnitude;
+        //    }
+
+        //}
 
         if (interactingHands.Count == 2)
         {
-            float avgScaleMag = 0f;
-            foreach (Hand h1 in interactingHands)
-                foreach (Hand h2 in interactingHands)
-                    if (h1 != h2)
-                        avgScaleMag += (h1.transform.position - h2.transform.position).magnitude;
 
+            float avgScaleMag = 0f;
+            foreach (Hand hi in interactingHands)
+                foreach (Hand hj in interactingHands)
+                    if (hi != hj)
+                        avgScaleMag += (hi.transform.position - hj.transform.position).magnitude;
 
             avgScaleMag /= interactingHands.Count; // to scale the object in between both hands
 
             if (firstPass) // start the old variables if it is the first pass. to avoid discontinuous transformations
-                oldScaleMag = avgScaleMag;    
-            
+                oldScaleMag = avgScaleMag;
 
             var scaleStep = avgScaleMag - oldScaleMag;
-            //objSelected.gameobject.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
-            imaginary.transform.localScale += new Vector3(scaleStep, scaleStep, scaleStep);
 
+            if (BothGripPressed(interactingHands))// apply scale only if the grip button of both controllers are pressed.
+            {            
+                var finalScale = imaginary.transform.localScale.x + scaleStep;
+                finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+                imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
+            }
             oldScaleMag = avgScaleMag;
             //objSelected.gameobject.transform.localScale = new Vector3(averageDistance, averageDistance, averageDistance);
+
         }
     }
 
+
+    private bool BothGripPressed(List<Hand> interactingHands)
+    {
+        var h1 = interactingHands[0];
+        var h2 = interactingHands[1];
+        if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGrip() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGrip()) 
+            return true;
+        return false;
+    }
 }

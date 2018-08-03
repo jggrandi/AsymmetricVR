@@ -13,13 +13,7 @@ public class InteractableObject : MonoBehaviour
     public GameObject imaginary;
 
     //-------------------------------------------------
-    void SetImaginaryTransformation()
-    {
-        //Sets the imaginary object position to the same as the visual representation
-        imaginary.transform.position = this.transform.position;
-        imaginary.transform.rotation = this.transform.rotation;
-        imaginary.transform.localScale = this.transform.localScale;
-    }
+
 
     // Use this for initialization
     void Start()
@@ -33,6 +27,13 @@ public class InteractableObject : MonoBehaviour
 
     }
     
+    //private void SetImaginaryTransform()
+    //{
+    //    imaginary.transform.position = this.gameObject.transform.position;
+    //    imaginary.transform.rotation = this.gameObject.transform.rotation;
+    //    imaginary.transform.localScale = this.gameObject.transform.localScale;
+    //}
+
     private void HandHoverUpdate(Hand hand)
     {
         if (hand.GetStandardInteractionButtonDown())
@@ -40,9 +41,9 @@ public class InteractableObject : MonoBehaviour
             if (hand.currentAttachedObject != gameObject)
             {
                 //Instantiate and imaginary god-object
-                SetImaginaryTransformation();
-                imaginary.GetComponent<Imaginary>().objReference = this.gameObject;
 
+                imaginary.GetComponent<Imaginary>().objReference = this.gameObject;
+                //SetImaginaryTransform();
                 hand.HoverLock(null);
                 hand.otherHand.HoverLock(null);
                 ObjectManager.SetSelected(gameObject, hand);
