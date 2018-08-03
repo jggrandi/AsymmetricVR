@@ -10,7 +10,7 @@ public class InteractableObject : MonoBehaviour
 {
     //public GameObject imaginaryPrefab;
 
-    public GameObject imaginary;
+    
 
     //-------------------------------------------------
 
@@ -42,7 +42,7 @@ public class InteractableObject : MonoBehaviour
             {
                 //Instantiate and imaginary god-object
 
-                imaginary.GetComponent<Imaginary>().objReference = this.gameObject;
+                //imaginary.GetComponent<Imaginary>().objReference = this.gameObject;
                 //SetImaginaryTransform();
                 hand.HoverLock(null);
                 hand.otherHand.HoverLock(null);

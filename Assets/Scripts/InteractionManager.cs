@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using Valve.VR.InteractionSystem;
 
-public class InteractionManager : MonoBehaviour {
+public class InteractionManager : NetworkBehaviour {
 
     Vector3[] oldPointsForRotation = new Vector3[2];
     float rotXOld = 0f;
@@ -11,17 +12,17 @@ public class InteractionManager : MonoBehaviour {
 
     bool firstPass = true;
 
-    public GameObject imaginary;
-
     // Use this for initialization
     void Start () {
-        imaginary = GameObject.Find("Imaginary");
+        if (!isLocalPlayer) return;
+
 
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        if (imaginary == null) return;
+        if (!isLocalPlayer) return;
+
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
@@ -68,8 +69,9 @@ public class InteractionManager : MonoBehaviour {
     void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         var averagePoint = AveragePoint(interactingHands);
+        this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint);
         //objSelected.gameobject.transform.position += averagePoint;
-        imaginary.transform.position += averagePoint;
+        //imaginary.transform.position += averagePoint;
 
     }
 
@@ -78,7 +80,8 @@ public class InteractionManager : MonoBehaviour {
         if(interactingHands.Count == 1)
         {
             //objSelected.gameobject.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * objSelected.gameobject.transform.rotation;
-            imaginary.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * imaginary.transform.rotation;
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep);
+            //imaginary.transform.rotation = interactingHands[0].GetComponent<TransformStep>().rotationStep * imaginary.transform.rotation;
         }
 
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
@@ -101,7 +104,9 @@ public class InteractionManager : MonoBehaviour {
 
             var difRotX = rotX - rotXOld;
             //objSelected.gameobject.transform.rotation = q  * Quaternion.Euler(difRotX,0f,0f) * objSelected.gameobject.transform.rotation; // add all rotations to the object
-            imaginary.transform.rotation = q * Quaternion.Euler(difRotX, 0f, 0f) * imaginary.transform.rotation; // add all rotations to the object
+
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, q * Quaternion.Euler(difRotX, 0f, 0f));
+            //imaginary.transform.rotation = q * Quaternion.Euler(difRotX, 0f, 0f) * imaginary.transform.rotation; // add all rotations to the object
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
@@ -147,10 +152,11 @@ public class InteractionManager : MonoBehaviour {
             var scaleStep = avgScaleMag - oldScaleMag;
 
             if (BothGripPressed(interactingHands))// apply scale only if the grip button of both controllers are pressed.
-            {            
-                var finalScale = imaginary.transform.localScale.x + scaleStep;
-                finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
-                imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
+            {
+                this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(objSelected.index, scaleStep);
+                //var finalScale = imaginary.transform.localScale.x + scaleStep;
+                //finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+                //imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
             }
             oldScaleMag = avgScaleMag;
             //objSelected.gameobject.transform.localScale = new Vector3(averageDistance, averageDistance, averageDistance);

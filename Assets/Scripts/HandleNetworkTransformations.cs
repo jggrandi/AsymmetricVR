@@ -6,9 +6,7 @@ using Valve.VR.InteractionSystem;
 
 public class HandleNetworkTransformations : NetworkBehaviour
 {
-    public GameObject imaginary;
     public GameObject interactableObjects;
-
 
     [Command]
     void CmdSyncAll()
@@ -59,13 +57,59 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     }
 
+    public void Translate(int index, Vector3 translatestep)
+    {
+        var g = ObjectManager.Get(index);
+        Vector3 prevLocalPos = g.transform.localPosition;
+        g.transform.position += translatestep;
+        Vector3 localPos = g.transform.localPosition;
+        g.transform.position -= translatestep;
+        CmdTranslate(index, localPos - prevLocalPos);
+    }
+
+    [Command]
+    void CmdTranslate(int index, Vector3 translatestep)
+    {
+        var g = ObjectManager.Get(index);
+        g.transform.localPosition += translatestep;
+        SyncObj(index);
+    }
+
+    public void Rotate(int index, Quaternion rotationstep)
+    {
+        CmdRotate(index, rotationstep);
+    }
+
+    [Command]
+    void CmdRotate(int index, Quaternion rotationstep)
+    {
+        var g = ObjectManager.Get(index);
+        g.transform.rotation = rotationstep * g.transform.rotation;
+        SyncObj(index);
+    }
+
+    public void Scale(int index, float scalestep)
+    {
+        CmdScale(index, scalestep);
+    }
+
+    [Command]
+    void CmdScale(int index, float scalestep)
+    {
+        var g = ObjectManager.Get(index);
+        var finalScale = g.transform.localScale.x + scalestep;
+        
+        finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+        g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
+        SyncObj(index);
+
+    }
 
 
     // Use this for initialization
     void Start()
     {
-        imaginary = GameObject.Find("Imaginary");
-
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
     }
 
     public override void OnStartLocalPlayer()
@@ -74,37 +118,5 @@ public class HandleNetworkTransformations : NetworkBehaviour
         CmdSyncAll(); // sync objects prosition when connected.
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        
-        if (!isLocalPlayer) return;
-        if (imaginary == null) return;
-        if (ObjectManager.GetSelected() == null) return; // if localplayer is not selecting an object
-        var objSelected = ObjectManager.GetSelected();
-
-        List<Hand> interactingHands = new List<Hand>();
-        foreach (Hand h in objSelected.hands) // get the hands that are manipulating the object
-        {
-            if (h.GetComponent<Hand>().GetStandardInteractionButton())
-                interactingHands.Add(h);
-        }
-
-        if (interactingHands.Count <= 0) return; // Dont need to apply transformations
-
-        //var objSelectedTransformStep = objSelected.gameobject.GetComponent<TransformStep>();
-        //var posStep = objSelectedTransformStep.positionStep;
-        //var rotStep = objSelectedTransformStep.rotationStep;
-        //var scaleStep = objSelectedTransformStep.scaleStep;
-
-        var objSelectedTransformStep = imaginary.GetComponent<TransformStep>();
-        var posStep = objSelectedTransformStep.positionStep;
-        var rotStep = objSelectedTransformStep.rotationStep;
-        var scaleStep = objSelectedTransformStep.scaleStep;
-
-
-        CmdSyncTransform(objSelected.index, posStep, rotStep,scaleStep);
-        
-    }
 
 }
