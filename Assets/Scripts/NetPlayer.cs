@@ -30,17 +30,18 @@ namespace Valve.VR.InteractionSystem
 
                 GetComponentInChildren<SteamVR_ControllerManager>().enabled = true;
                 GetComponentsInChildren<SteamVR_TrackedObject>(true).ToList().ForEach(x => x.enabled = true);
+                GetComponentsInChildren<SteamVR_TrackedController>(true).ToList().ForEach(x => x.enabled = true);
                 Head.GetComponentsInChildren<MeshRenderer>(true).ToList().ForEach(x => x.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly);
                 
                 Head.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
                 LeftController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
                 RightController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = false);
-                gameObject.name = "VRPawn (LocalPlayer)";
+                gameObject.name = "VRPlayer (Local)";
 
             }
             else
             {
-                gameObject.name = "VRPawn (RemotePlayer)";
+                gameObject.name = "VRPlayer (Remote)";
             }
             
         }

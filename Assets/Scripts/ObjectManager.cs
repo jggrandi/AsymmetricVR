@@ -16,7 +16,7 @@ public class ObjectManager : MonoBehaviour
 
     public List<GameObject> list;
     public static ObjectManager manager;
-    public ObjSelected objsSelected;
+    public ObjSelected objSelected;
     public GameObject allObjects;
 
     public static GameObject Get(int i)
@@ -39,19 +39,19 @@ public class ObjectManager : MonoBehaviour
         objS.hands.Add(h);
         if(h.otherHand != null)
             objS.hands.Add(h.otherHand); // add the other hand
-        manager.objsSelected = objS;
+        manager.objSelected = objS;
     }
 
     public static void SetSelected(GameObject obj, Hand h)
     {
-        if (manager.objsSelected == null) // if it is not selected, add to list
+        if (manager.objSelected == null) // if it is not selected, add to list
         {
             AddToSelected(obj, h); // add the object and the hand whitch is selecting it
         }
-        else if (GameObject.ReferenceEquals(obj, manager.objsSelected)) // it is already selected, we need to verify if the hand that is selecting is added to the object
+        else if (GameObject.ReferenceEquals(obj, manager.objSelected)) // it is already selected, we need to verify if the hand that is selecting is added to the object
         {
-            if (!manager.objsSelected.hands.Contains(h)) // if is not the same hand, add this hand to the obj
-                manager.objsSelected.hands.Add(h);
+            if (!manager.objSelected.hands.Contains(h)) // if is not the same hand, add this hand to the obj
+                manager.objSelected.hands.Add(h);
         }
     }
 
@@ -67,15 +67,15 @@ public class ObjectManager : MonoBehaviour
 
     public static void RemoveObjFromSelected(ObjSelected obj)
     {
-        if (GameObject.ReferenceEquals(manager.objsSelected, obj))
-            manager.objsSelected = null;
+        if (GameObject.ReferenceEquals(manager.objSelected, obj))
+            manager.objSelected = null;
 
     }
 
     public static ObjSelected GetSelected()
     {
-        if (manager.objsSelected != null)
-            return manager.objsSelected;
+        if (manager.objSelected != null)
+            return manager.objSelected;
         return null;
     }
 
@@ -163,7 +163,7 @@ public class ObjectManager : MonoBehaviour
             list.Add(allObjects.transform.GetChild(i).gameObject);
         }
         
-        objsSelected = null;
+        objSelected = null;
         manager = this;
     }
 
