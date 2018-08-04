@@ -27,39 +27,31 @@ public class ButtonSync : NetworkBehaviour {
         if (leftController != null)
         {
             leftInteractionButtonPressed = leftController.triggerPressed;
-            CmdUpdateLeftButtonPressed(leftInteractionButtonPressed);
+            CmdUpdateButtonPressed(leftInteractionButtonPressed, "left");
         }
 
         if (rightController != null)
         {
             rightInteractionButtonPressed = rightController.triggerPressed;
-            CmdUpdateRightButtonPressed(rightInteractionButtonPressed);
+            CmdUpdateButtonPressed(rightInteractionButtonPressed, "right");
         }
 
     }
 
     [Command]
-    void CmdUpdateLeftButtonPressed(bool toSyncButton)
+    void CmdUpdateButtonPressed(bool toSyncButton, string hand)
     {
-        RpcUpdateLeftButtonPressed(toSyncButton);
+        RpcUpdateButtonPressed(toSyncButton, hand);
     }
 
     [ClientRpc]
-    void RpcUpdateLeftButtonPressed(bool toSyncButton)
+    void RpcUpdateButtonPressed(bool toSyncButton, string hand)
     {
-        leftInteractionButtonPressed = toSyncButton;
-    }
+        if(string.Compare(hand,"left") == 0)
+            leftInteractionButtonPressed = toSyncButton;
+        else if (string.Compare(hand, "right") == 0)
+            rightInteractionButtonPressed = toSyncButton;
 
-    [Command]
-    void CmdUpdateRightButtonPressed(bool toSyncButton)
-    {
-        RpcUpdateRightButtonPressed(toSyncButton);
-    }
-
-    [ClientRpc]
-    void RpcUpdateRightButtonPressed(bool toSyncButton)
-    {
-        rightInteractionButtonPressed = toSyncButton;
     }
 
 }
