@@ -16,6 +16,10 @@ public class ButtonSync : NetworkBehaviour {
     public bool rApp = false;
     public bool rA = false;
     public bool rGrip = false;
+    public bool bimanual = false;
+    public bool lockedTrans = false;
+    public bool lockedRot = false;
+    public bool scale = false;
 
     Hand leftHand;
     Hand rightHand;
@@ -60,6 +64,8 @@ public class ButtonSync : NetworkBehaviour {
         if (!isLocalPlayer) return;
         if (leftHand == null) leftHand = player.leftHand;
         if (rightHand == null) rightHand = player.rightHand;
+        if (leftHand == null) return;
+        if (rightHand == null) return;
         if (refLeft == null) refLeft = leftHand.gameObject.GetComponent<HandleControllersButtons>();
         if (refRight == null) refRight = rightHand.gameObject.GetComponent<HandleControllersButtons>();
         
@@ -73,6 +79,24 @@ public class ButtonSync : NetworkBehaviour {
         rApp = refRight.GetAppPress();
         rGrip = refRight.GetGrip();
 
+        bimanual = false;
+        scale = false;
+        lockedTrans = false;
+        lockedRot = false;
+
+        if (lTrigger && rTrigger)
+        {
+            bimanual = true;
+            if (lGrip && rGrip)
+                scale = true;
+        }
+        if (lA || rA)
+            lockedRot = true;
+        if (lApp || rApp)
+            lockedTrans = true;
+
+
+
         CmdUpdateTriggerPressed(lTrigger,"left");
         CmdUpdateTriggerPressed(rTrigger, "right");
         CmdUpdateAPressed(lA, "left");
@@ -81,7 +105,21 @@ public class ButtonSync : NetworkBehaviour {
         CmdUpdateAppPressed(rApp, "right");
         CmdUpdateGripPressed(lGrip, "left");
         CmdUpdateGripPressed(rGrip, "right");
+        CmdUpdateActions(bimanual, scale, lockedRot, lockedTrans);
+    }
 
+    [Command]
+    void CmdUpdateActions(bool biman, bool scal, bool lockedrot, bool lockedtrans)
+    {
+        RpcUpdateActions(biman, scal, lockedrot, lockedtrans);
+    }
+    [ClientRpc]
+    void RpcUpdateActions(bool biman, bool scal, bool lockedrot, bool lockedtrans)
+    {
+        bimanual = biman;
+        scale = scal;
+        lockedTrans = lockedtrans;
+        lockedRot = lockedrot;
     }
 
     [Command]
