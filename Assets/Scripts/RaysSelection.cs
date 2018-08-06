@@ -50,13 +50,13 @@ public class RaysSelection : NetworkBehaviour {
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
                 color = blueColor;
 
-            if (buttonSync.leftInteractionButtonPressed)
+            if (buttonSync.lTrigger)
             {
                 if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
                     AddIcon(iconsLeftHand.transform.GetChild(0), leftController, selected);
                 AddLine(leftController.transform.position, ObjectManager.Get(selected).transform.position, color);
             }
-            if (buttonSync.rightInteractionButtonPressed)
+            if (buttonSync.rTrigger)
             {
                 if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
                     AddIcon(iconsRightHand.transform.GetChild(0), rightController, selected);

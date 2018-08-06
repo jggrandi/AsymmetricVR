@@ -55,22 +55,27 @@ public class InteractionManager : NetworkBehaviour {
     {
         Vector3 averagePoint = new Vector3();
         foreach (Hand h in interactingHands)
-        {
             averagePoint += h.gameObject.GetComponent<TransformStep>().positionStep;
-        }
         averagePoint /= interactingHands.Count;
         return averagePoint;
     }
 
     void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {
+        int locked = VerifyLockedDOF(interactingHands,"translation");
+        if (locked > 0) return; // any number greater than 0 means that this dof is locked
+        
         var averagePoint = AveragePoint(interactingHands);
         this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint); // add position changes to the object
+        
     }
 
     void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
-        if(interactingHands.Count == 1) // grabbing with one hand
+        int locked = VerifyLockedDOF(interactingHands, "rotation");
+        if (locked > 0) return; // any number greater than 0 means that this dof is locked
+
+        if (interactingHands.Count == 1) // grabbing with one hand
             this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep); // add single hand rotation
             
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
@@ -152,5 +157,28 @@ public class InteractionManager : NetworkBehaviour {
         if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGrip() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGrip()) 
             return true;
         return false;
+    }
+
+    private int VerifyLockedDOF(List<Hand> interactingHands, string dof)
+    {
+        int lockedTrans = 0;
+        if (string.Compare(dof, "translation") == 0)
+        {
+            foreach (Hand h in interactingHands)
+            {
+                if (h.GetComponent<HandleControllersButtons>().GetAppPress())
+                    lockedTrans++;
+            }
+        }
+        else if (string.Compare(dof, "rotation") == 0)
+        {
+            foreach (Hand h in interactingHands)
+            {
+                if (h.GetComponent<HandleControllersButtons>().GetAPress())
+                    lockedTrans++;
+            }
+        }
+
+        return lockedTrans;
     }
 }

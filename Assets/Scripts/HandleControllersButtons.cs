@@ -9,6 +9,8 @@ public class HandleControllersButtons : MonoBehaviour
     bool toogleAActive = true;
     bool toogleAppActive = true;
 
+    public GameObject playerObject;
+    public string handType;
     public static HandleControllersButtons handleButtons;
     Hand hand = null;
 
@@ -23,10 +25,35 @@ public class HandleControllersButtons : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+       // Debug.Log(hand.GuessCurrentHandType().ToString());
+    }
+
     public bool GetADown()
     {
         if (hand.controller.GetPressDown(EVRButtonId.k_EButton_A))
             return true;
+        return false;
+    }
+
+    public bool GetAPress()
+    {
+        if (hand.controller.GetPress(EVRButtonId.k_EButton_A))
+        {
+            if (string.Compare(handType, "left") == 0)
+                playerObject.GetComponent<ButtonSync>().lA = true;
+            else if (string.Compare(handType, "right") == 0)
+                playerObject.GetComponent<ButtonSync>().rA = true;
+
+            return true;
+        }
+        if (string.Compare(handType, "left") == 0)
+            playerObject.GetComponent<ButtonSync>().lA = false;
+        else if (string.Compare(handType, "right") == 0)
+            playerObject.GetComponent<ButtonSync>().rA = false;
+
+
         return false;
     }
 
@@ -52,6 +79,26 @@ public class HandleControllersButtons : MonoBehaviour
         return false;
     }
 
+    public bool GetAppPress()
+    {
+        if (hand.controller.GetPress(EVRButtonId.k_EButton_ApplicationMenu))
+        {
+            if (string.Compare(handType, "left") == 0)
+                playerObject.GetComponent<ButtonSync>().lApp = true;
+            else if (string.Compare(handType, "right") == 0)
+                playerObject.GetComponent<ButtonSync>().rApp = true;
+
+            return true;
+        }
+        if (string.Compare(handType, "left") == 0)
+            playerObject.GetComponent<ButtonSync>().lApp = false;
+        else if (string.Compare(handType, "right") == 0)
+            playerObject.GetComponent<ButtonSync>().rApp = false;
+
+
+        return false;
+    }
+
     public bool ToogleApp()
     {
         if (toogleAppActive)
@@ -70,13 +117,53 @@ public class HandleControllersButtons : MonoBehaviour
     public bool GetGrip()
     {
         if (hand.controller.GetPress(EVRButtonId.k_EButton_Grip))
+        {
+            if (string.Compare(handType, "left") == 0)
+                playerObject.GetComponent<ButtonSync>().lGrip = true;
+            else if (string.Compare(handType, "right") == 0)
+                playerObject.GetComponent<ButtonSync>().rGrip = true;
+
             return true;
+        }
+        if (string.Compare(handType, "left") == 0)
+            playerObject.GetComponent<ButtonSync>().lGrip = false;
+        else if (string.Compare(handType, "right") == 0)
+            playerObject.GetComponent<ButtonSync>().rGrip = false;
+
+
         return false;
     }
 
     public bool GetGripDown()
     {
         if (hand.controller.GetPressDown(EVRButtonId.k_EButton_Grip))
+            return true;
+        return false;
+    }
+
+    public bool GetTrigger()
+    {
+        if (hand.controller.GetPress(EVRButtonId.k_EButton_SteamVR_Trigger))
+        {
+            if (string.Compare(handType, "left") == 0)
+                playerObject.GetComponent<ButtonSync>().lTrigger = true;
+            else if (string.Compare(handType, "right") == 0)
+                playerObject.GetComponent<ButtonSync>().rTrigger = true;
+
+            return true;
+        }
+        if (string.Compare(handType, "left") == 0)
+            playerObject.GetComponent<ButtonSync>().lTrigger = false;
+        else if (string.Compare(handType, "right") == 0)
+            playerObject.GetComponent<ButtonSync>().rTrigger = false;
+
+
+        return false;
+    }
+
+    public bool GetTriggerDown()
+    {
+        if (hand.controller.GetPressDown(EVRButtonId.k_EButton_SteamVR_Trigger))
             return true;
         return false;
     }

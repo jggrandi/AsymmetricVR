@@ -18,7 +18,6 @@ namespace Valve.VR.InteractionSystem
         {
             if (isLocalPlayer)
             {
-                //Debug.Log("VAICARAI");
                 player = InteractionSystem.Player.instance;
 
                 if (player == null)
