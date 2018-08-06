@@ -53,13 +53,32 @@ public class RaysSelection : NetworkBehaviour {
             if (buttonSync.lTrigger)
             {
                 if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
-                    AddIcon(iconsLeftHand.transform.GetChild(0), leftController, selected);
+                {
+                    if(buttonSync.lockedRot)
+                        AddIcon(iconsLeftHand.transform.GetChild(1), leftController, selected, 0f);
+                    else if(buttonSync.lockedTrans)
+                        AddIcon(iconsLeftHand.transform.GetChild(2), leftController, selected, 0f);
+                    else
+                        AddIcon(iconsLeftHand.transform.GetChild(0), leftController, selected, 0f);
+                    if (buttonSync.scale) // scale icon is added apart
+                        AddIcon(iconsLeftHand.transform.GetChild(3), leftController, selected, 0.1f);
+
+                }
                 AddLine(leftController.transform.position, ObjectManager.Get(selected).transform.position, color);
             }
             if (buttonSync.rTrigger)
             {
                 if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
-                    AddIcon(iconsRightHand.transform.GetChild(0), rightController, selected);
+                {
+                    if (buttonSync.lockedRot)
+                        AddIcon(iconsRightHand.transform.GetChild(1), rightController, selected, 0f);
+                    else if (buttonSync.lockedTrans)
+                        AddIcon(iconsRightHand.transform.GetChild(2), rightController, selected, 0f);
+                    else
+                        AddIcon(iconsRightHand.transform.GetChild(0), rightController, selected, 0f);
+                    if(buttonSync.scale) // scale icon is added apart
+                        AddIcon(iconsRightHand.transform.GetChild(3), rightController, selected, 0.1f);
+                }
                 AddLine(rightController.transform.position, ObjectManager.Get(selected).transform.position, color);
             }
 
@@ -88,13 +107,13 @@ public class RaysSelection : NetworkBehaviour {
     }
 
 
-    void AddIcon(Transform icon, Transform controller, int indexObjSelected)
+    void AddIcon(Transform icon, Transform controller, int indexObjSelected, float offset)
     {
         icon.gameObject.SetActive(true);
         var obj = ObjectManager.Get(indexObjSelected);
         //var pos = obj.GetComponent<Renderer>().bounds.extents.sqrMagnitude;
         //Debug.Log(pos);
-        icon.position = controller.transform.position * 0.3f + obj.transform.position * 0.7f;
+        icon.position = controller.transform.position * (0.3f+offset) + obj.transform.position * (0.7f-offset) ;
         //icon.position = (controller.transform.position * 0.3f) + ((obj.transform.position - new Vector3(pos, pos, pos)) * 0.7f);
         icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
         icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
