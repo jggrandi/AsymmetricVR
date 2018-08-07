@@ -154,7 +154,7 @@ public class InteractionManager : NetworkBehaviour {
     {
         var h1 = interactingHands[0];
         var h2 = interactingHands[1];
-        if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGrip() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGrip()) 
+        if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGripPress() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGripPress()) 
             return true;
         return false;
     }

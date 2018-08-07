@@ -19,10 +19,8 @@ public class ButtonSync : NetworkBehaviour {
     public bool bimanual = false;
     public bool lockedTrans = false;
     public bool lockedRot = false;
-    public bool scale = false;
+    public bool lockedScale = false;
 
-    Hand leftHand;
-    Hand rightHand;
 
     Player player;
 
@@ -40,61 +38,60 @@ public class ButtonSync : NetworkBehaviour {
             return;
         }
 
-        leftHand = player.leftHand;
-        rightHand = player.rightHand;
+        refLeft = GetHandReference("left"); // Send to the "HandleControllerButtons" script the reference of this player. "HandleControllerButtons" script updates th
+        refRight = GetHandReference("right");
 
-        refLeft = leftHand.gameObject.GetComponent<HandleControllersButtons>();
-        if (refLeft != null)
-        {
-            refLeft.playerObject = this.gameObject; // the VR Hands update this script. we need to send a reference of the NetPlayer.
-            refLeft.handType = "left";
-        }
-
-        refRight = rightHand.gameObject.GetComponent<HandleControllersButtons>();
-        if (refRight != null)
-        {
-            refRight.playerObject = this.gameObject;
-            refRight.handType = "right";
-            
-        }
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (!isLocalPlayer) return;
-        if (leftHand == null) leftHand = player.leftHand;
-        if (rightHand == null) rightHand = player.rightHand;
-        if (leftHand == null) return;
-        if (rightHand == null) return;
-        if (refLeft == null) refLeft = leftHand.gameObject.GetComponent<HandleControllersButtons>();
-        if (refRight == null) refRight = rightHand.gameObject.GetComponent<HandleControllersButtons>();
+
+        if (refLeft == null) refLeft = GetHandReference("left"); 
+        if (refRight == null) refRight = GetHandReference("right"); 
         
-        lTrigger = refLeft.GetTrigger();
+        lTrigger = refLeft.GetTriggerPress();
         lA = refLeft.GetAPress();
         lApp = refLeft.GetAppPress();
-        lGrip = refLeft.GetGrip();
+        lGrip = refLeft.GetGripPress();
 
-        rTrigger = refRight.GetTrigger();
+        rTrigger = refRight.GetTriggerPress();
         rA = refRight.GetAPress();
         rApp = refRight.GetAppPress();
-        rGrip = refRight.GetGrip();
+        rGrip = refRight.GetGripPress();
 
         bimanual = false;
-        scale = false;
+        lockedScale = false;
         lockedTrans = false;
         lockedRot = false;
 
         if (lTrigger && rTrigger)
         {
             bimanual = true;
-            if (lGrip && rGrip)
-                scale = true;
         }
-        if (lA || rA)
-            lockedRot = true;
-        if (lApp || rApp)
-            lockedTrans = true;
 
+        if (bimanual)
+        {
+            if (lA && rA) lockedRot = true;
+            if (lApp && rApp) lockedTrans = true;
+            if (lGrip && rGrip) lockedScale = true;
+
+        }
+        else
+        {
+            if(lTrigger)
+            {
+                if (lA) lockedRot = true;
+                if (lApp) lockedTrans = true;
+                if (lGrip) lockedScale = true;
+            }
+            else if (rTrigger)
+            {
+                if (rA) lockedRot = true;
+                if (rApp) lockedTrans = true;
+                if (rGrip) lockedScale = true;
+            }
+        }
 
 
         CmdUpdateTriggerPressed(lTrigger,"left");
@@ -105,7 +102,26 @@ public class ButtonSync : NetworkBehaviour {
         CmdUpdateAppPressed(rApp, "right");
         CmdUpdateGripPressed(lGrip, "left");
         CmdUpdateGripPressed(rGrip, "right");
-        CmdUpdateActions(bimanual, scale, lockedRot, lockedTrans);
+        CmdUpdateActions(bimanual, lockedScale, lockedRot, lockedTrans);
+    }
+
+    private HandleControllersButtons GetHandReference(string side)
+    {
+        HandleControllersButtons hReference;
+        if (string.Compare(side, "left") == 0)
+            hReference = player.leftHand.gameObject.GetComponent<HandleControllersButtons>();
+        else if (string.Compare(side, "right") == 0)
+            hReference = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
+        else
+            hReference = null;
+
+        if (hReference != null)
+        {
+            hReference.playerObject = this.gameObject; // the VR Hands update this script. we need to send a reference of the NetPlayer.
+            return hReference;
+        }
+
+        return null;
     }
 
     [Command]
@@ -117,7 +133,7 @@ public class ButtonSync : NetworkBehaviour {
     void RpcUpdateActions(bool biman, bool scal, bool lockedrot, bool lockedtrans)
     {
         bimanual = biman;
-        scale = scal;
+        lockedScale = scal;
         lockedTrans = lockedtrans;
         lockedRot = lockedrot;
     }
