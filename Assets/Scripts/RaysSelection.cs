@@ -53,16 +53,19 @@ public class RaysSelection : NetworkBehaviour {
                 AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
                 var controllersCenter = (leftController.transform.position - rightController.transform.position);
                 controllersCenter = controllersCenter.normalized * (controllersCenter.magnitude / -2f) + leftController.transform.position;
-                if (player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
-                {
-                    UpdateIconsPosition(icons, controllersCenter, Vector3.zero);
-                 
-                }
+                //if (player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
+                //{
+                    UpdateIconPosition(icons.GetChild(0), controllersCenter, controllersCenter);
+                    UpdateIconPosition(icons.GetChild(1),  leftController.transform.position, controllersCenter);
+                    UpdateIconPosition(icons.GetChild(2),  rightController.transform.position, controllersCenter);
+
+                //}
                 //Icons(icons,controllersCenter, Vector3.zero, 0f); // add the action icons in the center of the two controllers
-                else //other players
+                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
+                //else //other players
                 {
                     AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object // line from the center of the controllers to the object
-                    UpdateIconsPosition(icons, controllersCenter, ObjectManager.Get(selected).transform.position);
+                    //UpdateIconsPosition(icons, controllersCenter, ObjectManager.Get(selected).transform.position);
                 }
                 ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
 
@@ -147,17 +150,12 @@ public class RaysSelection : NetworkBehaviour {
     }
 
 
-    void UpdateIconsPosition(Transform icons, Vector3 firstPos, Vector3 secondPos)
+    void UpdateIconPosition(Transform icon, Vector3 firstPos, Vector3 secondPos)
     {
-        float offset = -0.1f;
-        for(int i = 0; i < icons.childCount; i++)
-        {
-            var icon = icons.GetChild(i);
-            icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
-            icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
-            icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-            offset += 0.1f;
-        }
+        var calc = firstPos - secondPos;
+        icon.position = calc.normalized * calc.magnitude / -2f + secondPos ;
+        icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
+        icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
     }
 
     void ShowIcons(ButtonSync bsync, Transform icons)
