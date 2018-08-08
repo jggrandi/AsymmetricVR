@@ -17,9 +17,7 @@ public class ButtonSync : NetworkBehaviour {
     public bool rA = false;
     public bool rGrip = false;
     public bool bimanual = false;
-    public bool lockedTrans = false;
-    public bool lockedRot = false;
-    public bool lockedScale = false;
+    public int lockCombination = 0; // 0=alltransforms, 1=rot, 3=trans, 5=scale, 4=rot+trans, 6=rot+scale, 8=trans+scale, 9=allblocked
 
 
     Player player;
@@ -38,8 +36,8 @@ public class ButtonSync : NetworkBehaviour {
             return;
         }
 
-        refLeft = GetHandReference("left"); // Send to the "HandleControllerButtons" script the reference of this player. "HandleControllerButtons" script updates th
-        refRight = GetHandReference("right");
+        refLeft = player.leftHand.gameObject.GetComponent<HandleControllersButtons>(); // Get the reference of "HandleControllerButtons" script. "HandleControllerButtons" script updates the buttons state.
+        refRight = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
 
     }
 	
@@ -47,9 +45,9 @@ public class ButtonSync : NetworkBehaviour {
 	void Update () {
         if (!isLocalPlayer) return;
 
-        if (refLeft == null) refLeft = GetHandReference("left"); 
-        if (refRight == null) refRight = GetHandReference("right"); 
-        
+        if (refLeft == null) refLeft = player.leftHand.gameObject.GetComponent<HandleControllersButtons>();
+        if (refRight == null) refRight = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
+
         lTrigger = refLeft.GetTriggerPress();
         lA = refLeft.GetAPress();
         lApp = refLeft.GetAppPress();
@@ -61,148 +59,66 @@ public class ButtonSync : NetworkBehaviour {
         rGrip = refRight.GetGripPress();
 
         bimanual = false;
-        lockedScale = false;
-        lockedTrans = false;
-        lockedRot = false;
+        lockCombination = 0;
 
         if (lTrigger && rTrigger)
-        {
             bimanual = true;
-        }
-
         if (bimanual)
         {
-            if (lA && rA) lockedRot = true;
-            if (lApp && rApp) lockedTrans = true;
-            if (lGrip && rGrip) lockedScale = true;
-
+            if (lA && rA) lockCombination += 1;
+            if (lApp && rApp) lockCombination += 3;
+            if (lGrip && rGrip) lockCombination += 5;
         }
         else
         {
-            if(lTrigger)
+            if (lTrigger)
             {
-                if (lA) lockedRot = true;
-                if (lApp) lockedTrans = true;
-                if (lGrip) lockedScale = true;
+                if (lA) lockCombination += 1;
+                if (lApp) lockCombination += 3;
+                if (lGrip) lockCombination += 5;
             }
             else if (rTrigger)
             {
-                if (rA) lockedRot = true;
-                if (rApp) lockedTrans = true;
-                if (rGrip) lockedScale = true;
+                if (rA) lockCombination += 1;
+                if (rApp) lockCombination += 3;
+                if (rGrip) lockCombination += 5;
             }
         }
 
-
-        CmdUpdateTriggerPressed(lTrigger,"left");
-        CmdUpdateTriggerPressed(rTrigger, "right");
-        CmdUpdateAPressed(lA, "left");
-        CmdUpdateAPressed(rA, "right");
-        CmdUpdateAppPressed(lApp, "left");
-        CmdUpdateAppPressed(rApp, "right");
-        CmdUpdateGripPressed(lGrip, "left");
-        CmdUpdateGripPressed(rGrip, "right");
-        CmdUpdateActions(bimanual, lockedScale, lockedRot, lockedTrans);
-    }
-
-    private HandleControllersButtons GetHandReference(string side)
-    {
-        HandleControllersButtons hReference;
-        if (string.Compare(side, "left") == 0)
-            hReference = player.leftHand.gameObject.GetComponent<HandleControllersButtons>();
-        else if (string.Compare(side, "right") == 0)
-            hReference = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
-        else
-            hReference = null;
-
-        if (hReference != null)
-        {
-            hReference.playerObject = this.gameObject; // the VR Hands update this script. we need to send a reference of the NetPlayer.
-            return hReference;
-        }
-
-        return null;
+        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip); 
+        CmdUpdateActions(bimanual, lockCombination);
     }
 
     [Command]
-    void CmdUpdateActions(bool biman, bool scal, bool lockedrot, bool lockedtrans)
+    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip)
     {
-        RpcUpdateActions(biman, scal, lockedrot, lockedtrans);
+        RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip);
     }
+
     [ClientRpc]
-    void RpcUpdateActions(bool biman, bool scal, bool lockedrot, bool lockedtrans)
+    void RpcSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip)
+    {
+        lTrigger = ltrigger;
+        rTrigger = rtrigger;
+        lA = la;
+        rA = ra;
+        lApp = lapp;
+        rApp = rapp;
+        lGrip = lgrip;
+        rGrip = rgrip;
+
+    }
+
+    [Command]
+    void CmdUpdateActions(bool biman, int lockcomb)
+    {
+        RpcUpdateActions(biman, lockcomb);
+    }
+
+    [ClientRpc]
+    void RpcUpdateActions(bool biman, int lockcomb)
     {
         bimanual = biman;
-        lockedScale = scal;
-        lockedTrans = lockedtrans;
-        lockedRot = lockedrot;
+        lockCombination = lockcomb;
     }
-
-    [Command]
-    void CmdUpdateTriggerPressed(bool button, string side)
-    {
-        RpcUpdateTriggerPressed(button, side);
-    }
-
-    [ClientRpc]
-    void RpcUpdateTriggerPressed(bool button, string side)
-    {
-        if(string.Compare(side, "left") == 0)
-            lTrigger = button;
-        else if (string.Compare(side, "right") == 0)
-            rTrigger = button;
-
-    }
-
-    [Command]
-    void CmdUpdateAPressed(bool button, string side)
-    {
-        RpcUpdateAPressed(button, side);
-    }
-
-    [ClientRpc]
-    void RpcUpdateAPressed(bool button, string side)
-    {
-        if (string.Compare(side, "left") == 0)
-            lA = button;
-        else if (string.Compare(side, "right") == 0)
-            rA = button;
-
-    }
-
-    [Command]
-    void CmdUpdateAppPressed(bool button, string side)
-    {
-        RpcUpdateAppPressed(button, side);
-    }
-
-    [ClientRpc]
-    void RpcUpdateAppPressed(bool button, string side)
-    {
-        if (string.Compare(side, "left") == 0)
-            lApp = button;
-        else if (string.Compare(side, "right") == 0)
-            rApp = button;
-
-    }
-
-    [Command]
-    void CmdUpdateGripPressed(bool button, string side)
-    {
-        RpcUpdateGripPressed(button, side);
-    }
-
-    [ClientRpc]
-    void RpcUpdateGripPressed(bool button, string side)
-    {
-        if (string.Compare(side, "left") == 0)
-            lGrip = button;
-        else if (string.Compare(side, "right") == 0)
-            rGrip = button;
-
-    }
-
-
-
-
 }

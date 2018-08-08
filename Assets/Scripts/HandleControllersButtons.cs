@@ -9,7 +9,6 @@ public class HandleControllersButtons : MonoBehaviour
     bool toogleAActive = true;
     bool toogleAppActive = true;
 
-    public GameObject playerObject;
     public static HandleControllersButtons handleButtons;
     Hand hand = null;
 
@@ -18,14 +17,6 @@ public class HandleControllersButtons : MonoBehaviour
     {
         hand = gameObject.GetComponent<Hand>();
         handleButtons = this;
-    }
-    private void Awake()
-    {
-
-    }
-
-    private void Update()
-    {
     }
 
     public bool GetADown()

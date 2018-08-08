@@ -12,26 +12,33 @@ public class InteractionManager : NetworkBehaviour {
 
     bool firstPass = true;
 
+    ButtonSync buttonSync;
+
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
-
+        buttonSync = this.gameObject.GetComponent<ButtonSync>();
 
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (!isLocalPlayer) return;
+        if(buttonSync == null) this.gameObject.GetComponent<ButtonSync>();
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
 
         List<Hand> interactingHands = new List<Hand>();
-        foreach (Hand h in selected.hands) // get the hands that are manipulating the object
+        if (buttonSync.bimanual) 
         {
-            if (h.GetComponent<Hand>().GetStandardInteractionButton())
-                interactingHands.Add(h);
+            interactingHands = selected.hands; //send both hands for transform functions
         }
+        else if(buttonSync.lTrigger || buttonSync.rTrigger)
+        {
+            interactingHands.Add(selected.hands[0]); //there is only one hand interacting. send it to the transform functions
+        }
+
         if (interactingHands.Count == 1)
         {
             firstPass = true;
@@ -42,10 +49,21 @@ public class InteractionManager : NetworkBehaviour {
             return; // Dont need to apply transformations
         }
 
-        ApplyTranslation(selected, interactingHands);
-        ApplyRotation(selected, interactingHands);
-        ApplyScale(selected, interactingHands);
-
+        if (buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9) // all transforms are allowed 
+        {
+            ApplyTranslation(selected, interactingHands);
+            ApplyRotation(selected, interactingHands);
+            ApplyScale(selected, interactingHands);
+        }
+        else //allow only the trasform desired
+        {
+            if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8)
+                ApplyTranslation(selected, interactingHands);
+            if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6)
+                ApplyRotation(selected, interactingHands);
+            if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8)
+                ApplyScale(selected, interactingHands);
+        }
         if (interactingHands.Count == 2 && firstPass)
             firstPass = false;
 
@@ -61,10 +79,7 @@ public class InteractionManager : NetworkBehaviour {
     }
 
     void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
-    {
-        int locked = VerifyLockedDOF(interactingHands,"translation");
-        if (locked > 0) return; // any number greater than 0 means that this dof is locked
-        
+    {       
         var averagePoint = AveragePoint(interactingHands);
         this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint); // add position changes to the object
         
@@ -72,9 +87,6 @@ public class InteractionManager : NetworkBehaviour {
 
     void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
-        int locked = VerifyLockedDOF(interactingHands, "rotation");
-        if (locked > 0) return; // any number greater than 0 means that this dof is locked
-
         if (interactingHands.Count == 1) // grabbing with one hand
             this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep); // add single hand rotation
             
@@ -142,7 +154,7 @@ public class InteractionManager : NetworkBehaviour {
 
             var scaleStep = avgScaleMag - oldScaleMag;
 
-            if (BothGripPressed(interactingHands))// apply scale only if the grip button of both controllers are pressed.
+//            if (BothGripPressed(interactingHands))// apply scale only if the grip button of both controllers are pressed.
                 this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(objSelected.index, scaleStep); // add scale to the object
             
             oldScaleMag = avgScaleMag;
@@ -150,35 +162,37 @@ public class InteractionManager : NetworkBehaviour {
     }
 
 
-    private bool BothGripPressed(List<Hand> interactingHands)
-    {
-        var h1 = interactingHands[0];
-        var h2 = interactingHands[1];
-        if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGripPress() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGripPress()) 
-            return true;
-        return false;
-    }
+    //private bool BothGripPressed(List<Hand> interactingHands)
+    //{
+    //    var h1 = interactingHands[0];
+    //    var h2 = interactingHands[1];
+    //    if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGripPress() && h2.gameObject.GetComponent<HandleControllersButtons>().GetGripPress()) 
+    //        return true;
+    //    return false;
+    //}
 
-    private int VerifyLockedDOF(List<Hand> interactingHands, string dof)
-    {
-        int lockedTrans = 0;
-        if (string.Compare(dof, "translation") == 0)
-        {
-            foreach (Hand h in interactingHands)
-            {
-                if (h.GetComponent<HandleControllersButtons>().GetAppPress())
-                    lockedTrans++;
-            }
-        }
-        else if (string.Compare(dof, "rotation") == 0)
-        {
-            foreach (Hand h in interactingHands)
-            {
-                if (h.GetComponent<HandleControllersButtons>().GetAPress())
-                    lockedTrans++;
-            }
-        }
 
-        return lockedTrans;
-    }
+
+    //private int VerifyLockedDOF(List<Hand> interactingHands, string dof)
+    //{
+    //    int lockedTrans = 0;
+    //    if (string.Compare(dof, "translation") == 0)
+    //    {
+    //        foreach (Hand h in interactingHands)
+    //        {
+    //            if (h.GetComponent<HandleControllersButtons>().GetAppPress())
+    //                lockedTrans++;
+    //        }
+    //    }
+    //    else if (string.Compare(dof, "rotation") == 0)
+    //    {
+    //        foreach (Hand h in interactingHands)
+    //        {
+    //            if (h.GetComponent<HandleControllersButtons>().GetAPress())
+    //                lockedTrans++;
+    //        }
+    //    }
+
+    //    return lockedTrans;
+    //}
 }
