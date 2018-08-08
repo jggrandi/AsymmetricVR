@@ -17,7 +17,7 @@ public class ButtonSync : NetworkBehaviour {
     public bool rA = false;
     public bool rGrip = false;
     public bool bimanual = false;
-    public int lockCombination = 0; // 0=alltransforms, 1=rot, 3=trans, 5=scale, 4=rot+trans, 6=rot+scale, 8=trans+scale, 9=allblocked
+    public int lockCombination = 0; // 0=alltransforms, 1=trans, 3=rot, 5=scale, 4=trans+rot, 6=trans+scale, 8=rot+scale, 9=allblocked
 
 
     Player player;

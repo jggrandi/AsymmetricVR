@@ -18,7 +18,6 @@ public class RaysSelection : NetworkBehaviour {
         if (!isLocalPlayer) return;
         
         lines = GameObject.Find("Lines");
-        
         ClearLines();
     }
 
@@ -26,6 +25,7 @@ public class RaysSelection : NetworkBehaviour {
     void Update()
     {
         if (!isLocalPlayer) return;
+        
         CmdSyncSelected();
         linesUsed = 0;
         foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
@@ -39,26 +39,35 @@ public class RaysSelection : NetworkBehaviour {
             var head = player.transform.GetChild(0); // if the order changes in the prefab, it is necessary to update these indexes
             var leftController = player.transform.GetChild(1);
             var rightController = player.transform.GetChild(2);
-            var iconsLeftHand = leftController.transform.GetChild(2); // it is the thrird because the other 2 are the controllers (a sphere and a cube)
-            var iconsRightHand = rightController.transform.GetChild(2); // it is the thrird because the other 2 are the controllers (a sphere and a cube)
+            var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
+            
 
-            DisableIcons(iconsLeftHand); // disable all icons. Only show when an action is performed.
-            DisableIcons(iconsRightHand); // disable all icons. Only show when an action is performed.
+            DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
                 color = blueColor; // localplayer's ray is blue
-
 
             if (buttonSync.bimanual) // the rays drawn are different from one hand.
             {
                 AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
                 var controllersCenter = (leftController.transform.position - rightController.transform.position);
                 controllersCenter = controllersCenter.normalized * (controllersCenter.magnitude / -2f) + leftController.transform.position;
-                AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object
-                AddIcon(iconsLeftHand.transform.GetChild(3), controllersCenter, selected, 0.1f);
+                if (player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
+                {
+                    UpdateIconsPosition(icons, controllersCenter, Vector3.zero);
+                 
+                }
+                //Icons(icons,controllersCenter, Vector3.zero, 0f); // add the action icons in the center of the two controllers
+                else //other players
+                {
+                    AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object // line from the center of the controllers to the object
+                    UpdateIconsPosition(icons, controllersCenter, ObjectManager.Get(selected).transform.position);
+                }
+                ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
 
-                ////if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
+
+
                 //// {
                 //if (buttonSync.lockedRot)
                 //        AddIcon(iconsLeftHand.transform.GetChild(1), controllersCenter, selected, 0f);
@@ -138,17 +147,70 @@ public class RaysSelection : NetworkBehaviour {
     }
 
 
-    void AddIcon(Transform icon, Vector3 initialPos, int indexObjSelected, float offset)
+    void UpdateIconsPosition(Transform icons, Vector3 firstPos, Vector3 secondPos)
     {
-        icon.gameObject.SetActive(true);
-        var obj = ObjectManager.Get(indexObjSelected);
-        //var pos = obj.GetComponent<Renderer>().bounds.extents.sqrMagnitude;
-        //Debug.Log(pos);
-        icon.position = initialPos * (0.3f+offset) + obj.transform.position * (0.7f-offset) ;
-        //icon.position = (controller.transform.position * 0.3f) + ((obj.transform.position - new Vector3(pos, pos, pos)) * 0.7f);
-        icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
-        icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        float offset = -0.1f;
+        for(int i = 0; i < icons.childCount; i++)
+        {
+            var icon = icons.GetChild(i);
+            icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
+            icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
+            icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+            offset += 0.1f;
+        }
     }
+
+    void ShowIcons(ButtonSync bsync, Transform icons)
+    {
+        switch (bsync.lockCombination)
+        {
+            case 0: case 9:
+                icons.GetChild(0).gameObject.SetActive(true);
+                icons.GetChild(1).gameObject.SetActive(true);
+                icons.GetChild(2).gameObject.SetActive(true);
+                break;
+            case 1:
+                icons.GetChild(0).gameObject.SetActive(true);
+                break;
+            case 3:
+                icons.GetChild(1).gameObject.SetActive(true);
+                break;
+            case 4:
+                icons.GetChild(0).gameObject.SetActive(true);
+                icons.GetChild(1).gameObject.SetActive(true);
+                break;
+            case 5:
+                icons.GetChild(2).gameObject.SetActive(true);
+                break;
+            case 6:
+                icons.GetChild(0).gameObject.SetActive(true);
+                icons.GetChild(2).gameObject.SetActive(true);
+                break;
+            case 8:
+                icons.GetChild(1).gameObject.SetActive(true);
+                icons.GetChild(2).gameObject.SetActive(true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //void AddIcon(Transform icon, string transform, Vector3 firstPos, Vector3 secondPos)
+    //{
+    //    icon.gameObject.SetActive(true);
+    //    if (string.Compare(icon.gameObject.name, "trans") == 0)
+    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
+    //    if (string.Compare(icon.gameObject.name, "rotate") == 0)
+    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
+    //    if (string.Compare(icon.gameObject.name, "scale") == 0)
+    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
+
+
+    //    icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
+    //    icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+
+    //}
 
     void AddLine(Vector3 a, Vector3 b, Color c)
     {
@@ -176,10 +238,10 @@ public class RaysSelection : NetworkBehaviour {
         linesUsed = 0;
     }
 
-    void DisableIcons(Transform handIcons)
+    void DisableIcons(Transform icons)
     {
-        for (int i = 0; i < handIcons.transform.childCount; i++)
-            handIcons.transform.GetChild(i).gameObject.SetActive(false);
+        for (int i = 0; i < icons.transform.childCount; i++)
+            icons.transform.GetChild(i).gameObject.SetActive(false);
     }
 
 }

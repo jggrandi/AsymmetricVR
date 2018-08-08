@@ -21,7 +21,9 @@ public class ObjectManager : MonoBehaviour
 
     public static GameObject Get(int i)
     {
-        return manager.list[i];
+        if( i < manager.list.Count && i >= 0)
+            return manager.list[i];
+        return null;
     }
 
     public static void Set(int i, GameObject obj)

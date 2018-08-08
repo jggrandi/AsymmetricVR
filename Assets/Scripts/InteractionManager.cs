@@ -57,9 +57,9 @@ public class InteractionManager : NetworkBehaviour {
         }
         else //allow only the trasform desired
         {
-            if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8)
+            if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8)
                 ApplyTranslation(selected, interactingHands);
-            if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6)
+            if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6)
                 ApplyRotation(selected, interactingHands);
             if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8)
                 ApplyScale(selected, interactingHands);
