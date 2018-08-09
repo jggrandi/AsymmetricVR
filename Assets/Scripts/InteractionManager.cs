@@ -34,9 +34,12 @@ public class InteractionManager : NetworkBehaviour {
         {
             interactingHands = selected.hands; //send both hands for transform functions
         }
-        else if(buttonSync.lTrigger || buttonSync.rTrigger)
+        else 
         {
-            interactingHands.Add(selected.hands[0]); //there is only one hand interacting. send it to the transform functions
+            if (buttonSync.lTrigger)
+                interactingHands.Add(buttonSync.leftHand); //there is only one hand interacting. send it to the transform functions
+            else if (buttonSync.rTrigger)
+                interactingHands.Add(buttonSync.rightHand);
         }
 
         if (interactingHands.Count == 1)

@@ -48,82 +48,27 @@ public class RaysSelection : NetworkBehaviour {
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
                 color = blueColor; // localplayer's ray is blue
 
+            var controllersCenter = Vector3.zero;
             if (buttonSync.bimanual) // the rays drawn are different from one hand.
             {
                 AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
-                var controllersCenter = (leftController.transform.position - rightController.transform.position);
+                controllersCenter = (leftController.transform.position - rightController.transform.position);
                 controllersCenter = controllersCenter.normalized * (controllersCenter.magnitude / -2f) + leftController.transform.position;
-                //if (player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
-                //{
-                    UpdateIconPosition(icons.GetChild(0), controllersCenter, controllersCenter);
-                    UpdateIconPosition(icons.GetChild(1),  leftController.transform.position, controllersCenter);
-                    UpdateIconPosition(icons.GetChild(2),  rightController.transform.position, controllersCenter);
-
-                //}
-                //Icons(icons,controllersCenter, Vector3.zero, 0f); // add the action icons in the center of the two controllers
-                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // this player
-                //else //other players
-                {
-                    AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object // line from the center of the controllers to the object
-                    //UpdateIconsPosition(icons, controllersCenter, ObjectManager.Get(selected).transform.position);
-                }
-                ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
-
-
-
-                //// {
-                //if (buttonSync.lockedRot)
-                //        AddIcon(iconsLeftHand.transform.GetChild(1), controllersCenter, selected, 0f);
-                //    else if (buttonSync.lockedTrans)
-                //        AddIcon(iconsLeftHand.transform.GetChild(2), controllersCenter, selected, 0f);
-                //    else
-                //        AddIcon(iconsLeftHand.transform.GetChild(0), controllersCenter, selected, 0f);
-                //    if (buttonSync.scale) // scale icon is added apart
-                //        AddIcon(iconsLeftHand.transform.GetChild(3), controllersCenter, selected, 0.1f);
-
-                ////}
-
             }
-            //else // only one hand is interacting
-            //{
-            //    if(buttonSync.lTrigger) // draw a ray directly from the hand to the object
-            //        AddLine(leftController.transform.position, ObjectManager.Get(selected).transform.position, color);
-            //    else if (buttonSync.rTrigger)
-            //        AddLine(rightController.transform.position, ObjectManager.Get(selected).transform.position, color);
+            else
+            {
+                if (buttonSync.lTrigger)
+                    controllersCenter = leftController.transform.position;
+                else if (buttonSync.rTrigger)
+                    controllersCenter = rightController.transform.position;
+            }
 
-            //}
+            if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
+                if(buttonSync.bimanual || buttonSync.lTrigger || buttonSync.rTrigger) //only show the line if user is interacting
+                    AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object
 
-            //if (buttonSync.lTrigger)
-            //{
-            //    if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
-            //    {
-            //        if (buttonSync.lockedRot)
-            //            AddIcon(iconsLeftHand.transform.GetChild(1), leftController, selected, 0f);
-            //        else if (buttonSync.lockedTrans)
-            //            AddIcon(iconsLeftHand.transform.GetChild(2), leftController, selected, 0f);
-            //        else
-            //            AddIcon(iconsLeftHand.transform.GetChild(0), leftController, selected, 0f);
-            //        if (buttonSync.scale) // scale icon is added apart
-            //            AddIcon(iconsLeftHand.transform.GetChild(3), leftController, selected, 0.1f);
-
-            //    }
-            //    AddLine(leftController.transform.position, ObjectManager.Get(selected).transform.position, color);
-            //}
-            //if (buttonSync.rTrigger)
-            //{
-            //    if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // add icons only for other player's actions
-            //    {
-            //        if (buttonSync.lockedRot)
-            //            AddIcon(iconsRightHand.transform.GetChild(1), rightController, selected, 0f);
-            //        else if (buttonSync.lockedTrans)
-            //            AddIcon(iconsRightHand.transform.GetChild(2), rightController, selected, 0f);
-            //        else
-            //            AddIcon(iconsRightHand.transform.GetChild(0), rightController, selected, 0f);
-            //        if (buttonSync.scale) // scale icon is added apart
-            //            AddIcon(iconsRightHand.transform.GetChild(3), rightController, selected, 0.1f);
-            //    }
-            //    AddLine(rightController.transform.position, ObjectManager.Get(selected).transform.position, color);
-            //}
+            UpdateIconsPosition(icons, controllersCenter);
+            ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
 
         }
         ClearLines();
@@ -150,12 +95,10 @@ public class RaysSelection : NetworkBehaviour {
     }
 
 
-    void UpdateIconPosition(Transform icon, Vector3 firstPos, Vector3 secondPos)
+    void UpdateIconsPosition(Transform icons, Vector3 pos)
     {
-        var calc = firstPos - secondPos;
-        icon.position = calc.normalized * calc.magnitude / -2f + secondPos ;
-        icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
-        icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        icons.position = pos;
+        icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
     }
 
     void ShowIcons(ButtonSync bsync, Transform icons)

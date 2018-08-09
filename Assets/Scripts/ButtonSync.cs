@@ -21,7 +21,7 @@ public class ButtonSync : NetworkBehaviour {
 
 
     Player player;
-
+    public Hand leftHand, rightHand;
     HandleControllersButtons refLeft, refRight;
 
     // Use this for initialization
@@ -36,8 +36,10 @@ public class ButtonSync : NetworkBehaviour {
             return;
         }
 
-        refLeft = player.leftHand.gameObject.GetComponent<HandleControllersButtons>(); // Get the reference of "HandleControllerButtons" script. "HandleControllerButtons" script updates the buttons state.
-        refRight = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
+        leftHand = player.leftHand;
+        rightHand = player.rightHand;
+        if(leftHand != null) refLeft = leftHand.gameObject.GetComponent<HandleControllersButtons>(); // Get the reference of "HandleControllerButtons" script. "HandleControllerButtons" script updates the buttons state.
+        if(rightHand != null) refRight = rightHand.gameObject.GetComponent<HandleControllersButtons>();
 
     }
 	
@@ -45,8 +47,11 @@ public class ButtonSync : NetworkBehaviour {
 	void Update () {
         if (!isLocalPlayer) return;
 
-        if (refLeft == null) refLeft = player.leftHand.gameObject.GetComponent<HandleControllersButtons>();
-        if (refRight == null) refRight = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
+        if (leftHand == null) leftHand = player.leftHand; 
+        if (rightHand == null) rightHand = player.rightHand; 
+
+        refLeft = player.leftHand.gameObject.GetComponent<HandleControllersButtons>();
+        refRight = player.rightHand.gameObject.GetComponent<HandleControllersButtons>();
 
         lTrigger = refLeft.GetTriggerPress();
         lA = refLeft.GetAPress();
