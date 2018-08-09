@@ -19,6 +19,9 @@ public class ButtonSync : NetworkBehaviour {
     public bool bimanual = false;
     public int lockCombination = 0; // 0=alltransforms, 1=trans, 3=rot, 5=scale, 4=trans+rot, 6=trans+scale, 8=rot+scale, 9=allblocked
 
+    public bool transLocked = false;
+    public bool rotLocked = false;
+    public bool scaleLocked = false;
 
     Player player;
     public Hand leftHand, rightHand;

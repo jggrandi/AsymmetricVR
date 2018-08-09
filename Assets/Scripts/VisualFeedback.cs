@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class RaysSelection : NetworkBehaviour {
+public class VisualFeedback : NetworkBehaviour {
 
     Color greyColor = new Color(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
     Color blueColor = new Color(0 / 255.0f, 118 / 255.0f, 255 / 255.0f);
@@ -30,7 +30,7 @@ public class RaysSelection : NetworkBehaviour {
         linesUsed = 0;
         foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
         {
-            var selected = player.GetComponent<RaysSelection>().objSelectedShared;
+            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
             if (selected == -1) continue;
 
             var buttonSync = player.GetComponent<ButtonSync>();
@@ -136,30 +136,12 @@ public class RaysSelection : NetworkBehaviour {
         }
     }
 
-    //void AddIcon(Transform icon, string transform, Vector3 firstPos, Vector3 secondPos)
-    //{
-    //    icon.gameObject.SetActive(true);
-    //    if (string.Compare(icon.gameObject.name, "trans") == 0)
-    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
-    //    if (string.Compare(icon.gameObject.name, "rotate") == 0)
-    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
-    //    if (string.Compare(icon.gameObject.name, "scale") == 0)
-    //        icon.position = firstPos * (0.3f + offset) + secondPos * (0.7f - offset);
-
-
-    //    icon.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icon.position).normalized);
-    //    icon.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-
-
-    //}
-
     void AddLine(Vector3 a, Vector3 b, Color c)
     {
         if(lines == null) lines = GameObject.Find("Lines");
         if (linesUsed >= lines.transform.childCount) return;
         var g = lines.transform.GetChild(linesUsed++).gameObject;
         var line = g.GetComponent<VolumetricLines.VolumetricLineBehavior>();
-        //line.SetStartAndEndPoints(a, b);
         line.transform.position = a;
         line.transform.rotation = Quaternion.FromToRotation(new Vector3(0, 0, 1), (b - a).normalized);
         line.transform.localScale = new Vector3(1f, 1f, (b - a).magnitude);
@@ -173,7 +155,6 @@ public class RaysSelection : NetworkBehaviour {
         {
             var g = lines.transform.GetChild(i).gameObject;
             var line = g.GetComponent<VolumetricLines.VolumetricLineBehavior>();
-            //line.SetStartAndEndPoints(new Vector3(5000.0f, 5000.0f, 5000.0f), new Vector3(5000.0f, 5000.0f, 5000.0f));
             line.transform.position = new Vector3(500, 500, 500);
         }
         linesUsed = 0;
