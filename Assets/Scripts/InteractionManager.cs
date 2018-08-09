@@ -57,37 +57,35 @@ public class InteractionManager : NetworkBehaviour {
         if (interactingHands.Count == 0)
             return;
 
-        ApplyTranslation(selected, interactingHands);
-        ApplyRotation(selected, interactingHands);
-        ApplyScale(selected, interactingHands);
+        var newTranslation = CalcTranslation(selected, interactingHands);
+        var newRotation = CalcRotation(selected, interactingHands);
+        var newScale = CalcScale(selected, interactingHands);
 
-
+        if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(selected.index, newTranslation); // add position changes to the object
+        if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(selected.index, newRotation); // add all rotations to the object
+        if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+            this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(selected.index, newScale); // add scale to the object
 
     }
 
-    Vector3 AveragePoint(List<Hand> interactingHands)
-    {
+    Vector3 CalcTranslation(ObjSelected objSelected, List<Hand> interactingHands)
+    {       
         Vector3 averagePoint = new Vector3();
         foreach (Hand h in interactingHands)
             averagePoint += h.gameObject.GetComponent<TransformStep>().positionStep;
         averagePoint /= interactingHands.Count;
+
         return averagePoint;
     }
 
-    void ApplyTranslation(ObjSelected objSelected, List<Hand> interactingHands)
-    {       
-        var averagePoint = AveragePoint(interactingHands);
-        if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
-            this.gameObject.GetComponent<HandleNetworkTransformations>().Translate(objSelected.index, averagePoint); // add position changes to the object
-        
-    }
-
-    void ApplyRotation(ObjSelected objSelected, List<Hand> interactingHands)
+    Quaternion CalcRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
-
+        Quaternion q = Quaternion.identity;
         if (interactingHands.Count == 1) // grabbing with one hand
-            this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, interactingHands[0].GetComponent<TransformStep>().rotationStep); // add single hand rotation
-            
+            q = interactingHands[0].GetComponent<TransformStep>().rotationStep;
+
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
@@ -99,53 +97,38 @@ public class InteractionManager : NetworkBehaviour {
 
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
-            Quaternion q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-
-            if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
-                this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(objSelected.index, q * Quaternion.Euler(difRotX, 0f, 0f)); // add all rotations to the object
+            q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
+            q = q * Quaternion.Euler(difRotX, 0f, 0f);
 
             rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
             oldPointsForRotation[1] = interactingHands[1].transform.position;
-        }
 
+            
+        }
+        return q;
     }
 
-    void ApplyScale(ObjSelected objSelected, List<Hand> interactingHands)
+    float CalcScale(ObjSelected objSelected, List<Hand> interactingHands)
     {
 
         //if (interactingHands.Count == 1)
         //{
-        //    Hand h1 = interactingHands[0];
-        //    if (h1.gameObject.GetComponent<HandleControllersButtons>().GetGripDown())
-        //    {
-        //        if (firstPass) // start the old variables if it is the first pass. to avoid discontinuous transformations
-        //            oldScaleMag = h1.transform.position.magnitude;
-        //        var scaleStep = h1.transform.position.magnitude - oldScaleMag;
-        //        var finalScale = imaginary.transform.localScale.x + scaleStep;
-        //        finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
-        //        imaginary.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
-
-        //        oldScaleMag = h1.transform.position.magnitude;
-        //    }
-
+        // RESERVED FOR ONE HAND SCALE
         //}
 
+        float scaleStep = 0f;
         if (interactingHands.Count == 2)
         {
-
             float avgScaleMag = 0f;
             avgScaleMag += (buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position).magnitude;
             avgScaleMag += (buttonSync.rightHand.transform.position - buttonSync.leftHand.transform.position).magnitude;
-
             avgScaleMag /= interactingHands.Count; // to scale the object in between both hands
 
-            var scaleStep = avgScaleMag - oldScaleMag;
-
-            if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
-                this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(objSelected.index, scaleStep); // add scale to the object
+            scaleStep = avgScaleMag - oldScaleMag;
             
             oldScaleMag = avgScaleMag;
         }
+        return scaleStep;
     }
 }

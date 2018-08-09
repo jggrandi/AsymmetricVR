@@ -40,7 +40,6 @@ public class VisualFeedback : NetworkBehaviour {
             var leftController = player.transform.GetChild(1);
             var rightController = player.transform.GetChild(2);
             var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
-            
 
             DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
