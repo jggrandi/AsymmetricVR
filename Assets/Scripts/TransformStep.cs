@@ -31,7 +31,7 @@ public class TransformStep : MonoBehaviour
         scalingPrev = 0f;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         rotationMatrix = Matrix4x4.Rotate(this.gameObject.transform.rotation);
         translationMatrix = Matrix4x4.Translate(this.gameObject.transform.position);

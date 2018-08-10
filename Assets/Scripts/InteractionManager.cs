@@ -16,7 +16,6 @@ public class InteractionManager : NetworkBehaviour {
     void Start () {
         if (!isLocalPlayer) return;
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
-
     }
 	
 	// Update is called once per frame
@@ -26,6 +25,8 @@ public class InteractionManager : NetworkBehaviour {
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
+
+        
 
         List<Hand> interactingHands = new List<Hand>();
         if (buttonSync.bimanual) 
@@ -41,7 +42,7 @@ public class InteractionManager : NetworkBehaviour {
                 interactingHands.Add(buttonSync.rightHand);
         }
 
-
+        
         if (interactingHands.Count <= 1)
         {
             oldPointsForRotation[0] = buttonSync.leftHand.transform.position;
@@ -57,6 +58,8 @@ public class InteractionManager : NetworkBehaviour {
         if (interactingHands.Count == 0)
             return;
 
+        
+        //var newTranslation = TryGambiarra(selected, interactingHands);
         var newTranslation = CalcTranslation(selected, interactingHands);
         var newRotation = CalcRotation(selected, interactingHands);
         var newScale = CalcScale(selected, interactingHands);
@@ -67,6 +70,26 @@ public class InteractionManager : NetworkBehaviour {
             this.gameObject.GetComponent<HandleNetworkTransformations>().Rotate(selected.index, newRotation); // add all rotations to the object
         if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
             this.gameObject.GetComponent<HandleNetworkTransformations>().Scale(selected.index, newScale); // add scale to the object
+
+    }
+
+
+    Vector3 _localPosition, _lastPosition;
+    bool firstPass = true;
+
+    Vector3  TryGambiarra(ObjSelected objSelected, List<Hand> interactingHands)
+    {
+        //if (firstPass)
+        //{
+            _localPosition = interactingHands[0].transform.InverseTransformPoint(objSelected.gameobject.transform.position);
+        //    firstPass = false;
+        //}
+
+        _localPosition += _lastPosition - objSelected.gameobject.transform.position;
+        //s1.transform.position = interactingHands[0].transform.TransformPoint(_localPosition);
+        
+        _lastPosition = objSelected.gameobject.transform.position;
+        return _localPosition;
 
     }
 
@@ -89,18 +112,24 @@ public class InteractionManager : NetworkBehaviour {
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
-            float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
+            //float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
 
+            
+            Quaternion rotHands = interactingHands[0].gameObject.GetComponent<TransformStep>().rotationStep;
+            
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
-            var difRotX = rotX - rotXOld;
+            //var q2 = Quaternion.AngleAxis(, -direction2.normalized);
+
+            //var difRotX = rotX - rotXOld;
 
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
             q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            q = q * Quaternion.Euler(difRotX, 0f, 0f);
-
-            rotXOld = rotX;
+            //q = q * Quaternion.Euler(difRotX, 0f, 0f);
+            //q = q * rotHands;
+            
+            //rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
             oldPointsForRotation[1] = interactingHands[1].transform.position;
 

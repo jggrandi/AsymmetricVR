@@ -60,18 +60,15 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void Translate(int index, Vector3 translatestep)
     {
         var g = ObjectManager.Get(index);
-        Vector3 prevLocalPos = g.transform.localPosition;
-        g.transform.position += translatestep;
-        Vector3 localPos = g.transform.localPosition;
-        g.transform.position -= translatestep;
-        CmdTranslate(index, localPos - prevLocalPos);
+        CmdTranslate(index, translatestep);
     }
 
     [Command]
     void CmdTranslate(int index, Vector3 translatestep)
     {
         var g = ObjectManager.Get(index);
-        g.transform.localPosition += translatestep;
+        //g.transform.localPosition += translatestep;
+        g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
         SyncObj(index);
     }
 
@@ -84,7 +81,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     void CmdRotate(int index, Quaternion rotationstep)
     {
         var g = ObjectManager.Get(index);
-        g.transform.rotation = rotationstep * g.transform.rotation;
+        //g.transform.rotation = rotationstep * g.transform.rotation;
+        g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
         SyncObj(index);
     }
 
