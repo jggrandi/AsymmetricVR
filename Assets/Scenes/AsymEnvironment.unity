@@ -2076,6 +2076,47 @@ Prefab:
 Transform:
   m_PrefabParentObject: {fileID: 400000, guid: 11530f2b0a0cd2442949827ecbb622f2, type: 2}
   m_PrefabInternal: {fileID: 1724965871}
+--- !u!1 &1829732537
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1829732539}
+  - component: {fileID: 1829732538}
+  m_Layer: 0
+  m_Name: ControlObjectsOnScene
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1829732538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1829732537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400e52a70d219d140a9220951ed80656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VRPlayer: {fileID: 2083290083}
+--- !u!4 &1829732539
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1829732537}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 268, y: 123, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1855860228
 Prefab:
   m_ObjectHideFlags: 0
@@ -2316,6 +2357,10 @@ Prefab:
       propertyPath: startingHandType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 107946, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114000011983135080, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
@@ -2378,6 +2423,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86e29e4e9cdec264da7362caf31da921, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2083290083 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 107946, guid: dc06161b6d97feb419f45f03b62e14b9, type: 2}
+  m_PrefabInternal: {fileID: 2083290076}
 --- !u!1 &2119373682
 GameObject:
   m_ObjectHideFlags: 0
