@@ -39,6 +39,17 @@ public class MyNetworkManager : NetworkManager
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
     }
 
+    public override void OnClientSceneChanged(NetworkConnection conn)
+    {
+        //base.OnClientSceneChanged(conn);
+
+
+
+        //by overriding this function and commenting the base we are removing the functionality of this function 
+        //so we dont have conflict with  OnClientConnect
+
+    }
+
     public void btn0()
     {
         curPlayer = 0;

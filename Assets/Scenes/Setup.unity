@@ -863,7 +863,7 @@ MonoBehaviour:
   m_PlayerPrefab: {fileID: 0}
   m_AutoCreatePlayer: 0
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: 
+  m_OfflineScene: Setup
   m_OnlineScene: AsymEnvironment
   m_SpawnPrefabs:
   - {fileID: 102416, guid: 79047de92600f294f913a5c6606b4f53, type: 2}
