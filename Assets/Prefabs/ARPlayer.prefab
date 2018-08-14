@@ -22,9 +22,10 @@ GameObject:
   - component: {fileID: 114000012560445992}
   - component: {fileID: 114667699578071008}
   - component: {fileID: 114040854270740204}
+  - component: {fileID: 114440023099070912}
   m_Layer: 0
   m_Name: ARPlayer
-  m_TagString: player
+  m_TagString: PlayerAR
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -643,7 +644,7 @@ MonoBehaviour:
     i14: 169
     i15: 137
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114040854270740204
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -656,6 +657,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactableObjects: {fileID: 0}
+--- !u!114 &114440023099070912
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010815216546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bbcb2ccfa49e2f4a84dcff8a4813dbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lines: {fileID: 0}
+  objSelectedShared: -1
+  interactableObjects: {fileID: 0}
+  ARCameraPosition: {x: 0, y: 0, z: 0}
+  ARCameraRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &114667699578071008
 MonoBehaviour:
   m_ObjectHideFlags: 1

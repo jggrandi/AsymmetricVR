@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Lean.Touch;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,11 +14,15 @@ public class VisualFeedback : NetworkBehaviour {
     [SyncVar]
     public int objSelectedShared = -1; // the user selections visible by other players
 
+    public GameObject interactableObjects;
+
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
         
         lines = GameObject.Find("Lines");
+        interactableObjects = GameObject.Find("InteractableObjects");
+        if (interactableObjects == null) return;
         ClearLines();
     }
 
@@ -27,9 +32,20 @@ public class VisualFeedback : NetworkBehaviour {
         if (!isLocalPlayer) return;
         
         CmdSyncSelected();
+        CmdSetARCameraPosition(interactableObjects.transform.InverseTransformPoint(Camera.main.transform.position));
+        CmdSetARCameraRotation(Camera.main.transform.rotation);
+
         linesUsed = 0;
-        foreach (var player in GameObject.FindGameObjectsWithTag("Player"))
+        AddFeedbackVR();
+        AddFeedbackAR();
+        ClearLines();
+    }
+
+    void AddFeedbackVR()
+    {
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
         {
+
             var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
             if (selected == -1) continue;
 
@@ -63,16 +79,86 @@ public class VisualFeedback : NetworkBehaviour {
             }
 
             if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
-                if(buttonSync.bimanual || buttonSync.lTrigger || buttonSync.rTrigger) //only show the line if user is interacting
+                if (buttonSync.bimanual || buttonSync.lTrigger || buttonSync.rTrigger) //only show the line if user is interacting
                     AddLine(controllersCenter, ObjectManager.Get(selected).transform.position, color); // line from the center of the controllers to the object
 
             UpdateIconsPosition(icons, controllersCenter);
             ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
 
         }
-        ClearLines();
     }
 
+
+    public Vector3 ARCameraPosition;
+    public Quaternion ARCameraRotation;
+
+    void AddFeedbackAR()
+    {
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
+        {
+            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
+            if (selected == -1) continue;
+
+            var tablet = player.transform.GetChild(0);
+            var icons = player.transform.GetChild(1);
+
+            DisableIcons(icons);
+
+            var camPos = player.GetComponent<VisualFeedback>().ARCameraPosition;
+            var camRot = player.GetComponent<VisualFeedback>().ARCameraRotation;
+
+            tablet.transform.position = camPos;
+            tablet.transform.rotation = camRot;
+
+            Color color = greyColor; // other players' ray are grey
+            if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
+            {
+                camPos = Camera.main.transform.position - Camera.main.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
+                color = blueColor; // localplayer's ray is blue
+            }
+
+            AddLine(camPos, ObjectManager.Get(selected).transform.position, color);
+
+            int operation = player.GetComponent<ARInteractionManager>().currentOperation;
+            if (operation > 0 && !player.GetComponent<NetworkIdentity>().isLocalPlayer)
+            {
+                var OperationObj = icons.transform.GetChild(operation - 1);
+                OperationObj.gameObject.SetActive(true);
+                OperationObj.position = camPos * 0.3f + ObjectManager.Get(selected).transform.position * 0.7f;
+
+                OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
+                OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);
+            }
+
+
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSetARCameraPosition(Vector3 p)
+    {
+        if(interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        p = interactableObjects.transform.TransformPoint(p);
+        ARCameraPosition = p;
+    }
+    [Command]
+    public void CmdSetARCameraPosition(Vector3 p)
+    {
+        RpcSetARCameraPosition(p);
+    }
+
+    [ClientRpc]
+    void RpcSetARCameraRotation(Quaternion q)
+    {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        ARCameraRotation = q;
+    }
+
+    [Command]
+    public void CmdSetARCameraRotation(Quaternion q)
+    {
+        RpcSetARCameraRotation(q);
+    }
 
     void AddSelected(int index)
     {
