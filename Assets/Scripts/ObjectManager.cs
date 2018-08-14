@@ -31,7 +31,7 @@ public class ObjectManager : MonoBehaviour
         manager.list[i] = obj;
     }
 
-    public static void AddToSelected(GameObject obj, Hand h)
+    public static void AddToSelected(GameObject obj)
     {
         var index = DetermineIndexSelected(obj);
         ObjSelected objS = new ObjSelected();
@@ -44,18 +44,19 @@ public class ObjectManager : MonoBehaviour
         manager.objSelected = objS;
     }
 
-    public static void SetSelected(GameObject obj, Hand h)
+    public static void SetSelected(GameObject obj)
     {
         if (manager.objSelected == null) // if it is not selected, add to list
-        {
-            AddToSelected(obj, h); // add the object and the hand whitch is selecting it
-        }
-        //else if (GameObject.ReferenceEquals(obj, manager.objSelected)) // it is already selected, we need to verify if the hand that is selecting is added to the object
-        //{
-        //    if (!manager.objSelected.hands.Contains(h)) // if is not the same hand, add this hand to the obj
-        //        manager.objSelected.hands.Add(h);
-        //}
+            AddToSelected(obj); // add the object and the hand whitch is selecting it
     }
+
+    public static void SetSelected(int index)
+    {
+        var g = Get(index);
+        if (manager.objSelected == null) // if it is not selected, add to list
+            AddToSelected(g); // add the object and the hand whitch is selecting it
+    }
+
 
     public static int DetermineIndexSelected(GameObject obj)
     {

@@ -99,7 +99,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public Transform GetLocalTransform()
     {
-        return interactableObjects.transform.parent;
+        return interactableObjects.transform;
     }
 
     [ClientRpc]

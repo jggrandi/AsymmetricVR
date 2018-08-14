@@ -8,8 +8,7 @@ namespace Lean.Touch {
     
     public class ARInteractionManager : NetworkBehaviour {
         
-        public GameObject lockedObjects;
-        public GameObject trackedObjects;
+        public GameObject interactableObjects;
         public GameObject mainHandler;
         public HandleARGUI refGUI;
 
@@ -31,26 +30,28 @@ namespace Lean.Touch {
         void Start()
         {
             if (!isLocalPlayer) return;
-            trackedObjects = GameObject.Find("TrackedObjects");
-            mainHandler = GameObject.Find("MainHandler");
+            interactableObjects = GameObject.Find("InteractableObjects");
+            mainHandler = GameObject.Find("ARGUI");
             if (mainHandler != null)
                 refGUI = mainHandler.GetComponent<HandleARGUI>();
+            ObjectManager.SetSelected(1);
+            Utils.UpdateTouchSensibilty();
         }
 
-        string log ="";
+        //string log ="";
 
-        void OnGUI() {
-            var centeredStyle = GUI.skin.GetStyle("Label");
-            centeredStyle.alignment = TextAnchor.UpperCenter;
-            centeredStyle.fontSize = 30;
-            GUI.Label(new Rect(Screen.width / 2 - 500, Screen.height / 2 - 25, 500, 50), log, centeredStyle);
-        }
+        //void OnGUI() {
+        //    var centeredStyle = GUI.skin.GetStyle("Label");
+        //    centeredStyle.alignment = TextAnchor.UpperCenter;
+        //    centeredStyle.fontSize = 30;
+        //    GUI.Label(new Rect(Screen.width / 2 - 500, Screen.height / 2 - 25, 500, 50), log, centeredStyle);
+        //}
 
 
         void Update() {
             if (!isLocalPlayer) return;
 
-                        selected = ObjectManager.GetSelected();
+            selected = ObjectManager.GetSelected();
             if (selected == null) return; // there is no object to interact with
 
 

@@ -17,7 +17,7 @@ public class InteractableObject : MonoBehaviour
             {
                 hand.HoverLock(null);
                 hand.otherHand.HoverLock(null);
-                ObjectManager.SetSelected(gameObject, hand);
+                ObjectManager.SetSelected(gameObject);
 
             }
         }

@@ -38,12 +38,13 @@ public static class Utils {
 
     public static float ToutchSensibility = 1.0f;
 
-    public static void UpdateToutchSensibilty() {
+    public static void UpdateTouchSensibilty() {
 
         /*
          * MotoX2 420
          * S6 577
          * Nexeus5 445
+         * iPad 350 ~
          * 
          * */
         ToutchSensibility = 350/Screen.dpi;
