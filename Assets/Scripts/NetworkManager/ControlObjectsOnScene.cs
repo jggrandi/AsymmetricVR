@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class ControlObjectsOnScene : NetworkBehaviour {
-    public GameObject VRPlayer;
+    public GameObject VRCamera;
+    public GameObject ARCamera;
+
 
     GameObject netMan;
     // Use this for initialization
@@ -14,10 +16,13 @@ public class ControlObjectsOnScene : NetworkBehaviour {
         if (refMyNetMan.curPlayer == 0)
         {
             Debug.Log("Activating VR Stuff");
-            VRPlayer.SetActive(true);
+            VRCamera.SetActive(true);
         }
         else if (refMyNetMan.curPlayer == 1)
+        {
+            ARCamera.SetActive(true);
             Debug.Log("Activating AR Stuff");
+        }
         
 	}
 	

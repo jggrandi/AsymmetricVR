@@ -8,14 +8,24 @@ public class HandleNetworkTransformations : NetworkBehaviour
 {
     public GameObject interactableObjects;
 
+    void Start()
+    {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        if (isServer) return;
+        CmdSyncAll(); // sync objects prosition when connected.
+    }
+
+
     [Command]
     void CmdSyncAll()
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
-        {
             SyncObj(i);
-        }
     }
 
     public void SyncObj(int index, bool pos = true, bool rot = true, bool scale = true)
@@ -39,32 +49,14 @@ public class HandleNetworkTransformations : NetworkBehaviour
         if (scale != Vector3.zero) g.transform.localScale = scale;
     }
 
-    [Command]
-    void CmdSyncTransform(int index, Vector3 objtransstep, Quaternion objrotstep, Vector3 objscalestep)
-    {
-        RpcSyncTransform(index, objtransstep, objrotstep, objscalestep);
-    }
-
-    [ClientRpc]
-    void RpcSyncTransform(int index, Vector3 objetransstep, Quaternion objrotstep, Vector3 objscalestep)
-    {
-        if (isLocalPlayer) return;
-        var g = ObjectManager.Get(index);
-        
-        g.transform.position += objetransstep;
-        g.transform.rotation = objrotstep * g.transform.rotation;
-        g.transform.localScale += objscalestep; 
-
-    }
-
-    public void Translate(int index, Vector3 translatestep)
+    public void VRTranslate(int index, Vector3 translatestep)
     {
         var g = ObjectManager.Get(index);
-        CmdTranslate(index, translatestep);
+        CmdVRTranslate(index, translatestep);
     }
 
     [Command]
-    void CmdTranslate(int index, Vector3 translatestep)
+    void CmdVRTranslate(int index, Vector3 translatestep)
     {
         var g = ObjectManager.Get(index);
         //g.transform.localPosition += translatestep;
@@ -72,13 +64,13 @@ public class HandleNetworkTransformations : NetworkBehaviour
         SyncObj(index);
     }
 
-    public void Rotate(int index, Quaternion rotationstep)
+    public void VRRotate(int index, Quaternion rotationstep)
     {
-        CmdRotate(index, rotationstep);
+        CmdVRRotate(index, rotationstep);
     }
 
     [Command]
-    void CmdRotate(int index, Quaternion rotationstep)
+    void CmdVRRotate(int index, Quaternion rotationstep)
     {
         var g = ObjectManager.Get(index);
         //g.transform.rotation = rotationstep * g.transform.rotation;
@@ -86,13 +78,13 @@ public class HandleNetworkTransformations : NetworkBehaviour
         SyncObj(index);
     }
 
-    public void Scale(int index, float scalestep)
+    public void VRScale(int index, float scalestep)
     {
-        CmdScale(index, scalestep);
+        CmdVRScale(index, scalestep);
     }
 
     [Command]
-    void CmdScale(int index, float scalestep)
+    void CmdVRScale(int index, float scalestep)
     {
         var g = ObjectManager.Get(index);
         var finalScale = g.transform.localScale.x + scalestep;
@@ -103,18 +95,91 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     }
 
+    //AR methods////////////////
 
-    // Use this for initialization
-    void Start()
+    public Transform GetLocalTransform()
     {
+        return interactableObjects.transform.parent;
+    }
+
+    [ClientRpc]
+    public void RpcLockTransform(int index, Vector3 position, Quaternion rotation)
+    {
+        if (isLocalPlayer) return;
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        position = GetLocalTransform().TransformPoint(position);
+        rotation = rotation * GetLocalTransform().rotation;
+        ObjectManager.Get(index).transform.position = position;
+        ObjectManager.Get(index).transform.rotation = rotation;
     }
 
-    public override void OnStartLocalPlayer()
+    [Command]
+    public void CmdLockTransform(int index, Vector3 position, Quaternion rotation)
     {
-        if (isServer) return;
-        CmdSyncAll(); // sync objects prosition when connected.
+        RpcLockTransform(index, position, rotation);
+        //RpcSyncObj(index, position, rotation, Vector3.zero);
+    }
+    public void LockTransform(int index, Vector3 position, Quaternion rotation)
+    {
+        position = GetLocalTransform().InverseTransformPoint(position);
+        rotation = Quaternion.Inverse(GetLocalTransform().rotation) * rotation;
+        CmdLockTransform(index, position, rotation);
     }
 
+    public void ARTranslate(int index, Vector3 vec)
+    {
+        var g = ObjectManager.Get(index);
+        Vector3 prevLocalPos = g.transform.localPosition;
+        g.transform.position += vec;
+        Vector3 localPos = g.transform.localPosition;
+        g.transform.position -= vec;
+        CmdARTranslate(index, localPos - prevLocalPos);
+    }
 
+    [Command]
+    public void CmdARTranslate(int index, Vector3 vec)
+    {
+        var g = ObjectManager.Get(index);
+        //objTranslateStep = vec;
+        g.transform.localPosition += vec;
+        SyncObj(index);
+    }
+
+    [Command]
+    public void CmdARRotate(int index, Vector3 avg, Vector3 axis, float mag)
+    {
+        var g = ObjectManager.Get(index);
+        avg = GetLocalTransform().TransformPoint(avg);
+        axis = GetLocalTransform().TransformVector(axis);
+        g.transform.RotateAround(avg, axis, mag);
+        SyncObj(index);
+    }
+
+    public void ARRotate(int index, Vector3 avg, Vector3 axis, float mag)
+    {
+        avg = GetLocalTransform().InverseTransformPoint(avg);
+        axis = GetLocalTransform().InverseTransformVector(axis);
+        CmdARRotate(index, avg, axis, mag);
+    }
+
+    [ClientRpc]
+    public void RpcARScale(int index, float scale, Vector3 dir)
+    {
+        var g = ObjectManager.Get(index);
+        g.transform.position += dir * (-1 + scale);
+
+        g.transform.localScale *= scale;
+
+        var s = g.transform.localScale.x;
+        s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
+
+        g.transform.localScale = new Vector3(s, s, s);
+    }
+
+    [Command]
+    public void CmdARScale(int index, float scale, Vector3 dir)
+    {
+        //objScaleStep = scale;
+        RpcARScale(index, scale, dir);
+    }
 }

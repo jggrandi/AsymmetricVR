@@ -867,7 +867,7 @@ MonoBehaviour:
   m_OnlineScene: AsymEnvironment
   m_SpawnPrefabs:
   - {fileID: 102416, guid: 79047de92600f294f913a5c6606b4f53, type: 2}
-  - {fileID: 1827631301884872, guid: 7213fc2c18bb87a4896a12b144879848, type: 2}
+  - {fileID: 1000010815216546, guid: 3093aba5fbf11f24b93e258fe056a989, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

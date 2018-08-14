@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 public static class Utils {
-    public enum Transformations { Translation, Rotation, Scale };
+    public enum Transformations { None, Translation, Rotation, Scale, Lock };
 
 
 	//public static void FromMatrix4x4(this Transform transform, Matrix4x4 matrix)
@@ -38,7 +38,7 @@ public static class Utils {
 
     public static float ToutchSensibility = 1.0f;
 
-    public static void UpdateToutchSemsibilty() {
+    public static void UpdateToutchSensibilty() {
 
         /*
          * MotoX2 420
