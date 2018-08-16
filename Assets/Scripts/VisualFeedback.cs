@@ -14,15 +14,11 @@ public class VisualFeedback : NetworkBehaviour {
     [SyncVar]
     public int objSelectedShared = -1; // the user selections visible by other players
 
-    public GameObject interactableObjects;
-
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
         
         lines = GameObject.Find("Lines");
-        interactableObjects = GameObject.Find("InteractableObjects");
-        if (interactableObjects == null) return;
         ClearLines();
     }
 
@@ -32,8 +28,6 @@ public class VisualFeedback : NetworkBehaviour {
         if (!isLocalPlayer) return;
         
         CmdSyncSelected();
-        CmdSetARCameraPosition(interactableObjects.transform.InverseTransformPoint(Camera.main.transform.position));
-        CmdSetARCameraRotation(Camera.main.transform.rotation);
 
         linesUsed = 0;
         AddFeedbackVR();
@@ -58,6 +52,15 @@ public class VisualFeedback : NetworkBehaviour {
             var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
 
             DisableIcons(icons); // disable all icons. Only show when an action is performed.
+
+            var vrTransform = player.GetComponent<VRTransformSync>();
+            head.transform.position = vrTransform.headPos; // set the virtual avatar pos and rot
+            head.transform.rotation = vrTransform.headRot;
+            leftController.transform.position = vrTransform.leftHPos;
+            leftController.transform.rotation = vrTransform.leftHRot;
+            rightController.transform.position = vrTransform.rightHPos;
+            rightController.transform.rotation = vrTransform.rightHRot;
+
 
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
@@ -88,10 +91,6 @@ public class VisualFeedback : NetworkBehaviour {
         }
     }
 
-
-    public Vector3 ARCameraPosition;
-    public Quaternion ARCameraRotation;
-
     void AddFeedbackAR()
     {
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
@@ -103,28 +102,28 @@ public class VisualFeedback : NetworkBehaviour {
             var icons = player.transform.GetChild(1);
 
             DisableIcons(icons);
+            var arTransform = player.GetComponent<ARTransformSync>();
+            tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
+            tablet.transform.rotation = arTransform.rotation;
 
-            var camPos = player.GetComponent<VisualFeedback>().ARCameraPosition;
-            var camRot = player.GetComponent<VisualFeedback>().ARCameraRotation;
-
-            tablet.transform.position = camPos;
-            tablet.transform.rotation = camRot;
+            var rayAdjust = tablet.transform.position;
 
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
-                camPos = Camera.main.transform.position - Camera.main.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
+                rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
                 color = blueColor; // localplayer's ray is blue
+                tablet.gameObject.SetActive(false); // dont need to render localplayer tablet object
             }
 
-            AddLine(camPos, ObjectManager.Get(selected).transform.position, color);
+            AddLine(rayAdjust, ObjectManager.Get(selected).transform.position, color);
 
             int operation = player.GetComponent<ARInteractionManager>().currentOperation;
             if (operation > 0 && !player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 var OperationObj = icons.transform.GetChild(operation - 1);
                 OperationObj.gameObject.SetActive(true);
-                OperationObj.position = camPos * 0.3f + ObjectManager.Get(selected).transform.position * 0.7f;
+                OperationObj.position = rayAdjust * 0.3f + ObjectManager.Get(selected).transform.position * 0.7f;
 
                 OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
                 OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);
@@ -134,31 +133,7 @@ public class VisualFeedback : NetworkBehaviour {
         }
     }
 
-    [ClientRpc]
-    public void RpcSetARCameraPosition(Vector3 p)
-    {
-        if(interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        p = interactableObjects.transform.TransformPoint(p);
-        ARCameraPosition = p;
-    }
-    [Command]
-    public void CmdSetARCameraPosition(Vector3 p)
-    {
-        RpcSetARCameraPosition(p);
-    }
 
-    [ClientRpc]
-    void RpcSetARCameraRotation(Quaternion q)
-    {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        ARCameraRotation = q;
-    }
-
-    [Command]
-    public void CmdSetARCameraRotation(Quaternion q)
-    {
-        RpcSetARCameraRotation(q);
-    }
 
     void AddSelected(int index)
     {

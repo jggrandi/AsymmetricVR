@@ -229,7 +229,7 @@ namespace Lean.Touch {
                 }
                 if (gestureOperation != 1) {
                     //Vector3 dir = g.transform.position - avg;
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().CmdARScale(selected.index, scale, g.transform.position);
+                    this.gameObject.GetComponent<HandleNetworkTransformations>().CmdARScale(selected.index, scale);
                 }
             //}
         }

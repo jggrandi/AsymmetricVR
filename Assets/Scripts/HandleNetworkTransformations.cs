@@ -162,24 +162,17 @@ public class HandleNetworkTransformations : NetworkBehaviour
         CmdARRotate(index, avg, axis, mag);
     }
 
-    [ClientRpc]
-    public void RpcARScale(int index, float scale, Vector3 dir)
-    {
-        var g = ObjectManager.Get(index);
-        g.transform.position += dir * (-1 + scale);
-
-        g.transform.localScale *= scale;
-
-        var s = g.transform.localScale.x;
-        s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
-
-        g.transform.localScale = new Vector3(s, s, s);
-    }
 
     [Command]
-    public void CmdARScale(int index, float scale, Vector3 dir)
+    public void CmdARScale(int index, float scale)
     {
-        //objScaleStep = scale;
-        RpcARScale(index, scale, dir);
+        var g = ObjectManager.Get(index);
+
+        g.transform.localScale *= scale;
+        var s = g.transform.localScale.x;
+        s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
+        g.transform.localScale = new Vector3(s, s, s);
+
+        SyncObj(index);
     }
 }

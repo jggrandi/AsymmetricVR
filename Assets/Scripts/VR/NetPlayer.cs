@@ -40,6 +40,9 @@ namespace Valve.VR.InteractionSystem
             }
             else
             {
+                Head.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = true);
+                LeftController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = true);
+                RightController.GetComponentsInChildren<Renderer>(true).ToList().ForEach(x => x.enabled = true);
                 gameObject.name = "VRPlayer (Remote)";
             }
             

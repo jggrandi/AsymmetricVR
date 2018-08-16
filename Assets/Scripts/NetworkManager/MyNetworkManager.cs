@@ -5,7 +5,7 @@ using UnityEngine.Networking.NetworkSystem;
 public class MyNetworkManager : NetworkManager
 {
 
-    public int curPlayer;
+    public int curPlayer = -1;
 
 
     //Called on client when connect
