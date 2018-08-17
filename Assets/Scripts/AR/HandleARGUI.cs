@@ -13,7 +13,7 @@ public class HandleARGUI : MonoBehaviour {
     {
         netMan = GameObject.Find("NetworkManager");
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
-        if(refMyNetMan.curPlayer == (int)Utils.PlayerType.AR)
+        if(refMyNetMan.curPlayer == Utils.PlayerType.AR)
             this.gameObject.GetComponent<Canvas>().enabled = true;
 
     }

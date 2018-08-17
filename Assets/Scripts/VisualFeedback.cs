@@ -102,8 +102,8 @@ public class VisualFeedback : NetworkBehaviour {
             DisableIcons(icons);
             var arTransform = player.GetComponent<ARTransformSync>();
 
-            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.1f);
-            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.1f);
+            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.01f);
+            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.01f);
             //tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
             //tablet.transform.rotation = arTransform.rotation;
 
@@ -112,13 +112,16 @@ public class VisualFeedback : NetworkBehaviour {
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
-                rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
+                //rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
                 color = blueColor; // localplayer's ray is blue
             }
 
-            AddLine(rayAdjust, ObjectManager.Get(selected).transform.position, color);
-
             int operation = player.GetComponent<ARInteractionManager>().currentOperation;
+
+            if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
+                if(operation != (int)Utils.Transformations.None) //only show the line if user is interacting
+                    AddLine(rayAdjust, ObjectManager.Get(selected).transform.position, color); // add line 
+
             if (operation > 0 && !player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 var OperationObj = icons.transform.GetChild(operation - 1);
