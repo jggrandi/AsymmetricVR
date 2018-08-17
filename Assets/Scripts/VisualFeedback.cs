@@ -39,19 +39,10 @@ public class VisualFeedback : NetworkBehaviour {
     {
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
         {
-
-            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
-            if (selected == -1) continue;
-
-            var buttonSync = player.GetComponent<ButtonSync>();
-            if (buttonSync == null) return;
-
             var head = player.transform.GetChild(0); // if the order changes in the prefab, it is necessary to update these indexes
             var leftController = player.transform.GetChild(1);
             var rightController = player.transform.GetChild(2);
             var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
-
-            DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
             var vrTransform = player.GetComponent<VRTransformSync>();
             head.transform.position = vrTransform.headPos; // set the virtual avatar pos and rot
@@ -61,6 +52,13 @@ public class VisualFeedback : NetworkBehaviour {
             rightController.transform.position = vrTransform.rightHPos;
             rightController.transform.rotation = vrTransform.rightHRot;
 
+            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
+            if (selected == -1) continue;
+
+            var buttonSync = player.GetComponent<ButtonSync>();
+            if (buttonSync == null) return;
+
+            DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
@@ -95,11 +93,11 @@ public class VisualFeedback : NetworkBehaviour {
     {
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
         {
-            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
-            if (selected == -1) continue;
-
             var tablet = player.transform.GetChild(0);
             var icons = player.transform.GetChild(1);
+
+            var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
+            if (selected == -1) continue;
 
             DisableIcons(icons);
             var arTransform = player.GetComponent<ARTransformSync>();
@@ -113,7 +111,6 @@ public class VisualFeedback : NetworkBehaviour {
             {
                 rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
                 color = blueColor; // localplayer's ray is blue
-                tablet.gameObject.SetActive(false); // dont need to render localplayer tablet object
             }
 
             AddLine(rayAdjust, ObjectManager.Get(selected).transform.position, color);
