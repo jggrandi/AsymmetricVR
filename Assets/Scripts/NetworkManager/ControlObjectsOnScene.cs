@@ -13,14 +13,14 @@ public class ControlObjectsOnScene : MonoBehaviour {
     void Start () {
         netMan = GameObject.Find("NetworkManager");
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
-        if (refMyNetMan.curPlayer == 0)
+        if (refMyNetMan.curPlayer == (int)Utils.PlayerType.VR)
         {
             VRCamera.SetActive(true);
             ARCamera.SetActive(false);
 
             Debug.Log("Activating VR Stuff");
         }
-        else if (refMyNetMan.curPlayer == 1)
+        else if (refMyNetMan.curPlayer == (int)Utils.PlayerType.AR)
         {
             ARCamera.SetActive(true);
             VRCamera.SetActive(false);
@@ -28,7 +28,7 @@ public class ControlObjectsOnScene : MonoBehaviour {
         }
         else
         {
-            refMyNetMan.curPlayer = -1;
+            refMyNetMan.curPlayer = (int)Utils.PlayerType.None;
             Debug.Log("Fail to activate VR or AR camera.");
         }
 

@@ -9,7 +9,7 @@ namespace Lean.Touch {
     public class ARInteractionManager : NetworkBehaviour {
         
         public GameObject interactableObjects;
-        public GameObject mainHandler;
+        public GameObject canvas;
         public HandleARGUI refGUI;
 
         public bool isTapForTransform = false;
@@ -31,9 +31,9 @@ namespace Lean.Touch {
         {
             if (!isLocalPlayer) return;
             interactableObjects = GameObject.Find("InteractableObjects");
-            mainHandler = GameObject.Find("ARGUI");
-            if (mainHandler != null)
-                refGUI = mainHandler.GetComponent<HandleARGUI>();
+            canvas = GameObject.Find("Canvas");
+            if (canvas != null)
+                refGUI = canvas.GetComponent<HandleARGUI>();
             ObjectManager.SetSelected(1);
             Utils.UpdateTouchSensibilty();
         }

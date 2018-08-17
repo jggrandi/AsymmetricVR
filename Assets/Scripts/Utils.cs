@@ -5,16 +5,17 @@ using System.Threading;
 
 public static class Utils {
     public enum Transformations { None, Translation, Rotation, Scale, Lock };
+    public enum PlayerType { VR, AR, None };
 
 
-	//public static void FromMatrix4x4(this Transform transform, Matrix4x4 matrix)
-	//{
-	//	transform.localScale = matrix.GetScale();
-	//	transform.rotation = matrix.GetRotation();
-	//	transform.position = matrix.GetPosition();
-	//}
-	
-	public static Quaternion GetRotationn(this Matrix4x4 matrix)
+    //public static void FromMatrix4x4(this Transform transform, Matrix4x4 matrix)
+    //{
+    //	transform.localScale = matrix.GetScale();
+    //	transform.rotation = matrix.GetRotation();
+    //	transform.position = matrix.GetPosition();
+    //}
+
+    public static Quaternion GetRotationn(this Matrix4x4 matrix)
 	{
 		var qw = Mathf.Sqrt(1f + matrix.m00 + matrix.m11 + matrix.m22) / 2;
 		var w = 4 * qw;

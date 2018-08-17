@@ -7,7 +7,19 @@ public class HandleARGUI : MonoBehaviour {
 
     public bool lockTransform = false;
 
-    public void buttonLock () {
+    GameObject netMan;
+    // Use this for initialization
+    void Start()
+    {
+        netMan = GameObject.Find("NetworkManager");
+        var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
+        if(refMyNetMan.curPlayer == (int)Utils.PlayerType.AR)
+            this.gameObject.GetComponent<Canvas>().enabled = true;
+
+    }
+
+    public void buttonLock()
+    {
         lockTransform = true;
     }
 

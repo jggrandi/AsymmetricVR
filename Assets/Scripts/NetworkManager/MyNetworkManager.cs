@@ -5,7 +5,7 @@ using UnityEngine.Networking.NetworkSystem;
 public class MyNetworkManager : NetworkManager
 {
 
-    public int curPlayer = -1;
+    public int curPlayer = (int)Utils.PlayerType.None;
 
 
     //Called on client when connect
@@ -52,12 +52,12 @@ public class MyNetworkManager : NetworkManager
 
     public void btn0()
     {
-        curPlayer = 0;
+        curPlayer = (int)Utils.PlayerType.VR;
     }
 
     public void btn1()
     {
-        curPlayer = 1;
+        curPlayer = (int)Utils.PlayerType.AR;
     }
 
 }
