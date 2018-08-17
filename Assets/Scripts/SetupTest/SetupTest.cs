@@ -67,7 +67,7 @@ public class SetupTest : NetworkBehaviour {
 
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
             player.gameObject.SetActive(false);
-
+        pc = networkManager.client.connection.playerControllers;
         if (pc.Count == 1)
             GameObject.Find("Player1").GetComponent<Text>().text = pc[0].gameObject.name;
 
