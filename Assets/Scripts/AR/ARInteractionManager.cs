@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace Lean.Touch {
 
@@ -29,6 +30,7 @@ namespace Lean.Touch {
 
         void Start()
         {
+            if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
             if (!isLocalPlayer) return;
             interactableObjects = GameObject.Find("InteractableObjects");
             canvas = GameObject.Find("Canvas");
@@ -49,6 +51,7 @@ namespace Lean.Touch {
 
 
         void Update() {
+            if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
             if (!isLocalPlayer) return;
 
             selected = ObjectManager.GetSelected();

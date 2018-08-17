@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
 public class VRTransformSync : NetworkBehaviour
@@ -18,6 +19,8 @@ public class VRTransformSync : NetworkBehaviour
 
     private void Start()
     {
+        if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
+
         if (!isLocalPlayer) return;
 
         player = Player.instance;

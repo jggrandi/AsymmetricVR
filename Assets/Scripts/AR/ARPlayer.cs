@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class ARPlayer : NetworkBehaviour {
 
@@ -10,7 +11,9 @@ public class ARPlayer : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
         if (tablet == null) return;
+
         if (isLocalPlayer)
         {
             if (tablet == null)

@@ -243,4 +243,108 @@ public static class Utils {
         t.Start();
     }
 
+
+    static public List<int> randomizeVector(int size)
+    {
+
+        var randomNumbers = new List<int>();
+        var numbers = new List<int>();
+
+
+        for (int i = 0; i < size; i++) // numbers  to be randomized
+            numbers.Add(i);
+
+        for (int i = 0; i < size; i++)
+        {
+            var thisNumber = UnityEngine.Random.Range(0, numbers.Count);
+            randomNumbers.Add(numbers[thisNumber]);
+            numbers.RemoveAt(thisNumber);
+        }
+        return randomNumbers;
+    }
+
+    static public List<int> randomizeVector(int begin, int end)
+    {
+
+        var randomNumbers = new List<int>();
+        var numbers = new List<int>();
+
+
+        for (int i = begin; i < end; i++) // numbers  to be randomized
+            numbers.Add(i);
+
+        for (int i = begin; i < end; i++)
+        {
+            var thisNumber = UnityEngine.Random.Range(0, numbers.Count);
+            randomNumbers.Add(numbers[thisNumber]);
+            numbers.RemoveAt(thisNumber);
+        }
+        return randomNumbers;
+    }
+
+
+    static public List<int> randomizeVector(int[] vec)
+    {
+
+        var randomNumbers = new List<int>();
+        var numbers = new List<int>();
+
+
+        for (int i = 0; i < vec.Length; i++) // numbers  to be randomized
+            numbers.Add(vec[i]);
+
+        for (int i = 0; i < vec.Length; i++)
+        {
+            var thisNumber = UnityEngine.Random.Range(0, numbers.Count);
+            randomNumbers.Add(numbers[thisNumber]);
+            numbers.RemoveAt(thisNumber);
+        }
+        return randomNumbers;
+    }
+
+    public static List<int> allPermutations = new List<int>();
+
+    public static int[] selectTaskSequence(int uid, int tasks)
+    { //Select an permutation based on the ID given
+        allPermutations.Clear();
+        int[] elements = new int[tasks];
+        for (int i = 0; i < tasks; i++)
+            elements[i] = i;
+        permute(elements, 0, tasks); // Generate all permutations
+
+        int permutationIndex = uid % (allPermutations.Count / tasks); // the beginning of the sequence to be taken from the list of all permutations
+
+        int[] thePermutation = new int[tasks];
+        for (int i = 0; i < tasks; i++)
+            thePermutation[i] = allPermutations[permutationIndex * tasks + i]; //store the permutation selected
+
+        return thePermutation;
+    }
+
+    public static void permute(int[] arry, int i, int n)
+    {
+        int j;
+        if (i == n)
+            for (int k = 0; k < arry.Length; k++)
+                allPermutations.Add(arry[k]);  // Acumulate all permutations in an List
+        else
+        {
+            for (j = i; j < n; j++)
+            {
+                swap(ref arry[i], ref arry[j]);
+                permute(arry, i + 1, n);
+                swap(ref arry[i], ref arry[j]); //backtrack
+            }
+        }
+    }
+
+    public static void swap(ref int a, ref int b)
+    {
+        int tmp;
+        tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+
 }

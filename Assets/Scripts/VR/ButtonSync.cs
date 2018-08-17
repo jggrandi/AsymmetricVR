@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
 
@@ -25,6 +26,7 @@ public class ButtonSync : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
+        if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
         if (!isLocalPlayer) return;
 
         player = Player.instance;
