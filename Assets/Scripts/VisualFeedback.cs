@@ -101,8 +101,11 @@ public class VisualFeedback : NetworkBehaviour {
 
             DisableIcons(icons);
             var arTransform = player.GetComponent<ARTransformSync>();
-            tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
-            tablet.transform.rotation = arTransform.rotation;
+
+            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.1f);
+            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.1f);
+            //tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
+            //tablet.transform.rotation = arTransform.rotation;
 
             var rayAdjust = tablet.transform.position;
 
