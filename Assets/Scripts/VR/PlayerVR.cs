@@ -14,6 +14,11 @@ public class PlayerVR : NetworkBehaviour
 
     Player player = null;
 
+    void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     void Start()
     {
         if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
