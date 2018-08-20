@@ -13,14 +13,14 @@ public class ControlObjectsOnScene : MonoBehaviour {
     void Start () {
         netMan = GameObject.Find("NetworkManager");
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
-        if (refMyNetMan.curPlayer == Utils.PlayerType.VR)
+        if (refMyNetMan.playerType == Utils.PlayerType.VR)
         {
             VRCamera.SetActive(true);
             ARCamera.SetActive(false);
 
             Debug.Log("Activating VR Stuff");
         }
-        else if (refMyNetMan.curPlayer == Utils.PlayerType.AR)
+        else if (refMyNetMan.playerType == Utils.PlayerType.AR)
         {
             ARCamera.SetActive(true);
             VRCamera.SetActive(false);
@@ -28,15 +28,28 @@ public class ControlObjectsOnScene : MonoBehaviour {
         }
         else
         {
-            refMyNetMan.curPlayer = Utils.PlayerType.None;
+            refMyNetMan.playerType = Utils.PlayerType.None;
             Debug.Log("Fail to activate VR or AR camera.");
         }
 
-        
-	}
+
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
+            player.gameObject.SetActive(true);
+
+
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
+            player.gameObject.SetActive(true);
+
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
+            player.gameObject.SetActive(true);
+
+
+        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
+            player.gameObject.SetActive(true);
+    }
 }

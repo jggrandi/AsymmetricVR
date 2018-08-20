@@ -11,7 +11,7 @@ public class ARPlayer : NetworkBehaviour {
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+//        DontDestroyOnLoad(this.gameObject);
     }
 
     // Use this for initialization

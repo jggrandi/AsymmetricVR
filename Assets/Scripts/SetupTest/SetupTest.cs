@@ -17,6 +17,8 @@ public class SetupTest : NetworkBehaviour {
         pc = networkManager.client.connection.playerControllers;
         playersConnected = new List<GameObject>();
 
+        NetworkServer.SetAllClientsNotReady();
+
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
             player.gameObject.SetActive(false);
 

@@ -16,7 +16,7 @@ public class PlayerVR : NetworkBehaviour
 
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+//        DontDestroyOnLoad(this.gameObject);
     }
 
     void Start()
