@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 
 public class ControlObjectsOnScene : MonoBehaviour {
     public GameObject VRCamera;
@@ -45,6 +45,7 @@ public class ControlObjectsOnScene : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
             player.gameObject.SetActive(true);
 

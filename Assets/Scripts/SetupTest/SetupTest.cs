@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SetupTest : NetworkBehaviour {
@@ -14,10 +15,6 @@ public class SetupTest : NetworkBehaviour {
 
     void Start()
     {
-        pc = networkManager.client.connection.playerControllers;
-        playersConnected = new List<GameObject>();
-
-        NetworkServer.SetAllClientsNotReady();
 
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
             player.gameObject.SetActive(false);
@@ -50,18 +47,8 @@ public class SetupTest : NetworkBehaviour {
         }
     }
 
-    bool alreadyOnTheList = false;
-
     void Update()
     {
-        if (!isServer) return;
-
-        //for (int i = 0; i < pc.Count; i++)
-        //{
-
-        //    if (pc[i].IsValid)
-        //        Debug.Log(pc[i].gameObject.name);
-        //}
 
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
             player.gameObject.SetActive(false);
@@ -69,15 +56,6 @@ public class SetupTest : NetworkBehaviour {
 
         foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
             player.gameObject.SetActive(false);
-        pc = networkManager.client.connection.playerControllers;
-        if (pc.Count == 1)
-            GameObject.Find("Player1").GetComponent<Text>().text = pc[0].gameObject.name;
-
-        if (pc.Count == 2)
-        {
-            GameObject.Find("Player1").GetComponent<Text>().text = pc[0].gameObject.name;
-            GameObject.Find("Player2").GetComponent<Text>().text = pc[1].gameObject.name;
-        }
 
 
     }
@@ -87,7 +65,7 @@ public class SetupTest : NetworkBehaviour {
         foreach (var p in playersConnected)
         {
             if (string.Compare(p.name, player.name) == 0)
-                alreadyOnTheList = true;
+                return true;
         }
         return false;
     }

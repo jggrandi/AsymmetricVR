@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
 public class HandleNetworkTransformations : NetworkBehaviour
@@ -16,7 +17,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         if (isServer) return;
-        CmdSyncAll(); // sync objects prosition when connected.
+        if (SceneManager.GetActiveScene().name != "SetupTest")
+            CmdSyncAll(); // sync objects prosition when connected.
     }
 
 

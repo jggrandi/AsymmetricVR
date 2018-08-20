@@ -30,11 +30,11 @@ public class MyNetworkManager : NetworkManager
     }
 
     ////Called on client when connect
-    //public override void OnClientConnect(NetworkConnection conn)
-    //{
-    //    IntegerMessage msg = new IntegerMessage((int)playerType); // Create message to set the player
-    //    ClientScene.AddPlayer(conn, 0, msg); // Call Add player and pass the message
-    //}
+    public override void OnClientConnect(NetworkConnection conn)
+    {
+        playerPrefab = spawnPrefabs[(int)playerType];
+        autoCreatePlayer = true;
+    }
 
     // Server
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
@@ -46,8 +46,8 @@ public class MyNetworkManager : NetworkManager
             var stream = extraMessageReader.ReadMessage<IntegerMessage>();
             pT = (int)(Utils.PlayerType)stream.value;
         }
-        playerPrefab = spawnPrefabs[pT]; //Select the prefab from the spawnable objects list
-        var player = Instantiate(playerPrefab, new Vector3(Random.Range(-2,2),0,0), Quaternion.identity) as GameObject; // Create player object with prefab
+        var pP = spawnPrefabs[pT]; //Select the prefab from the spawnable objects list
+        var player = Instantiate(pP, new Vector3(Random.Range(-2, 2), 0, 0), Quaternion.identity) as GameObject; // Create player object with prefab
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId); // Add player object for connection
     }
 
@@ -56,6 +56,7 @@ public class MyNetworkManager : NetworkManager
         Debug.Log("Client CALLED");
         IntegerMessage msg = new IntegerMessage((int)playerType); // Create message to set the player
         ClientScene.AddPlayer(conn, 0, msg); // Call Add player and pass the message
+
     }
 
     public void SelectVR()

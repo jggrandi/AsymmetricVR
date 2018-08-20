@@ -19,14 +19,14 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4000010454337842}
-  - component: {fileID: 114697547858889804}
-  - component: {fileID: 114165189406426578}
-  - component: {fileID: 114089961737337006}
-  - component: {fileID: 114860502486217136}
-  - component: {fileID: 114465845408484092}
-  - component: {fileID: 114215069569806404}
+  - component: {fileID: 114000012560445992}
+  - component: {fileID: 114180109860038712}
+  - component: {fileID: 114667699578071008}
+  - component: {fileID: 114040854270740204}
+  - component: {fileID: 114440023099070912}
+  - component: {fileID: 114765989886888740}
   m_Layer: 0
-  m_Name: ARPlayer
+  m_Name: ARPlayer 1
   m_TagString: PlayerAR
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -967,7 +967,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114089961737337006
+--- !u!114 &114000012560445992
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -975,13 +975,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000010815216546}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43f9a75c6382f1742a4599b9ffc2ae72, type: 3}
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 38
+    i1: 200
+    i2: 80
+    i3: 74
+    i4: 47
+    i5: 105
+    i6: 236
+    i7: 132
+    i8: 248
+    i9: 60
+    i10: 120
+    i11: 137
+    i12: 16
+    i13: 244
+    i14: 178
+    i15: 61
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 1
+--- !u!114 &114040854270740204
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010815216546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a81b3e8d7aa65f488910a9f8f601098, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   interactableObjects: {fileID: 0}
-  position: {x: 0, y: 0, z: 0}
-  rotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &114165189406426578
+--- !u!114 &114180109860038712
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -993,7 +1023,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tablet: {fileID: 4034151953605066}
---- !u!114 &114215069569806404
+--- !u!114 &114440023099070912
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1006,51 +1036,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lines: {fileID: 0}
   objSelectedShared: -1
---- !u!114 &114465845408484092
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010815216546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a81b3e8d7aa65f488910a9f8f601098, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactableObjects: {fileID: 0}
---- !u!114 &114697547858889804
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010815216546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 48
-    i1: 147
-    i2: 171
-    i3: 165
-    i4: 251
-    i5: 241
-    i6: 31
-    i7: 36
-    i8: 185
-    i9: 62
-    i10: 37
-    i11: 143
-    i12: 224
-    i13: 86
-    i14: 169
-    i15: 137
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 1
---- !u!114 &114860502486217136
+--- !u!114 &114667699578071008
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1069,6 +1055,20 @@ MonoBehaviour:
   modality: -1
   currentOperation: 0
   gestureOperation: 0
+--- !u!114 &114765989886888740
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010815216546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f9a75c6382f1742a4599b9ffc2ae72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactableObjects: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  rotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!136 &136431614787888746
 CapsuleCollider:
   m_ObjectHideFlags: 1
