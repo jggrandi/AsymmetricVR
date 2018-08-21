@@ -12,12 +12,11 @@ public class VisualFeedback : NetworkBehaviour {
     
     int linesUsed = 0;
 
+    int indexObjSelected;
     // Use this for initialization
     void Start () {
-
-            lines = GameObject.Find("Lines");
-            ClearLines();
-
+        lines = GameObject.Find("Lines");
+        ClearLines();
     }
 
     // Update is called once per frame
@@ -25,7 +24,7 @@ public class VisualFeedback : NetworkBehaviour {
     {
         //if(!isServer && isClient)
         //    CmdSyncSelected();
-
+        indexObjSelected = ObjectManager.manager.objSelectedShared;
         linesUsed = 0;
         AddFeedbackVR();
         AddFeedbackAR();
@@ -51,7 +50,7 @@ public class VisualFeedback : NetworkBehaviour {
             rightController.transform.rotation = vrTransform.rightHRot;
 
             //var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
-            if (ObjectManager.manager.objSelectedShared == -1) continue;
+            if (indexObjSelected == -1) continue;
 
             var buttonSync = player.GetComponent<ButtonSync>();
             if (buttonSync == null) return;
@@ -79,7 +78,7 @@ public class VisualFeedback : NetworkBehaviour {
 
             if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
                 if (buttonSync.bimanual || buttonSync.lTrigger || buttonSync.rTrigger) //only show the line if user is interacting
-                    AddLine(controllersCenter, ObjectManager.Get(ObjectManager.manager.objSelectedShared).transform.position, color); // line from the center of the controllers to the object
+                    AddLine(controllersCenter, ObjectManager.Get(indexObjSelected).transform.position, color); // line from the center of the controllers to the object
 
             UpdateIconsPosition(icons, controllersCenter);
             ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
@@ -96,7 +95,7 @@ public class VisualFeedback : NetworkBehaviour {
 
             //var selected = player.GetComponent<VisualFeedback>().;
 
-            if (ObjectManager.manager.objSelectedShared == -1) continue;
+            if (indexObjSelected == -1) continue;
 
             DisableIcons(icons);
             var arTransform = player.GetComponent<ARTransformSync>();
@@ -119,13 +118,13 @@ public class VisualFeedback : NetworkBehaviour {
 
             if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
                 if(operation != (int)Utils.Transformations.None) //only show the line if user is interacting
-                    AddLine(rayAdjust, ObjectManager.Get(ObjectManager.manager.objSelectedShared).transform.position, color); // add line 
+                    AddLine(rayAdjust, ObjectManager.Get(indexObjSelected).transform.position, color); // add line 
 
             if (operation > 0 && !player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 var OperationObj = icons.transform.GetChild(operation - 1);
                 OperationObj.gameObject.SetActive(true);
-                OperationObj.position = rayAdjust * 0.3f + ObjectManager.Get(ObjectManager.manager.objSelectedShared).transform.position * 0.7f;
+                OperationObj.position = rayAdjust * 0.3f + ObjectManager.Get(indexObjSelected).transform.position * 0.7f;
 
                 OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
                 OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);

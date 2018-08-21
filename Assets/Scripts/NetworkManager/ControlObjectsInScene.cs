@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ControlObjectsOnScene : MonoBehaviour {
-    public GameObject VRCamera;
-    public GameObject ARCamera;
-    public GameObject ServerCamera;
+public class ControlObjectsInScene : MonoBehaviour {
+    public GameObject VRStuff;
+    public GameObject ARStuff;
+    public GameObject ServerStuff;
 
 
     GameObject netMan;
@@ -16,25 +16,25 @@ public class ControlObjectsOnScene : MonoBehaviour {
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         if (refMyNetMan.playerType == Utils.PlayerType.VR)
         {
-            VRCamera.SetActive(true);
-            ARCamera.SetActive(false);
-            ServerCamera.SetActive(false);
+            VRStuff.SetActive(true);
+            ARStuff.SetActive(false);
+            ServerStuff.SetActive(false);
             Debug.Log("Activating VR Stuff");
         }
         else if (refMyNetMan.playerType == Utils.PlayerType.AR)
         {
-            ARCamera.SetActive(true);
-            VRCamera.SetActive(false);
-            ServerCamera.SetActive(false);
+            ARStuff.SetActive(true);
+            VRStuff.SetActive(false);
+            ServerStuff.SetActive(false);
             Debug.Log("Activating AR Stuff");
         }
         else 
         {
             refMyNetMan.playerType = Utils.PlayerType.None;
-            ARCamera.SetActive(false);
-            VRCamera.SetActive(false);
-            ServerCamera.SetActive(true);
-            Debug.Log("Activating Server Camera");
+            ARStuff.SetActive(false);
+            VRStuff.SetActive(false);
+            ServerStuff.SetActive(true);
+            Debug.Log("Activating Server Stuff");
         }
 
 

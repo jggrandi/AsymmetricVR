@@ -3,31 +3,13 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class MyNetworkManager : NetworkManager
 {
 
     public Utils.PlayerType playerType = Utils.PlayerType.None;
     public string userID;
-    bool isInSetup = true;
-
-    //private void Start()
-    //{
-    //    playerType =
-    //}
-
-    private void Update()
-    {
-        if (!isInSetup) return;
-
-        var tVR = GameObject.Find("ToggleVR").GetComponent<Toggle>();
-        var tAR = GameObject.Find("ToggleAR").GetComponent<Toggle>();
-
-        if (!tVR.isOn && !tAR.isOn)
-            playerType = Utils.PlayerType.None;
-
-
-    }
 
     ////Called on client when connect
     public override void OnClientConnect(NetworkConnection conn)
@@ -75,16 +57,15 @@ public class MyNetworkManager : NetworkManager
     {
         SetPort();
         userID = "0";
-        isInSetup = false;
         NetworkManager.singleton.StartServer();
     }
 
     public void JoinSession()
     {
-        if (!SetUserID()) return;
+        if (!SetUserID()) return; // only connect if it has user id
+        if (playerType == Utils.PlayerType.None) return; // and player type is selected
         SetPort();
         SetIpAddress();
-        isInSetup = false;
         NetworkManager.singleton.StartClient();
     }
 
