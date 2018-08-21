@@ -9,11 +9,6 @@ public class ARPlayer : NetworkBehaviour {
 
     public Transform tablet;
 
-    void Awake()
-    {
-//        DontDestroyOnLoad(this.gameObject);
-    }
-
     // Use this for initialization
     void Start () {
         if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;

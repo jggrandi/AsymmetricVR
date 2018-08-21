@@ -19,7 +19,7 @@ public class TestController : NetworkBehaviour {
     public int sceneIndex = 0;
 
 
-    void Awake() {
+    void Start() {
 
         if (tcontrol == null)
         { 

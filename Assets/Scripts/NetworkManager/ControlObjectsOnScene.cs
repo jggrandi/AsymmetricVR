@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class ControlObjectsOnScene : MonoBehaviour {
     public GameObject VRCamera;
     public GameObject ARCamera;
+    public GameObject ServerCamera;
 
 
     GameObject netMan;
@@ -17,19 +18,23 @@ public class ControlObjectsOnScene : MonoBehaviour {
         {
             VRCamera.SetActive(true);
             ARCamera.SetActive(false);
-
+            ServerCamera.SetActive(false);
             Debug.Log("Activating VR Stuff");
         }
         else if (refMyNetMan.playerType == Utils.PlayerType.AR)
         {
             ARCamera.SetActive(true);
             VRCamera.SetActive(false);
+            ServerCamera.SetActive(false);
             Debug.Log("Activating AR Stuff");
         }
-        else
+        else 
         {
             refMyNetMan.playerType = Utils.PlayerType.None;
-            Debug.Log("Fail to activate VR or AR camera.");
+            ARCamera.SetActive(false);
+            VRCamera.SetActive(false);
+            ServerCamera.SetActive(true);
+            Debug.Log("Activating Server Camera");
         }
 
 

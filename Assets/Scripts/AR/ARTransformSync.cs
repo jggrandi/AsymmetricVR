@@ -34,6 +34,9 @@ public class ARTransformSync : NetworkBehaviour {
     [Command]
     public void CmdSetARCameraPosition(Vector3 p)
     {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        p = interactableObjects.transform.TransformPoint(p);
+        position = p;
         RpcSetARCameraPosition(p);
     }
 
@@ -49,6 +52,8 @@ public class ARTransformSync : NetworkBehaviour {
     [Command]
     public void CmdSetARCameraRotation(Quaternion q)
     {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        rotation = q;
         RpcSetARCameraRotation(q);
     }
 

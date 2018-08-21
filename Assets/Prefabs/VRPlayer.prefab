@@ -286,7 +286,6 @@ GameObject:
   - component: {fileID: 114454689216363968}
   - component: {fileID: 114925987982225932}
   - component: {fileID: 114123993681782652}
-  - component: {fileID: 114089207430224248}
   m_Layer: 0
   m_Name: VRPlayer
   m_TagString: PlayerVR
@@ -1170,19 +1169,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114089207430224248
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1731187058201612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bbcb2ccfa49e2f4a84dcff8a4813dbd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lines: {fileID: 0}
-  objSelectedShared: -1
 --- !u!114 &114123993681782652
 MonoBehaviour:
   m_ObjectHideFlags: 1

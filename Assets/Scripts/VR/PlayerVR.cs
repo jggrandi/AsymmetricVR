@@ -21,8 +21,6 @@ public class PlayerVR : NetworkBehaviour
 
     void Start()
     {
-        if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
-
         if (isLocalPlayer)
         {
             player = Player.instance;

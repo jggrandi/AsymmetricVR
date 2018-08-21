@@ -101,6 +101,15 @@ public class ButtonSync : NetworkBehaviour {
     [Command]
     void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip)
     {
+        lTrigger = ltrigger;
+        rTrigger = rtrigger;
+        lA = la;
+        rA = ra;
+        lApp = lapp;
+        rApp = rapp;
+        lGrip = lgrip;
+        rGrip = rgrip;
+
         RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip);
     }
 
@@ -121,6 +130,8 @@ public class ButtonSync : NetworkBehaviour {
     [Command]
     void CmdUpdateActions(bool biman, int lockcomb)
     {
+        bimanual = biman;
+        lockCombination = lockcomb;
         RpcUpdateActions(biman, lockcomb);
     }
 

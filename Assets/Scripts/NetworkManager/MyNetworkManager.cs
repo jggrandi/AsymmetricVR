@@ -7,14 +7,14 @@ using UnityEngine.SceneManagement;
 public class MyNetworkManager : NetworkManager
 {
 
-    public Utils.PlayerType playerType;
+    public Utils.PlayerType playerType = Utils.PlayerType.None;
     public string userID;
     bool isInSetup = true;
 
-    private void Start()
-    {
-        playerType = Utils.PlayerType.None;
-    }
+    //private void Start()
+    //{
+    //    playerType =
+    //}
 
     private void Update()
     {
@@ -32,8 +32,8 @@ public class MyNetworkManager : NetworkManager
     ////Called on client when connect
     public override void OnClientConnect(NetworkConnection conn)
     {
-        playerPrefab = spawnPrefabs[(int)playerType];
-        autoCreatePlayer = true;
+        Debug.Log("OnClientConnect");
+        //base.OnClientConnect(conn);
     }
 
     // Server
@@ -49,13 +49,15 @@ public class MyNetworkManager : NetworkManager
         var pP = spawnPrefabs[pT]; //Select the prefab from the spawnable objects list
         var player = Instantiate(pP, new Vector3(Random.Range(-2, 2), 0, 0), Quaternion.identity) as GameObject; // Create player object with prefab
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId); // Add player object for connection
+        //base.OnServerAddPlayer(conn, playerControllerId, extraMessageReader);
     }
 
     public override void OnClientSceneChanged(NetworkConnection conn)
     {
-        Debug.Log("Client CALLED");
+        Debug.Log("OnClientSceneChanged");
         IntegerMessage msg = new IntegerMessage((int)playerType); // Create message to set the player
         ClientScene.AddPlayer(conn, 0, msg); // Call Add player and pass the message
+        //base.OnClientSceneChanged(conn);
 
     }
 
@@ -74,7 +76,7 @@ public class MyNetworkManager : NetworkManager
         SetPort();
         userID = "0";
         isInSetup = false;
-        NetworkManager.singleton.StartHost();
+        NetworkManager.singleton.StartServer();
     }
 
     public void JoinSession()

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using Valve.VR.InteractionSystem;
 
 
@@ -11,13 +12,27 @@ public class ObjSelected
     //public List<Hand> hands;
 }
 
-public class ObjectManager : MonoBehaviour
+public class ObjectManager : NetworkBehaviour
 {
+    [SyncVar]
+    public int objSelectedShared = 1; // the user selections visible by other players
 
     public List<GameObject> list;
     public static ObjectManager manager;
     public ObjSelected objSelected;
     public GameObject allObjects;
+
+    // Use this for initialization
+    void Start()
+    {
+        allObjects = GameObject.Find("InteractableObjects");
+
+        for (int i = 0; i < allObjects.transform.childCount; i++)
+            list.Add(allObjects.transform.GetChild(i).gameObject);
+
+        manager = this;
+        SetSelected(objSelectedShared);
+    }
 
     public static GameObject Get(int i)
     {
@@ -156,19 +171,7 @@ public class ObjectManager : MonoBehaviour
 
 
 
-    // Use this for initialization
-    void Start()
-    {
-        allObjects = GameObject.Find("InteractableObjects");
 
-        for (int i = 0; i < allObjects.transform.childCount; i++)
-        {
-            list.Add(allObjects.transform.GetChild(i).gameObject);
-        }
-        
-        objSelected = null;
-        manager = this;
-    }
 
 
 }

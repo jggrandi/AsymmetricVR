@@ -63,6 +63,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdHeadPos(Vector3 pos)
     {
+        headPos = pos;
         RpcHeadPos(pos);
     }
 
@@ -75,6 +76,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdHeadRot(Quaternion rot)
     {
+        headRot = rot;
         RpcHeadRot(rot);
     }
 
@@ -87,6 +89,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdLeftHPos(Vector3 pos)
     {
+        leftHPos = pos;
         RpcLeftHPos(pos);
     }
 
@@ -99,6 +102,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdLeftHRot(Quaternion rot)
     {
+        leftHRot = rot;
         RpcLeftHRot(rot);
     }
 
@@ -112,6 +116,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdRightHPos(Vector3 pos)
     {
+        rightHPos = pos;
         RpcRightHPos(pos);
     }
 
@@ -124,6 +129,7 @@ public class VRTransformSync : NetworkBehaviour
     [Command]
     void CmdRightHRot(Quaternion rot)
     {
+        rightHRot = rot;
         RpcRightHRot(rot);
     }
 
