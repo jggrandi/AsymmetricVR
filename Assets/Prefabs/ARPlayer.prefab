@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114089961737337006}
   - component: {fileID: 114860502486217136}
   - component: {fileID: 114465845408484092}
-  - component: {fileID: 114826868846904384}
+  - component: {fileID: 114581799279797616}
   m_Layer: 0
   m_Name: ARPlayer
   m_TagString: PlayerAR
@@ -1005,6 +1005,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactableObjects: {fileID: 0}
+--- !u!114 &114581799279797616
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010815216546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00058356d067d6949a1d6de8ef56db60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: -1
+  type: 2
 --- !u!114 &114697547858889804
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1037,19 +1050,6 @@ MonoBehaviour:
     i15: 137
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &114826868846904384
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010815216546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00058356d067d6949a1d6de8ef56db60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
-  type: 0
 --- !u!114 &114860502486217136
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -12,11 +11,14 @@ public class HandleTestParameters : NetworkBehaviour
     public int modalityIndex = 0;
 
     GameObject panelConnected;
+    GameObject panelModality;
     GameObject mainHandler;
     SyncTestParameters syncParameters;
     NetworkManager netMan;
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
+
+    string[] conditionName = { "VR-VR", "AR-AR", "VR-AR" };
 
     // Use this for initialization
     void Start()
@@ -34,13 +36,11 @@ public class HandleTestParameters : NetworkBehaviour
         for (int i = 0; i < 10; i++) guiPlayer.Add(null);
         activeInScene = new List<GameObject>();
 
-        GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = groupID.ToString();
-        int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        syncParameters.conditionsOrder.Clear();
+        panelModality = GameObject.Find("PanelModality");
+        if (panelModality == null) return;
 
-        for (int i = 0; i < order.Length; i++)
-            syncParameters.conditionsOrder.Add(order[i]);
-        GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
+        GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = "0";
+        UpdateGroupId();
 
 
     }
@@ -120,8 +120,52 @@ public class HandleTestParameters : NetworkBehaviour
 
         for (int i = 0; i < order.Length; i++)
             syncParameters.conditionsOrder.Add(order[i]);
+        
+        var oC = GameObject.Find("OrderConditions");//.GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
+        for (int i = 0; i < oC.transform.childCount; i++)
+            oC.transform.GetChild(i).gameObject.GetComponent<Text>().text = conditionName[i];
+
         modalityIndex = 0;
-        GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
+        ReorderConditionNames();
+        UpdateSelectionColor();
+        
+    }
+
+    void ReorderConditionNames()
+    {
+        for (int i = 0; i < panelModality.transform.childCount; i++)
+            panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = conditionName[syncParameters.conditionsOrder[i]];
+    }
+
+    void ClearConditionColor()
+    {
+        for (int i = 0; i < panelModality.transform.childCount; i++)
+            panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.white;
+    }
+
+    void UpdateSelectionColor()
+    {
+        ClearConditionColor();
+        panelModality.transform.GetChild(modalityIndex).gameObject.GetComponentInChildren<Image>().color = Color.grey;
+
+    }
+
+    public void OnClickVRVR()
+    {
+        modalityIndex = 0;
+        UpdateSelectionColor();
+    }
+
+    public void OnClickARAR()
+    {
+        modalityIndex = 1;
+        UpdateSelectionColor();
+    }
+
+    public void OnClickVRAR()
+    {
+        modalityIndex = 2;
+        UpdateSelectionColor();
     }
 
     public void ButtonNextCondition()
