@@ -2189,7 +2189,6 @@ MonoBehaviour:
   isNetworkActive: 0
   matchMaker: {fileID: 0}
   playerType: 2
-  userID: 
 --- !u!4 &1829136965
 Transform:
   m_ObjectHideFlags: 0

@@ -37,25 +37,5 @@ public class ControlObjectsInScene : MonoBehaviour {
             Debug.Log("Activating Server Stuff");
         }
 
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
-            player.gameObject.SetActive(true);
-
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
-            player.gameObject.SetActive(true);
-
-
-    }
-	
-	// Update is called once per frame
-	void Update () {
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
-            player.gameObject.SetActive(true);
-
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
-            player.gameObject.SetActive(true);
     }
 }

@@ -9,7 +9,7 @@ public class MyNetworkManager : NetworkManager
 {
 
     public Utils.PlayerType playerType = Utils.PlayerType.None;
-    public string userID;
+    string userID;
 
     ////Called on client when connect
     public override void OnClientConnect(NetworkConnection conn)
@@ -22,14 +22,22 @@ public class MyNetworkManager : NetworkManager
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
     {
         Debug.Log("OnServerAddPlayer");
-        int pT = -1;
+        int pType = -1;
+        int pId = -1;
+        string[] parameters = new string[2];
         if (extraMessageReader != null) // Read client message and receive index
         {
-            var stream = extraMessageReader.ReadMessage<IntegerMessage>();
-            pT = (int)(Utils.PlayerType)stream.value;
+            var stream = extraMessageReader.ReadMessage<StringMessage>();
+            parameters = stream.value.Split(';');
+            pType = int.Parse(parameters[0]);
+            pId = int.Parse(parameters[1]);
         }
-        var pP = spawnPrefabs[pT]; //Select the prefab from the spawnable objects list
-        var player = Instantiate(pP, new Vector3(Random.Range(-2, 2), 0, 0), Quaternion.identity) as GameObject; // Create player object with prefab
+        var pPrefab = spawnPrefabs[pType]; //Select the prefab from the spawnable objects list
+        var pStuff = pPrefab.GetComponent<PlayerStuff>();
+        pStuff.id = pId;
+        pStuff.type = (Utils.PlayerType)pType;
+
+        var player = Instantiate(pPrefab, new Vector3(Random.Range(-2, 2), 0, 0), Quaternion.identity) as GameObject; // Create player object with prefab
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId); // Add player object for connection
         //base.OnServerAddPlayer(conn, playerControllerId, extraMessageReader);
     }
@@ -37,10 +45,10 @@ public class MyNetworkManager : NetworkManager
     public override void OnClientSceneChanged(NetworkConnection conn)
     {
         Debug.Log("OnClientSceneChanged");
-        IntegerMessage msg = new IntegerMessage((int)playerType); // Create message to set the player
+        string message = (int)playerType + ";" + userID; //cast to int because otherwise it will get the string of playertype
+        StringMessage msg = new StringMessage(message); // Create message to set the player
         ClientScene.AddPlayer(conn, 0, msg); // Call Add player and pass the message
         //base.OnClientSceneChanged(conn);
-
     }
 
     public void SelectVR()
