@@ -6,12 +6,20 @@ using UnityEngine.UI;
 
 public class HandleTestParameters : NetworkBehaviour
 {
-    public int conditionsToPermute = 3;
+    public const int qntTraining = 3;
+    public const int conditionsToPermute = 3;
+    public const int qntTrials = 8;
     public int groupID = 0;
     public int modalityIndex = 0;
+    public int trialIndex = 0;
+
+    List<int> activeTrialOrder = new List<int>();
+    public List<int> trialsCompleted = new List<int>();
 
     GameObject panelConnected;
     GameObject panelModality;
+    GameObject panelTrial;
+
     GameObject mainHandler;
     SyncTestParameters syncParameters;
     NetworkManager netMan;
@@ -39,9 +47,12 @@ public class HandleTestParameters : NetworkBehaviour
         panelModality = GameObject.Find("PanelModality");
         if (panelModality == null) return;
 
-        GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = "0";
-        UpdateGroupId();
+        panelTrial = GameObject.Find("PanelTrial");
+        if (panelTrial == null) return;
 
+        GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = "0";
+
+        UpdateParameters();
 
     }
 
@@ -111,7 +122,7 @@ public class HandleTestParameters : NetworkBehaviour
     }
 
 
-    public void UpdateGroupId()
+    public void UpdateParameters()
     {
         groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
@@ -120,15 +131,19 @@ public class HandleTestParameters : NetworkBehaviour
 
         for (int i = 0; i < order.Length; i++)
             syncParameters.conditionsOrder.Add(order[i]);
-        
-        var oC = GameObject.Find("OrderConditions");//.GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
-        for (int i = 0; i < oC.transform.childCount; i++)
-            oC.transform.GetChild(i).gameObject.GetComponent<Text>().text = conditionName[i];
+
+        RandomizeTrialOrder(syncParameters.condition0TrialOrder); //three because we have 3 conditions....
+        RandomizeTrialOrder(syncParameters.condition1TrialOrder);
+        RandomizeTrialOrder(syncParameters.condition2TrialOrder);
 
         modalityIndex = 0;
+
+        ResetTrialsCompleted();
+        SetActiveTrialOrder();
         ReorderConditionNames();
-        UpdateSelectionColor();
-        
+        UpdateConditionColor();
+        UpdateTrialColor();
+
     }
 
     void ReorderConditionNames()
@@ -143,67 +158,110 @@ public class HandleTestParameters : NetworkBehaviour
             panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.white;
     }
 
-    void UpdateSelectionColor()
+    void UpdateConditionColor()
     {
         ClearConditionColor();
         panelModality.transform.GetChild(modalityIndex).gameObject.GetComponentInChildren<Image>().color = Color.grey;
 
     }
 
-    public void OnClickVRVR()
+    void ClearTrialColor()
     {
-        modalityIndex = 0;
-        UpdateSelectionColor();
+        for (int i = 0; i < panelTrial.transform.childCount; i++)
+            panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.white;
     }
 
-    public void OnClickARAR()
+
+    void UpdateTrialColor()
     {
-        modalityIndex = 1;
-        UpdateSelectionColor();
+        ClearTrialColor();
+        panelTrial.transform.GetChild(trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+        for (int i = 0; i < trialsCompleted.Count; i++)
+            panelTrial.transform.GetChild(trialsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
     }
 
-    public void OnClickVRAR()
+    void ResetTrialsCompleted()
     {
-        modalityIndex = 2;
-        UpdateSelectionColor();
+        trialIndex = 0;
+        trialsCompleted.Clear();
+        ClearTrialColor();
     }
 
-    public void ButtonNextCondition()
+    public void OnClickCondition(int newIndex)
     {
-        if (modalityIndex < conditionsToPermute-1)
+        if (newIndex == modalityIndex) return;
+        ResetTrialsCompleted();
+        UpdateTrialColor();
+        SetActiveTrialOrder();
+        modalityIndex = newIndex;
+        UpdateConditionColor();
+    }
+
+    public void OnClickTrial(int newIndex)
+    {
+        if (newIndex == trialIndex) return;
+        UpdateTrialsCompleted(newIndex);
+        trialIndex = newIndex;
+        UpdateTrialColor();
+    }
+
+    void UpdateTrialsCompleted(int newIndex) {
+        if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
+        trialsCompleted.Add(trialIndex);
+    }
+    
+    void DisplayTrialOrder()
+    {
+        for (int i = 0; i < panelTrial.transform.childCount; i++)
+            panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = activeTrialOrder[i].ToString();
+    }
+
+    void RandomizeTrialOrder(SyncListInt _trials)
+    {
+        if (_trials.Count != 0)
+            _trials.Clear();
+
+        List<int> trainingPlusTrials = new List<int>() { 0, 1, 2 };
+        List<int> randomizedList = Utils.randomizeVector(qntTraining, qntTraining+ qntTrials); // the numbers start in 3 and finishes in 11. The # 0,1 and 2 are indexes for training;
+        trainingPlusTrials.AddRange(randomizedList);
+        ListToSyncList(ref trainingPlusTrials, ref _trials);
+    }
+
+    public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
+    {
+        syncList.Clear();
+        for (int i = 0; i < list.Count; i++)
         {
-            IncrementSceneID();
-            GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
-            //UpdateScene();
+            syncList.Add(list[i]);
         }
     }
 
-    public void ButtonPreviousCondition()
+    public void SyncListToList(ref SyncListInt syncList, ref List<int> list)
     {
-        if (modalityIndex > 0)
+        list.Clear();
+        for (int i = 0; i < syncList.Count; i++)
         {
-            DecrementSceneID();
-            GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
-           // UpdateScene();
+            list.Add(syncList[i]);
         }
     }
 
-
-    void IncrementSceneID()
+    void SetActiveTrialOrder()
     {
-        modalityIndex++;
+        switch (modalityIndex)
+        {
+            case 0:
+                SyncListToList(ref syncParameters.condition0TrialOrder, ref activeTrialOrder);
+                break;
+            case 1:
+                SyncListToList(ref syncParameters.condition1TrialOrder, ref activeTrialOrder);
+                break;
+            case 2:
+                SyncListToList(ref syncParameters.condition2TrialOrder, ref activeTrialOrder);
+                break;
+            default:
+                break;
+        }
+        DisplayTrialOrder();
     }
-
-    void DecrementSceneID()
-    {
-        modalityIndex--;
-    }
-
-
-    void UpdateScene()
-    {
-        modalityIndex = int.Parse(GameObject.Find("InputModality").GetComponent<InputField>().text);
-    }
-
 
 }
