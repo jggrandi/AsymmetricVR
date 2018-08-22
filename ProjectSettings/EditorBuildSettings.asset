@@ -11,13 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Connect.unity
     guid: 87683eba6cfd50447ac3dbac0b03a4b7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SetupTest.unity
     guid: 6fd014d9eca3736428e9b435854ae1be
   - enabled: 1
     path: Assets/Scenes/AsymEnvironment.unity
     guid: 46e0e6f579e73b04d881c15d1031e29a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/EndTest.unity
     guid: ad614720fbc110b4a86ea45e4311d865
   - enabled: 0

@@ -286,6 +286,7 @@ GameObject:
   - component: {fileID: 114454689216363968}
   - component: {fileID: 114925987982225932}
   - component: {fileID: 114123993681782652}
+  - component: {fileID: 114263098965821560}
   m_Layer: 0
   m_Name: VRPlayer
   m_TagString: PlayerVR
@@ -1181,6 +1182,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactableObjects: {fileID: 0}
+--- !u!114 &114263098965821560
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731187058201612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00058356d067d6949a1d6de8ef56db60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
 --- !u!114 &114345443872499918
 MonoBehaviour:
   m_ObjectHideFlags: 1

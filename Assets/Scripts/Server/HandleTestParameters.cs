@@ -7,17 +7,13 @@ using UnityEngine.UI;
 
 public class HandleTestParameters : NetworkBehaviour
 {
-
     public int conditionsToPermute = 3;
-    public SyncListInt taskOrder = new SyncListInt();
-
-    [SyncVar]
     public int groupID = 0;
-    [SyncVar]
     public int modalityIndex = 0;
 
-
     GameObject panelConnected;
+    GameObject mainHandler;
+    SyncTestParameters syncParameters;
     NetworkManager netMan;
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
@@ -25,10 +21,14 @@ public class HandleTestParameters : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
-
         if (!isServer) return;
-        panelConnected = GameObject.Find("ClientsConnected");
+
         netMan = NetworkManager.singleton;
+        panelConnected = GameObject.Find("ClientsConnected");
+        if (panelConnected == null) return;
+        mainHandler = GameObject.Find("MainHandler");
+        if (mainHandler == null) return;
+        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
         guiPlayer = new List<GameObject>();
         for (int i = 0; i < 10; i++) guiPlayer.Add(null);
@@ -36,11 +36,11 @@ public class HandleTestParameters : NetworkBehaviour
 
         GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = groupID.ToString();
         int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        taskOrder.Clear();
+        syncParameters.conditionsOrder.Clear();
 
         for (int i = 0; i < order.Length; i++)
-            taskOrder.Add(order[i]);
-        GameObject.Find("InputModality").GetComponent<InputField>().text = taskOrder[modalityIndex].ToString();
+            syncParameters.conditionsOrder.Add(order[i]);
+        GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
 
 
     }
@@ -116,12 +116,12 @@ public class HandleTestParameters : NetworkBehaviour
         groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
         int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        taskOrder.Clear();
+        syncParameters.conditionsOrder.Clear();
 
         for (int i = 0; i < order.Length; i++)
-            taskOrder.Add(order[i]);
+            syncParameters.conditionsOrder.Add(order[i]);
         modalityIndex = 0;
-        GameObject.Find("InputModality").GetComponent<InputField>().text = taskOrder[modalityIndex].ToString();
+        GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
     }
 
     public void ButtonNextCondition()
@@ -129,7 +129,7 @@ public class HandleTestParameters : NetworkBehaviour
         if (modalityIndex < conditionsToPermute-1)
         {
             IncrementSceneID();
-            GameObject.Find("InputModality").GetComponent<InputField>().text = taskOrder[modalityIndex].ToString();
+            GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
             //UpdateScene();
         }
     }
@@ -139,7 +139,7 @@ public class HandleTestParameters : NetworkBehaviour
         if (modalityIndex > 0)
         {
             DecrementSceneID();
-            GameObject.Find("InputModality").GetComponent<InputField>().text = taskOrder[modalityIndex].ToString();
+            GameObject.Find("InputModality").GetComponent<InputField>().text = syncParameters.conditionsOrder[modalityIndex].ToString();
            // UpdateScene();
         }
     }

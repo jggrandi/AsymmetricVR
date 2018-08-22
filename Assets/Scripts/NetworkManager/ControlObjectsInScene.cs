@@ -11,7 +11,7 @@ public class ControlObjectsInScene : MonoBehaviour {
 
     GameObject netMan;
     // Use this for initialization
-    void Start () {
+    void Awake () {
         netMan = GameObject.Find("NetworkManager");
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         if (refMyNetMan.playerType == Utils.PlayerType.VR)
@@ -37,25 +37,5 @@ public class ControlObjectsInScene : MonoBehaviour {
             Debug.Log("Activating Server Stuff");
         }
 
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
-            player.gameObject.SetActive(true);
-
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
-            player.gameObject.SetActive(true);
-
-
-    }
-	
-	// Update is called once per frame
-	void Update () {
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
-            player.gameObject.SetActive(true);
-
-
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
-            player.gameObject.SetActive(true);
     }
 }
