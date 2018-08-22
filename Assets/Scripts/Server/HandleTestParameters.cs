@@ -10,11 +10,11 @@ public class HandleTestParameters : NetworkBehaviour
     public const int conditionsToPermute = 3;
     public const int qntTrials = 8;
     public int groupID = 0;
-    public int modalityIndex = 0;
-    public int trialIndex = 0;
-
+    public int conditionIndex = 0;
+    
     List<int> activeTrialOrder = new List<int>();
     public List<int> trialsCompleted = new List<int>();
+    public List<int> conditionsCompleted = new List<int>();
 
     GameObject panelConnected;
     GameObject panelModality;
@@ -136,8 +136,8 @@ public class HandleTestParameters : NetworkBehaviour
         RandomizeTrialOrder(syncParameters.condition1TrialOrder);
         RandomizeTrialOrder(syncParameters.condition2TrialOrder);
 
-        modalityIndex = 0;
-
+        conditionIndex = 0;
+        ResetConditionsCompleted();
         ResetTrialsCompleted();
         SetActiveTrialOrder();
         ReorderConditionNames();
@@ -161,7 +161,9 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateConditionColor()
     {
         ClearConditionColor();
-        panelModality.transform.GetChild(modalityIndex).gameObject.GetComponentInChildren<Image>().color = Color.grey;
+        panelModality.transform.GetChild(conditionIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+        for (int i = 0; i < conditionsCompleted.Count; i++)
+            panelModality.transform.GetChild(conditionsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
 
     }
 
@@ -175,39 +177,53 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateTrialColor()
     {
         ClearTrialColor();
-        panelTrial.transform.GetChild(trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+        panelTrial.transform.GetChild(syncParameters. trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
         for (int i = 0; i < trialsCompleted.Count; i++)
             panelTrial.transform.GetChild(trialsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
     }
 
+    void ResetConditionsCompleted()
+    {
+        conditionIndex = 0;
+        conditionsCompleted.Clear();
+        ClearConditionColor();
+    }
+
     void ResetTrialsCompleted()
     {
-        trialIndex = 0;
+        syncParameters.trialIndex = 0;
         trialsCompleted.Clear();
         ClearTrialColor();
     }
 
     public void OnClickCondition(int newIndex)
     {
-        if (newIndex == modalityIndex) return;
+        if (newIndex == conditionIndex) return;
         ResetTrialsCompleted();
         UpdateTrialColor();
         SetActiveTrialOrder();
-        modalityIndex = newIndex;
+        UpdateConditionCompleted(newIndex);
+        conditionIndex = newIndex;
         UpdateConditionColor();
+    }
+
+    void UpdateConditionCompleted(int newIndex)
+    {
+        if (conditionsCompleted.Contains(newIndex)) conditionsCompleted.Remove(newIndex);
+        conditionsCompleted.Add(conditionIndex);
     }
 
     public void OnClickTrial(int newIndex)
     {
-        if (newIndex == trialIndex) return;
+        if (newIndex == syncParameters.trialIndex) return;
         UpdateTrialsCompleted(newIndex);
-        trialIndex = newIndex;
+        syncParameters.trialIndex = newIndex;
         UpdateTrialColor();
     }
 
     void UpdateTrialsCompleted(int newIndex) {
         if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
-        trialsCompleted.Add(trialIndex);
+        trialsCompleted.Add(syncParameters.trialIndex);
     }
     
     void DisplayTrialOrder()
@@ -247,7 +263,7 @@ public class HandleTestParameters : NetworkBehaviour
 
     void SetActiveTrialOrder()
     {
-        switch (modalityIndex)
+        switch (conditionIndex)
         {
             case 0:
                 SyncListToList(ref syncParameters.condition0TrialOrder, ref activeTrialOrder);
