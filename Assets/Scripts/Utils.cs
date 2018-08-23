@@ -302,6 +302,27 @@ public static class Utils {
         return randomNumbers;
     }
 
+    static public List<int> RandomizeList(List<int> _list)
+    {
+
+        var randomNumbers = new List<int>();
+        var numbers = new List<int>();
+
+
+        for (int i = 0; i < _list.Count; i++) // numbers  to be randomized
+            numbers.Add(_list[i]);
+
+        for (int i = 0; i < _list.Count; i++)
+        {
+            var thisNumber = UnityEngine.Random.Range(0, numbers.Count);
+            randomNumbers.Add(numbers[thisNumber]);
+            numbers.RemoveAt(thisNumber);
+        }
+        return randomNumbers;
+    }
+
+
+
     public static List<int> allPermutations = new List<int>();
 
     public static int[] selectTaskSequence(int uid, int tasks)
@@ -344,6 +365,35 @@ public static class Utils {
         tmp = a;
         a = b;
         b = tmp;
+    }
+
+    public static List<int> FitVectorIntoAnother(int size1, int size2)
+    {
+        int count = 0;
+        int i = 0;
+        List<int> fittedList = new List<int>();
+
+        var rest = size1 % size2;
+        var times = (int)(size1 / size2);
+
+        while (count < times)
+        {
+            if (i < size2)
+            {
+                fittedList.Add(i);
+                i++;
+            }
+            else
+            {
+                count++;
+                i = 0;
+            }
+        }
+
+        for (int ii = 0; ii < rest; ii++)
+            fittedList.Add(ii);
+
+        return fittedList;
     }
 
 

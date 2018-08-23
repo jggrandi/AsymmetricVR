@@ -24,7 +24,7 @@ public class VisualFeedback : NetworkBehaviour {
     {
         //if(!isServer && isClient)
         //    CmdSyncSelected();
-        indexObjSelected = ObjectManager.manager.objSelectedShared;
+        indexObjSelected = ObjectManager.GetSelected().index;
         linesUsed = 0;
         AddFeedbackVR();
         AddFeedbackAR();

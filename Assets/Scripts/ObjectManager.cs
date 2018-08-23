@@ -14,8 +14,8 @@ public class ObjSelected
 
 public class ObjectManager : NetworkBehaviour
 {
-    [SyncVar]
-    public int objSelectedShared = 1; // the user selections visible by other players
+    //[SyncVar]
+    //public int objSelectedShared = 1; // the user selections visible by other players
 
     public List<GameObject> list;
     public static ObjectManager manager;
@@ -31,7 +31,7 @@ public class ObjectManager : NetworkBehaviour
             list.Add(allObjects.transform.GetChild(i).gameObject);
 
         manager = this;
-        SetSelected(objSelectedShared);
+
     }
 
     public static GameObject Get(int i)
@@ -68,10 +68,16 @@ public class ObjectManager : NetworkBehaviour
     public static void SetSelected(int index)
     {
         var g = Get(index);
+        ClearSelected();
         if (manager.objSelected == null) // if it is not selected, add to list
             AddToSelected(g); // add the object and the hand whitch is selecting it
     }
 
+    public static void ClearSelected()
+    {
+        if (manager.objSelected != null)
+            manager.objSelected = null;
+    }
 
     public static int DetermineIndexSelected(GameObject obj)
     {

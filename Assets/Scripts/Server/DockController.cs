@@ -11,8 +11,9 @@ public class DockController : NetworkBehaviour {
 
     SyncTestParameters syncParamRef;
     
-    GameObject interactableObjects;
+    GameObject interactableObjects; // interactable and ghosts must have the same number of elements
     GameObject ghostObjects;
+    GameObject spawnInfo;
     HandleTestParameters testParameters;
 
     public List<float> errorTrans = new List<float>();
@@ -24,13 +25,9 @@ public class DockController : NetworkBehaviour {
     void Start () {
         if (!isServer) return;
 
-        ResetErrorDocking();
-
         GameObject mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
         syncParamRef = mainHandler.GetComponent<SyncTestParameters>();
-
-        testParameters = this.gameObject.GetComponent<HandleTestParameters>();
 
         interactableObjects = GameObject.Find("InteractableObjects");
         if (interactableObjects == null) return;
@@ -38,28 +35,36 @@ public class DockController : NetworkBehaviour {
         ghostObjects = GameObject.Find("GhostObjects");
         if (ghostObjects == null) return;
 
+        spawnInfo = GameObject.Find("Spawn");
+        if (spawnInfo == null) return;
+
+        testParameters = this.gameObject.GetComponent<HandleTestParameters>();
+
+        ResetErrorDocking();
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (!isServer) return;
 
-        DeactivateAllObjects(interactableObjects);
-        DeactivateAllObjects(ghostObjects);
-        ActivateObject(syncParamRef.trialIndex, interactableObjects);
-        ActivateObject(syncParamRef.trialIndex, ghostObjects);
-
         CalculateDocking();
         bool isGoodEnough = EvaluateCurrentDocking();
         if (isGoodEnough)
         {
-            syncParamRef.trialIndex++;
+            //VERIFY IF IT IS THE LAST TRIAL, AND IF THERE IS TRIALS THAT WERE NOT COMPLETED
+            var nextTrial = syncParamRef.trialIndex + 1;
+            testParameters.UpdateTrialCompleted(nextTrial);
         }
     }
 
-    void ResetErrorDocking()
+
+    public void ResetErrorDocking()
     {
-        for (int i = 0; i < HandleTestParameters.qntTrials + HandleTestParameters.qntTraining; i++)
+        errorTrans.Clear();
+        errorRot.Clear();
+        errorScale.Clear();
+
+        for (int i = 0; i < testParameters.qntTrials + testParameters.qntTraining; i++)
         {
             errorTrans.Add(Mathf.Infinity);
             errorRot.Add(Mathf.Infinity);
@@ -70,8 +75,8 @@ public class DockController : NetworkBehaviour {
 
     void CalculateDocking()
     {
-        Transform movingObject = interactableObjects.transform.GetChild(syncParamRef.trialIndex);
-        Transform staticObject = ghostObjects.transform.GetChild(syncParamRef.trialIndex);
+        Transform movingObject = interactableObjects.transform.GetChild(syncParamRef.activeTrialOrder[syncParamRef.trialIndex]);
+        Transform staticObject = ghostObjects.transform.GetChild(syncParamRef.activeTrialOrder[syncParamRef.trialIndex]);
 
         Matrix4x4 movingMatrixTrans = Matrix4x4.TRS(movingObject.position, Quaternion.identity, new Vector3(1.0f, 1.0f, 1.0f));
         Matrix4x4 movingMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), movingObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
@@ -94,21 +99,6 @@ public class DockController : NetworkBehaviour {
         if (errorTrans[tIndex] < toleranceTrans && errorRotAngle[tIndex] < toleranceRot && errorScale[tIndex] < toleranceScale)
             return true;
         return false;
-    }
-
-
-    void DeactivateAllObjects(GameObject parent)
-    {
-        for (int i = 0; i < parent.transform.childCount; i++)
-            parent.transform.GetChild(i).gameObject.SetActive(false);
-    }
-
-    void ActivateObject(int index, GameObject parent)
-    {
-        if (index > parent.transform.childCount) return;
-
-        parent.transform.GetChild(index).gameObject.SetActive(true);
-
     }
 
 }

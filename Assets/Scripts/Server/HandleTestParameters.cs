@@ -4,18 +4,25 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+
+
 public class HandleTestParameters : NetworkBehaviour
 {
-    public const int qntTraining = 3;
     public const int conditionsToPermute = 3;
-    public const int qntTrials = 8;
+    public int qntTraining = 3;
+    public int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
     public int groupID = 0;
     public int conditionIndex = 0;
-    
-    List<int> activeTrialOrder = new List<int>();
-    public List<int> trialsCompleted = new List<int>();
+
+    public List<int> conditionsOrder = new List<int>();
     public List<int> conditionsCompleted = new List<int>();
 
+    public List<int> trialsCompleted = new List<int>();
+
+    public List<int> condition0TrialOrder = new List<int>();
+    public List<int> condition1TrialOrder = new List<int>();
+    public List<int> condition2TrialOrder = new List<int>();
+    
     GameObject panelConnected;
     GameObject panelModality;
     GameObject panelTrial;
@@ -23,8 +30,12 @@ public class HandleTestParameters : NetworkBehaviour
     GameObject mainHandler;
     SyncTestParameters syncParameters;
     NetworkManager netMan;
+    DockController dockController;
+    SpawnInformation spawnInfo;
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
+
+    GameObject interactableObjects;
 
     string[] conditionName = { "VR-VR", "AR-AR", "VR-AR" };
 
@@ -32,13 +43,15 @@ public class HandleTestParameters : NetworkBehaviour
     void Start()
     {
         if (!isServer) return;
-
+        
         netMan = NetworkManager.singleton;
         panelConnected = GameObject.Find("ClientsConnected");
         if (panelConnected == null) return;
+
         mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
         syncParameters = mainHandler.GetComponent<SyncTestParameters>();
+        spawnInfo = mainHandler.GetComponent<SpawnInformation>();
 
         guiPlayer = new List<GameObject>();
         for (int i = 0; i < 10; i++) guiPlayer.Add(null);
@@ -50,6 +63,12 @@ public class HandleTestParameters : NetworkBehaviour
         panelTrial = GameObject.Find("PanelTrial");
         if (panelTrial == null) return;
 
+        interactableObjects = GameObject.Find("InteractableObjects");
+        if (interactableObjects == null) return;
+        //qntTrials = interactableObjects.transform.childCount; // set the number of trials depending on the number of elements child of interactableObjects
+
+        dockController = this.gameObject.GetComponent<DockController>();
+        
         GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = "0";
 
         UpdateParameters();
@@ -127,18 +146,21 @@ public class HandleTestParameters : NetworkBehaviour
         groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
         int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        syncParameters.conditionsOrder.Clear();
+        conditionsOrder.Clear();
 
         for (int i = 0; i < order.Length; i++)
-            syncParameters.conditionsOrder.Add(order[i]);
+            conditionsOrder.Add(order[i]);
 
-        RandomizeTrialOrder(syncParameters.condition0TrialOrder); //three because we have 3 conditions....
-        RandomizeTrialOrder(syncParameters.condition1TrialOrder);
-        RandomizeTrialOrder(syncParameters.condition2TrialOrder);
+        condition0TrialOrder = RandomizeTrialOrder(); //three because we have 3 conditions....
+        condition1TrialOrder = RandomizeTrialOrder();
+        condition2TrialOrder = RandomizeTrialOrder();
+
+        RandomizeTrialSpawn();
 
         conditionIndex = 0;
         ResetConditionsCompleted();
         ResetTrialsCompleted();
+        dockController.ResetErrorDocking();
         SetActiveTrialOrder();
         ReorderConditionNames();
         UpdateConditionColor();
@@ -149,7 +171,7 @@ public class HandleTestParameters : NetworkBehaviour
     void ReorderConditionNames()
     {
         for (int i = 0; i < panelModality.transform.childCount; i++)
-            panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = conditionName[syncParameters.conditionsOrder[i]];
+            panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = conditionName[conditionsOrder[i]];
     }
 
     void ClearConditionColor()
@@ -177,7 +199,7 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateTrialColor()
     {
         ClearTrialColor();
-        panelTrial.transform.GetChild(syncParameters. trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+        panelTrial.transform.GetChild(syncParameters.trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
         for (int i = 0; i < trialsCompleted.Count; i++)
             panelTrial.transform.GetChild(trialsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
     }
@@ -187,6 +209,13 @@ public class HandleTestParameters : NetworkBehaviour
         conditionIndex = 0;
         conditionsCompleted.Clear();
         ClearConditionColor();
+    }
+
+    void ResetSpawnOrder()
+    {
+        syncParameters.spawnPosition.Clear();
+        syncParameters.spawnRotation.Clear();
+        syncParameters.spawnScale.Clear();
     }
 
     void ResetTrialsCompleted()
@@ -200,8 +229,10 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (newIndex == conditionIndex) return;
         ResetTrialsCompleted();
+        dockController.ResetErrorDocking();
         UpdateTrialColor();
         SetActiveTrialOrder();
+        RandomizeTrialSpawn();
         UpdateConditionCompleted(newIndex);
         conditionIndex = newIndex;
         UpdateConditionColor();
@@ -216,32 +247,52 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickTrial(int newIndex)
     {
         if (newIndex == syncParameters.trialIndex) return;
-        UpdateTrialsCompleted(newIndex);
-        syncParameters.trialIndex = newIndex;
-        UpdateTrialColor();
+        UpdateTrialCompleted(newIndex);
+
     }
 
-    void UpdateTrialsCompleted(int newIndex) {
+    public void UpdateTrialCompleted(int newIndex) {
         if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
         trialsCompleted.Add(syncParameters.trialIndex);
+        syncParameters.trialIndex = newIndex;
+        UpdateTrialColor();
     }
     
     void DisplayTrialOrder()
     {
         for (int i = 0; i < panelTrial.transform.childCount; i++)
-            panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = activeTrialOrder[i].ToString();
+            panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Text>().text = syncParameters.activeTrialOrder[i].ToString();
     }
 
-    void RandomizeTrialOrder(SyncListInt _trials)
+    List<int> RandomizeTrialOrder()
     {
-        if (_trials.Count != 0)
-            _trials.Clear();
-
         List<int> trainingPlusTrials = new List<int>() { 0, 1, 2 };
-        List<int> randomizedList = Utils.randomizeVector(qntTraining, qntTraining+ qntTrials); // the numbers start in 3 and finishes in 11. The # 0,1 and 2 are indexes for training;
+        List<int> randomizedList = Utils.randomizeVector(qntTraining, qntTraining + qntTrials); // the numbers start in 3 and finishes in 11. The # 0,1 and 2 are indexes for training;
         trainingPlusTrials.AddRange(randomizedList);
-        ListToSyncList(ref trainingPlusTrials, ref _trials);
+        return trainingPlusTrials;
+        //ListToSyncList(ref trainingPlusTrials, ref _trials);
     }
+
+    void RandomizeTrialSpawn()
+    {
+        RandomizeTrialSpawnTransform(syncParameters.spawnPosition, spawnInfo.pos.Count);
+        RandomizeTrialSpawnTransform(syncParameters.spawnRotation, spawnInfo.rot.Count);
+        RandomizeTrialSpawnTransform(syncParameters.spawnScale, spawnInfo.scale.Count);
+
+    }
+
+    void RandomizeTrialSpawnTransform(SyncListInt _spawnT, int size)
+    {
+        if (_spawnT.Count != 0)
+            _spawnT.Clear();
+
+        var fullList = Utils.FitVectorIntoAnother(qntTrials + qntTraining, size);
+        fullList = Utils.RandomizeList(fullList);
+        ListToSyncList(ref fullList, ref _spawnT);
+    }
+
+
+ 
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
     {
@@ -266,13 +317,13 @@ public class HandleTestParameters : NetworkBehaviour
         switch (conditionIndex)
         {
             case 0:
-                SyncListToList(ref syncParameters.condition0TrialOrder, ref activeTrialOrder);
+                ListToSyncList(ref condition0TrialOrder, ref syncParameters.activeTrialOrder);
                 break;
             case 1:
-                SyncListToList(ref syncParameters.condition1TrialOrder, ref activeTrialOrder);
+                ListToSyncList(ref condition1TrialOrder, ref syncParameters.activeTrialOrder);
                 break;
             case 2:
-                SyncListToList(ref syncParameters.condition2TrialOrder, ref activeTrialOrder);
+                ListToSyncList(ref condition2TrialOrder, ref syncParameters.activeTrialOrder);
                 break;
             default:
                 break;

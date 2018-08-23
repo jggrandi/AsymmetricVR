@@ -36,7 +36,7 @@ namespace Lean.Touch {
             canvas = GameObject.Find("Canvas");
             if (canvas != null)
                 refGUI = canvas.GetComponent<HandleARGUI>();
-            ObjectManager.SetSelected(1);
+
             Utils.UpdateTouchSensibilty();
         }
 
@@ -51,7 +51,7 @@ namespace Lean.Touch {
 
 
         void Update() {
-            if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
+            
             if (!isLocalPlayer) return;
 
             selected = ObjectManager.GetSelected();
