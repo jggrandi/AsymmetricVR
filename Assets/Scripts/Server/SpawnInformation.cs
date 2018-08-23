@@ -6,6 +6,7 @@ public class SpawnInformation : MonoBehaviour
 {
 
     public List<Vector3> pos = new List<Vector3>();
+    public Vector3 ghostPos = new Vector3();
     public List<Quaternion> rot = new List<Quaternion>();
     public List<float> scale = new List<float>();
 
@@ -17,6 +18,7 @@ public class SpawnInformation : MonoBehaviour
         if (table == null) return;
 
         CreatePositions();
+        CreateGhostPos();
         CreateRotations();
         CreateScales();
     }
@@ -54,5 +56,10 @@ public class SpawnInformation : MonoBehaviour
         scale.Add(scaleNormal - scale1);
         scale.Add(scaleNormal + scale2);
         scale.Add(scaleNormal - scale2);
+    }
+
+    void CreateGhostPos()
+    {
+        ghostPos = new Vector3(table.transform.position.x, 1f, table.transform.position.z);
     }
 }

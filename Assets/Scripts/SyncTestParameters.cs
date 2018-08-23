@@ -17,6 +17,8 @@ public class SyncTestParameters : NetworkBehaviour {
     GameObject interactableObjects;
     GameObject ghostObjects;
 
+    SpawnInformation spawnInfo;
+
     // Use this for initialization
     void Start () {
         //if (!isClient) return;
@@ -26,6 +28,10 @@ public class SyncTestParameters : NetworkBehaviour {
         ghostObjects = GameObject.Find("GhostObjects");
         if (ghostObjects == null) return;
 
+        spawnInfo = this.gameObject.GetComponent<SpawnInformation>();
+
+        UpdateGhostPos();
+        UpdateSpawnInfo();
 
     }
 	
@@ -38,6 +44,27 @@ public class SyncTestParameters : NetworkBehaviour {
         ActivateObject(trialIndex, ghostObjects);
 
         ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+    }
+
+    void UpdateSpawnInfo()
+    {
+        for (int i = 0; i < interactableObjects.transform.childCount; i++)
+        {
+            var obj = interactableObjects.transform.GetChild(i);
+            obj.transform.position = spawnInfo.pos[spawnPosition[i]];
+            obj.transform.rotation = spawnInfo.rot[spawnRotation[i]];
+            var uniformScale = spawnInfo.scale[spawnScale[i]];
+            obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
+        }
+    }
+
+    void UpdateGhostPos()
+    {
+        for(int i=0; i < ghostObjects.transform.childCount; i++)
+        {
+            var obj = ghostObjects.transform.GetChild(i);
+            obj.transform.position = spawnInfo.ghostPos;
+        }
     }
 
 
