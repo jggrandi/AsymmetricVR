@@ -11,7 +11,7 @@ public class SyncTestParameters : NetworkBehaviour {
     public SyncListInt spawnRotation = new SyncListInt();
     public SyncListInt spawnScale = new SyncListInt();
 
-    [SyncVar]// (hook = "OnConditionChange")]
+    [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
     public int conditionIndex;
 
     public int prevConditionIndex;
@@ -74,25 +74,7 @@ public class SyncTestParameters : NetworkBehaviour {
             ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
             prevTrialIndex = trialIndex;
         }
-
-
     }
-
-    //void OnTrialChanged(int _trialIndex)
-    //{
-    //    Debug.Log("VVVV");
-    //    ObjectManager.SetSelected(activeTrialOrder[_trialIndex]);
-    //    trialIndex = _trialIndex;
-    //}
-
-    //void OnConditionChange(int _conditionIndex)
-    //{
-    //    Debug.Log("AAAA");
-    //    UpdateSpawnInfo();
-    //    conditionIndex = _conditionIndex;
-
-    //}
-
 
     public void UpdateSpawnInfo()
     {
@@ -105,6 +87,16 @@ public class SyncTestParameters : NetworkBehaviour {
             obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
         }
     }
+
+    public void UpdateSpawnInfo(int index)
+    {
+        var obj = interactableObjects.transform.GetChild(index);
+        obj.transform.position = spawnInfo.pos[spawnPosition[index]];
+        obj.transform.rotation = spawnInfo.rot[spawnRotation[index]];
+        var uniformScale = spawnInfo.scale[spawnScale[index]];
+        obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
+    }
+
 
     void UpdateGhostPos()
     {

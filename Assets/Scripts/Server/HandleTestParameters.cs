@@ -35,6 +35,9 @@ public class HandleTestParameters : NetworkBehaviour
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
 
+    public bool allConditionsCompleted = false;
+
+
     GameObject interactableObjects;
 
     string[] conditionName = { "VR-VR", "AR-AR", "VR-AR" };
@@ -79,6 +82,9 @@ public class HandleTestParameters : NetworkBehaviour
     void Update()
     {
         if (!isServer) return;
+        
+        if (allConditionsCompleted)
+            Debug.Log("SHOULD FINISH THE TEST");
 
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
         var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
@@ -108,6 +114,8 @@ public class HandleTestParameters : NetworkBehaviour
         }
 
         HandleDisplayPlayer(activeInScene); // handle the display of the player's name on the UI
+
+
     }
 
     void HandleDisplayPlayer(List<GameObject> _bjs)
@@ -156,18 +164,24 @@ public class HandleTestParameters : NetworkBehaviour
         condition1TrialOrder = RandomizeTrialOrder();
         condition2TrialOrder = RandomizeTrialOrder();
         syncParameters.conditionIndex = 0;
-        RandomizeTrialSpawn();
 
-        
         ResetConditionsCompleted();
+        ReorderConditionNames();
+        UpdateConditionColor();
+
+        UpdateTrial();
+        
+    }
+
+    void UpdateTrial()
+    {
+        RandomizeTrialSpawn();
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
         SetActiveTrialOrder();
-        ReorderConditionNames();
-        UpdateConditionColor();
         UpdateTrialColor();
-
     }
+
 
     void ReorderConditionNames()
     {
@@ -229,32 +243,58 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickCondition(int newIndex)
     {
         if (newIndex == syncParameters.conditionIndex) return;
-        ResetTrialsCompleted();
-        dockController.ResetErrorDocking();
-        UpdateTrialColor();
-        SetActiveTrialOrder();
-        syncParameters.conditionIndex = newIndex;
-        RandomizeTrialSpawn();
-        UpdateConditionCompleted(newIndex);
-        UpdateConditionColor();
+        ConditionCompleted(newIndex);
     }
 
-    void UpdateConditionCompleted(int newIndex)
+    public void ConditionCompleted(int newIndex)
     {
-        if (conditionsCompleted.Contains(newIndex)) conditionsCompleted.Remove(newIndex);
-        conditionsCompleted.Add(syncParameters.conditionIndex);
+
+        if (conditionsCompleted.Contains(newIndex)) return;
+
+        AddToCompletedList(syncParameters.conditionIndex);
+        if (conditionsCompleted.Count == conditionsToPermute)
+        {
+            allConditionsCompleted = true;
+            return;
+        }
+        
+        syncParameters.conditionIndex = newIndex;
+        UpdateConditionColor();
+        UpdateTrial();
+
+    }
+
+    void AddToCompletedList(int oldIndex)
+    {
+        if (!conditionsCompleted.Contains(oldIndex))
+            conditionsCompleted.Add(oldIndex);
     }
 
     public void OnClickTrial(int newIndex)
     {
         if (newIndex == syncParameters.trialIndex) return;
-        UpdateTrialCompleted(newIndex);
+        syncParameters.UpdateSpawnInfo(newIndex);
+        TrialChanged(newIndex);
+    }
+
+    void TrialChanged(int newIndex)
+    {
+        if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
+        syncParameters.trialIndex = newIndex;
+        UpdateTrialColor();
 
     }
 
-    public void UpdateTrialCompleted(int newIndex) {
+    public void TrialCompleted(int newIndex) {
         if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
+
         trialsCompleted.Add(syncParameters.trialIndex);
+        if (trialsCompleted.Count == qntTraining + qntTrials)
+        {
+            ConditionCompleted(syncParameters.conditionIndex);
+            return;
+        }
+
         syncParameters.trialIndex = newIndex;
         UpdateTrialColor();
     }
@@ -290,9 +330,6 @@ public class HandleTestParameters : NetworkBehaviour
         fullList = Utils.RandomizeList(fullList);
         ListToSyncList(ref fullList, ref _spawnT);
     }
-
-
- 
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
     {
