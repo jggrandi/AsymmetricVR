@@ -12,7 +12,7 @@ public class HandleTestParameters : NetworkBehaviour
     public const int qntTraining = 3;
     public const int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
     public int groupID = 0;
-    public int conditionIndex = 0;
+    //public int conditionIndex = 0;
 
     public List<int> conditionsOrder = new List<int>();
     public List<int> conditionsCompleted = new List<int>();
@@ -155,10 +155,10 @@ public class HandleTestParameters : NetworkBehaviour
         condition0TrialOrder = RandomizeTrialOrder(); //three because we have 3 conditions....
         condition1TrialOrder = RandomizeTrialOrder();
         condition2TrialOrder = RandomizeTrialOrder();
-
+        syncParameters.conditionIndex = 0;
         RandomizeTrialSpawn();
 
-        conditionIndex = 0;
+        
         ResetConditionsCompleted();
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
@@ -184,7 +184,7 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateConditionColor()
     {
         ClearConditionColor();
-        panelModality.transform.GetChild(conditionIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+        panelModality.transform.GetChild(syncParameters.conditionIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
         for (int i = 0; i < conditionsCompleted.Count; i++)
             panelModality.transform.GetChild(conditionsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
 
@@ -207,7 +207,7 @@ public class HandleTestParameters : NetworkBehaviour
 
     void ResetConditionsCompleted()
     {
-        conditionIndex = 0;
+        syncParameters.conditionIndex = 0;
         conditionsCompleted.Clear();
         ClearConditionColor();
     }
@@ -228,21 +228,21 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void OnClickCondition(int newIndex)
     {
-        if (newIndex == conditionIndex) return;
+        if (newIndex == syncParameters.conditionIndex) return;
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
         UpdateTrialColor();
         SetActiveTrialOrder();
+        syncParameters.conditionIndex = newIndex;
         RandomizeTrialSpawn();
         UpdateConditionCompleted(newIndex);
-        conditionIndex = newIndex;
         UpdateConditionColor();
     }
 
     void UpdateConditionCompleted(int newIndex)
     {
         if (conditionsCompleted.Contains(newIndex)) conditionsCompleted.Remove(newIndex);
-        conditionsCompleted.Add(conditionIndex);
+        conditionsCompleted.Add(syncParameters.conditionIndex);
     }
 
     public void OnClickTrial(int newIndex)
@@ -279,7 +279,6 @@ public class HandleTestParameters : NetworkBehaviour
         RandomizeTrialSpawnTransform(syncParameters.spawnPosition, spawnInfo.pos.Count);
         RandomizeTrialSpawnTransform(syncParameters.spawnRotation, spawnInfo.rot.Count);
         RandomizeTrialSpawnTransform(syncParameters.spawnScale, spawnInfo.scale.Count);
-
     }
 
     void RandomizeTrialSpawnTransform(SyncListInt _spawnT, int size)
@@ -315,7 +314,7 @@ public class HandleTestParameters : NetworkBehaviour
 
     void SetActiveTrialOrder()
     {
-        switch (conditionIndex)
+        switch (syncParameters.conditionIndex)
         {
             case 0:
                 ListToSyncList(ref condition0TrialOrder, ref syncParameters.activeTrialOrder);

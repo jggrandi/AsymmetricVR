@@ -11,8 +11,15 @@ public class SyncTestParameters : NetworkBehaviour {
     public SyncListInt spawnRotation = new SyncListInt();
     public SyncListInt spawnScale = new SyncListInt();
 
-    [SyncVar (hook= "OnTrialChanged")]
+    [SyncVar]// (hook = "OnConditionChange")]
+    public int conditionIndex;
+
+    public int prevConditionIndex;
+
+    [SyncVar]// (hook = "OnTrialChanged")]
     public int trialIndex;
+
+    public int prevTrialIndex;
 
     [SyncVar]
     public bool restTime = false;
@@ -22,9 +29,11 @@ public class SyncTestParameters : NetworkBehaviour {
 
     SpawnInformation spawnInfo;
 
+
     // Use this for initialization
     void Start () {
         //if (!isClient) return;
+        
         interactableObjects = GameObject.Find("InteractableObjects");
         if (interactableObjects == null) return;
 
@@ -32,6 +41,9 @@ public class SyncTestParameters : NetworkBehaviour {
         if (ghostObjects == null) return;
 
         spawnInfo = this.gameObject.GetComponent<SpawnInformation>();
+
+        prevConditionIndex = conditionIndex;
+        prevTrialIndex = trialIndex;
 
         UpdateGhostPos();
         UpdateSpawnInfo();
@@ -51,16 +63,38 @@ public class SyncTestParameters : NetworkBehaviour {
         ActivateObject(trialIndex, interactableObjects);
         ActivateObject(trialIndex, ghostObjects);
 
+        if (prevConditionIndex != conditionIndex)
+        {
+            UpdateSpawnInfo();
+            prevConditionIndex = conditionIndex;
+        }
+
+        if (prevTrialIndex != trialIndex)
+        {
+            ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+            prevTrialIndex = trialIndex;
+        }
+
 
     }
 
-    void OnTrialChanged(int _trialIndex)
-    {
-        ObjectManager.SetSelected(activeTrialOrder[_trialIndex]);
-        trialIndex = _trialIndex;
-    }
+    //void OnTrialChanged(int _trialIndex)
+    //{
+    //    Debug.Log("VVVV");
+    //    ObjectManager.SetSelected(activeTrialOrder[_trialIndex]);
+    //    trialIndex = _trialIndex;
+    //}
 
-    void UpdateSpawnInfo()
+    //void OnConditionChange(int _conditionIndex)
+    //{
+    //    Debug.Log("AAAA");
+    //    UpdateSpawnInfo();
+    //    conditionIndex = _conditionIndex;
+
+    //}
+
+
+    public void UpdateSpawnInfo()
     {
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
         {
