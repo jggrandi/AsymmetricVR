@@ -35,9 +35,6 @@ public class DockController : NetworkBehaviour {
         ghostObjects = GameObject.Find("GhostObjects");
         if (ghostObjects == null) return;
 
-        spawnInfo = GameObject.Find("Spawn");
-        if (spawnInfo == null) return;
-
         testParameters = this.gameObject.GetComponent<HandleTestParameters>();
 
         ResetErrorDocking();
@@ -51,20 +48,34 @@ public class DockController : NetworkBehaviour {
         bool isGoodEnough = EvaluateCurrentDocking();
         if (isGoodEnough)
         {
-            //VERIFY IF IT IS THE LAST TRIAL, AND IF THERE IS TRIALS THAT WERE NOT COMPLETED
             var nextTrial = syncParamRef.trialIndex + 1;
             testParameters.UpdateTrialCompleted(nextTrial);
+            //StartCoroutine("CoolDown");
+            //Time.timeScale = 1;
+            //if (syncParamRef.restTime) return;
+
+
+            //VERIFY IF IT IS THE LAST TRIAL, AND IF THERE IS TRIALS THAT WERE NOT COMPLETED
+
         }
     }
 
+    IEnumerator CoolDown()
+    {
+        syncParamRef.restTime = true;
+        yield return new WaitForSeconds(5);
+        syncParamRef.restTime = false;
 
-    public void ResetErrorDocking()
+        yield return null;
+    }
+
+        public void ResetErrorDocking()
     {
         errorTrans.Clear();
         errorRot.Clear();
         errorScale.Clear();
 
-        for (int i = 0; i < testParameters.qntTrials + testParameters.qntTraining; i++)
+        for (int i = 0; i < HandleTestParameters.qntTrials + HandleTestParameters.qntTraining; i++)
         {
             errorTrans.Add(Mathf.Infinity);
             errorRot.Add(Mathf.Infinity);

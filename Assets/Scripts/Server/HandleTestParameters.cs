@@ -9,8 +9,8 @@ using UnityEngine.UI;
 public class HandleTestParameters : NetworkBehaviour
 {
     public const int conditionsToPermute = 3;
-    public int qntTraining = 3;
-    public int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
+    public const int qntTraining = 3;
+    public const int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
     public int groupID = 0;
     public int conditionIndex = 0;
 
@@ -129,7 +129,8 @@ public class HandleTestParameters : NetworkBehaviour
         guiPlayer[index] = g;
         var slot = panelConnected.transform.GetChild(index);
         Text playerName = slot.GetComponent<Text>();
-        playerName.text = g.name;
+        var playerInfo = g.GetComponent<PlayerStuff>();
+        playerName.text = playerInfo.type + " " + playerInfo.id;
     }
 
     void RemovePlayerOnDisplay(int index)

@@ -23,7 +23,7 @@ public class ObjectManager : NetworkBehaviour
     public GameObject allObjects;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         allObjects = GameObject.Find("InteractableObjects");
 

@@ -11,8 +11,11 @@ public class SyncTestParameters : NetworkBehaviour {
     public SyncListInt spawnRotation = new SyncListInt();
     public SyncListInt spawnScale = new SyncListInt();
 
-    [SyncVar]
+    [SyncVar (hook= "OnTrialChanged")]
     public int trialIndex;
+
+    [SyncVar]
+    public bool restTime = false;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
@@ -33,6 +36,8 @@ public class SyncTestParameters : NetworkBehaviour {
         UpdateGhostPos();
         UpdateSpawnInfo();
 
+        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+
     }
 	
 	// Update is called once per frame
@@ -40,10 +45,19 @@ public class SyncTestParameters : NetworkBehaviour {
         //if (!isClient) return;
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
+
+        if (restTime) return; // dont do an
+
         ActivateObject(trialIndex, interactableObjects);
         ActivateObject(trialIndex, ghostObjects);
 
-        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+
+    }
+
+    void OnTrialChanged(int _trialIndex)
+    {
+        ObjectManager.SetSelected(activeTrialOrder[_trialIndex]);
+        trialIndex = _trialIndex;
     }
 
     void UpdateSpawnInfo()
