@@ -23,7 +23,7 @@ public class SyncTestParameters : NetworkBehaviour {
     public bool restTime = false;
 
     [SyncVar]
-    public bool allConditionsCompleted = false;
+    public bool conditionCompleted = false;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
@@ -61,7 +61,7 @@ public class SyncTestParameters : NetworkBehaviour {
 
         if (restTime) return; // dont do an
 
-        if (allConditionsCompleted) return;
+        if (conditionCompleted) return;
         ActivateObject(trialIndex, interactableObjects);
         ActivateObject(trialIndex, ghostObjects);
 

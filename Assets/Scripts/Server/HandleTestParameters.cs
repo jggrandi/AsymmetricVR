@@ -80,8 +80,8 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (!isServer) return;
         
-        if (syncParameters.allConditionsCompleted)
-            Debug.Log("SHOULD FINISH THE TEST");
+        //if (syncParameters.allConditionsCompleted)
+        //    Debug.Log("SHOULD FINISH THE TEST");
 
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
         var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
@@ -167,7 +167,7 @@ public class HandleTestParameters : NetworkBehaviour
         UpdateConditionColor();
 
         UpdateTrial();
-        syncParameters.allConditionsCompleted = false;
+        syncParameters.conditionCompleted = false;
     }
 
     void UpdateTrial()
@@ -207,17 +207,20 @@ public class HandleTestParameters : NetworkBehaviour
             panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.white;
     }
 
-
-    void UpdateTrialColor()
+    void GreyTrialCompleted()
     {
-        ClearTrialColor();
-
         for (int i = 0; i < trialsCompleted.Count; i++)
         {
             if (trialsCompleted[i])
                 panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.gray;
         }
-            
+    }
+
+    void UpdateTrialColor()
+    {
+        ClearTrialColor();
+        GreyTrialCompleted();
+
         panelTrial.transform.GetChild(syncParameters.trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
     }
 
@@ -247,17 +250,25 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickCondition(int newIndex)
     {
         if (newIndex == syncParameters.conditionIndex) return;
-        ConditionCompleted(newIndex);
+        NextCondition(newIndex);
+        syncParameters.conditionCompleted = false;
     }
 
-    public void ConditionCompleted(int newIndex)
+    public void ConditionCompleted()
+    {
+        GreyTrialCompleted();
+        syncParameters.conditionCompleted = true;
+
+    }
+
+    public void NextCondition(int newIndex)
     {
         if (conditionsCompleted.Contains(newIndex)) return;
 
         AddToCompletedList(syncParameters.conditionIndex);
         if (conditionsCompleted.Count == conditionsToPermute)
         {
-            syncParameters.allConditionsCompleted = true;
+            syncParameters.conditionCompleted = true;
             return;
         }
         
@@ -293,11 +304,9 @@ public class HandleTestParameters : NetworkBehaviour
         if (!trialsCompleted.Contains(false))
         {
             var nextCondition = syncParameters.conditionIndex + 1;
-            ConditionCompleted(nextCondition);
+            ConditionCompleted();
             return;
         }
-
-        Debug.Log( trialsCompleted.IndexOf(false));
         syncParameters.trialIndex = trialsCompleted.IndexOf(false);
         UpdateTrialColor();
     }
