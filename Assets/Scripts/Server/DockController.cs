@@ -6,16 +6,16 @@ using UnityEngine.Networking;
 public class DockController : NetworkBehaviour {
 
     //original
-    //const float toleranceTrans = 0.05f;
-    //const float toleranceRot = 8.0f;
-    //const float toleranceScale = 0.03f;
+    const float toleranceTrans = 0.05f;
+    const float toleranceRot = 8.0f;
+    const float toleranceScale = 0.03f;
 
-    const float toleranceTrans = 12f;
-    const float toleranceRot = 190.0f;
-    const float toleranceScale = 1f;
+    //const float toleranceTrans = 12f;
+    //const float toleranceRot = 190.0f;
+    //const float toleranceScale = 1f;
 
 
-    SyncTestParameters syncParamRef;
+    SyncTestParameters syncParameters;
     
     GameObject interactableObjects; // interactable and ghosts must have the same number of elements
     GameObject ghostObjects;
@@ -33,7 +33,7 @@ public class DockController : NetworkBehaviour {
 
         GameObject mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
-        syncParamRef = mainHandler.GetComponent<SyncTestParameters>();
+        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
         interactableObjects = GameObject.Find("InteractableObjects");
         if (interactableObjects == null) return;
@@ -49,13 +49,15 @@ public class DockController : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (!isServer) return;
-        if (testParameters.allConditionsCompleted) return;
+        
+        if (syncParameters.allConditionsCompleted) return;
+
         CalculateDocking();
         bool isGoodEnough = EvaluateCurrentDocking();
         if (isGoodEnough)
         {
-            var nextTrial = syncParamRef.trialIndex + 1;
-            testParameters.TrialCompleted(nextTrial);
+                testParameters.TrialCompleted();
+        }
             //StartCoroutine("CoolDown");
             //Time.timeScale = 1;
             //if (syncParamRef.restTime) return;
@@ -63,14 +65,14 @@ public class DockController : NetworkBehaviour {
 
             //VERIFY IF IT IS THE LAST TRIAL, AND IF THERE IS TRIALS THAT WERE NOT COMPLETED
 
-        }
+        
     }
 
     IEnumerator CoolDown()
     {
-        syncParamRef.restTime = true;
+        syncParameters.restTime = true;
         yield return new WaitForSeconds(5);
-        syncParamRef.restTime = false;
+        syncParameters.restTime = false;
 
         yield return null;
     }
@@ -92,8 +94,8 @@ public class DockController : NetworkBehaviour {
 
     void CalculateDocking()
     {
-        Transform movingObject = interactableObjects.transform.GetChild(syncParamRef.activeTrialOrder[syncParamRef.trialIndex]);
-        Transform staticObject = ghostObjects.transform.GetChild(syncParamRef.activeTrialOrder[syncParamRef.trialIndex]);
+        Transform movingObject = interactableObjects.transform.GetChild(syncParameters.activeTrialOrder[syncParameters.trialIndex]);
+        Transform staticObject = ghostObjects.transform.GetChild(syncParameters.activeTrialOrder[syncParameters.trialIndex]);
 
         Matrix4x4 movingMatrixTrans = Matrix4x4.TRS(movingObject.position, Quaternion.identity, new Vector3(1.0f, 1.0f, 1.0f));
         Matrix4x4 movingMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), movingObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
@@ -103,16 +105,16 @@ public class DockController : NetworkBehaviour {
         Matrix4x4 staticMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), staticObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
         float staticScale = staticObject.localScale.x;
 
-        errorTrans[syncParamRef.trialIndex] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
-        errorRot[syncParamRef.trialIndex] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
-        errorRotAngle[syncParamRef.trialIndex] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
-        errorScale[syncParamRef.trialIndex] = Mathf.Abs(movingScale - staticScale);
+        errorTrans[syncParameters.trialIndex] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
+        errorRot[syncParameters.trialIndex] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
+        errorRotAngle[syncParameters.trialIndex] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
+        errorScale[syncParameters.trialIndex] = Mathf.Abs(movingScale - staticScale);
 
     }
 
     bool EvaluateCurrentDocking()
     {
-        var tIndex = syncParamRef.trialIndex;
+        var tIndex = syncParameters.trialIndex;
         if (errorTrans[tIndex] < toleranceTrans && errorRotAngle[tIndex] < toleranceRot && errorScale[tIndex] < toleranceScale)
             return true;
         return false;

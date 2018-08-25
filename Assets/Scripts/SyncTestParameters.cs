@@ -13,16 +13,17 @@ public class SyncTestParameters : NetworkBehaviour {
 
     [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
     public int conditionIndex;
-
     public int prevConditionIndex;
 
     [SyncVar]// (hook = "OnTrialChanged")]
     public int trialIndex;
-
     public int prevTrialIndex;
 
     [SyncVar]
     public bool restTime = false;
+
+    [SyncVar]
+    public bool allConditionsCompleted = false;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
@@ -60,6 +61,7 @@ public class SyncTestParameters : NetworkBehaviour {
 
         if (restTime) return; // dont do an
 
+        if (allConditionsCompleted) return;
         ActivateObject(trialIndex, interactableObjects);
         ActivateObject(trialIndex, ghostObjects);
 

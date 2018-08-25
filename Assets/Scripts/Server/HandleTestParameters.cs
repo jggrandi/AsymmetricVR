@@ -17,7 +17,7 @@ public class HandleTestParameters : NetworkBehaviour
     public List<int> conditionsOrder = new List<int>();
     public List<int> conditionsCompleted = new List<int>();
 
-    public List<int> trialsCompleted = new List<int>();
+    public List<bool> trialsCompleted = new List<bool>();
 
     public List<int> condition0TrialOrder = new List<int>();
     public List<int> condition1TrialOrder = new List<int>();
@@ -34,9 +34,6 @@ public class HandleTestParameters : NetworkBehaviour
     SpawnInformation spawnInfo;
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
-
-    public bool allConditionsCompleted = false;
-
 
     GameObject interactableObjects;
 
@@ -83,7 +80,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (!isServer) return;
         
-        if (allConditionsCompleted)
+        if (syncParameters.allConditionsCompleted)
             Debug.Log("SHOULD FINISH THE TEST");
 
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
@@ -170,15 +167,15 @@ public class HandleTestParameters : NetworkBehaviour
         UpdateConditionColor();
 
         UpdateTrial();
-        
+        syncParameters.allConditionsCompleted = false;
     }
 
     void UpdateTrial()
     {
         RandomizeTrialSpawn();
+        SetActiveTrialOrder();
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
-        SetActiveTrialOrder();
         UpdateTrialColor();
     }
 
@@ -214,9 +211,14 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateTrialColor()
     {
         ClearTrialColor();
-        panelTrial.transform.GetChild(syncParameters.trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+
         for (int i = 0; i < trialsCompleted.Count; i++)
-            panelTrial.transform.GetChild(trialsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
+        {
+            if (trialsCompleted[i])
+                panelTrial.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.gray;
+        }
+            
+        panelTrial.transform.GetChild(syncParameters.trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
     }
 
     void ResetConditionsCompleted()
@@ -237,6 +239,8 @@ public class HandleTestParameters : NetworkBehaviour
     {
         syncParameters.trialIndex = 0;
         trialsCompleted.Clear();
+        for (int i = 0; i < syncParameters.activeTrialOrder.Count; i++)
+            trialsCompleted.Add(false);
         ClearTrialColor();
     }
 
@@ -248,13 +252,12 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void ConditionCompleted(int newIndex)
     {
-
         if (conditionsCompleted.Contains(newIndex)) return;
 
         AddToCompletedList(syncParameters.conditionIndex);
         if (conditionsCompleted.Count == conditionsToPermute)
         {
-            allConditionsCompleted = true;
+            syncParameters.allConditionsCompleted = true;
             return;
         }
         
@@ -273,29 +276,29 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickTrial(int newIndex)
     {
         if (newIndex == syncParameters.trialIndex) return;
-        syncParameters.UpdateSpawnInfo(newIndex);
-        TrialChanged(newIndex);
+        TrialChange(newIndex);
     }
 
-    void TrialChanged(int newIndex)
+    void TrialChange(int newIndex)
     {
-        if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
+        if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
+        syncParameters.UpdateSpawnInfo(syncParameters.activeTrialOrder[newIndex]);
         syncParameters.trialIndex = newIndex;
         UpdateTrialColor();
-
     }
 
-    public void TrialCompleted(int newIndex) {
-        if (trialsCompleted.Contains(newIndex)) trialsCompleted.Remove(newIndex);
-
-        trialsCompleted.Add(syncParameters.trialIndex);
-        if (trialsCompleted.Count == qntTraining + qntTrials)
+    public void TrialCompleted()
+    {
+        trialsCompleted[syncParameters.trialIndex] = true;
+        if (!trialsCompleted.Contains(false))
         {
-            ConditionCompleted(syncParameters.conditionIndex);
+            var nextCondition = syncParameters.conditionIndex + 1;
+            ConditionCompleted(nextCondition);
             return;
         }
 
-        syncParameters.trialIndex = newIndex;
+        Debug.Log( trialsCompleted.IndexOf(false));
+        syncParameters.trialIndex = trialsCompleted.IndexOf(false);
         UpdateTrialColor();
     }
     
@@ -311,7 +314,6 @@ public class HandleTestParameters : NetworkBehaviour
         List<int> randomizedList = Utils.randomizeVector(qntTraining, qntTraining + qntTrials); // the numbers start in 3 and finishes in 11. The # 0,1 and 2 are indexes for training;
         trainingPlusTrials.AddRange(randomizedList);
         return trainingPlusTrials;
-        //ListToSyncList(ref trainingPlusTrials, ref _trials);
     }
 
     void RandomizeTrialSpawn()
