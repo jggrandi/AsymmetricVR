@@ -9,6 +9,10 @@ public class HandleNetworkTransformations : NetworkBehaviour
 {
     public GameObject interactableObjects;
 
+    public Vector3 tStep = new Vector3();
+    public Quaternion rStep = new Quaternion();
+    public float sStep = 1f;
+
     void Start()
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
@@ -20,7 +24,6 @@ public class HandleNetworkTransformations : NetworkBehaviour
         if (SceneManager.GetActiveScene().name != "SetupTest")
             CmdSyncAll(); // sync objects prosition when connected.
     }
-
 
     [Command]
     void CmdSyncAll()
@@ -60,6 +63,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     void CmdVRTranslate(int index, Vector3 translatestep)
     {
+        tStep = translatestep;
         var g = ObjectManager.Get(index);
         //g.transform.localPosition += translatestep;
         g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
@@ -74,6 +78,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     void CmdVRRotate(int index, Quaternion rotationstep)
     {
+        rStep = rotationstep;
         var g = ObjectManager.Get(index);
         //g.transform.rotation = rotationstep * g.transform.rotation;
         g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
@@ -88,6 +93,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     void CmdVRScale(int index, float scalestep)
     {
+        sStep = scalestep;
         var g = ObjectManager.Get(index);
         var finalScale = g.transform.localScale.x + scalestep;
         
@@ -118,6 +124,12 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     public void CmdLockTransform(int index, Vector3 position, Quaternion rotation)
     {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        position = GetLocalTransform().TransformPoint(position);
+        rotation = rotation * GetLocalTransform().rotation;
+        ObjectManager.Get(index).transform.position = position;
+        ObjectManager.Get(index).transform.rotation = rotation;
+
         RpcLockTransform(index, position, rotation);
         //RpcSyncObj(index, position, rotation, Vector3.zero);
     }
@@ -139,11 +151,12 @@ public class HandleNetworkTransformations : NetworkBehaviour
     }
 
     [Command]
-    public void CmdARTranslate(int index, Vector3 vec)
+    public void CmdARTranslate(int index, Vector3 translatestep)
     {
+        tStep = translatestep;
         var g = ObjectManager.Get(index);
         //objTranslateStep = vec;
-        g.transform.localPosition += vec;
+        g.transform.localPosition += translatestep;
         SyncObj(index);
     }
 
@@ -163,14 +176,19 @@ public class HandleNetworkTransformations : NetworkBehaviour
         axis = GetLocalTransform().InverseTransformVector(axis);
         CmdARRotate(index, avg, axis, mag);
     }
+    public void CmdRotStep( Quaternion q)
+    {
+        rStep = q;
+    }
 
 
     [Command]
-    public void CmdARScale(int index, float scale)
+    public void CmdARScale(int index, float scalestep)
     {
+        sStep = scalestep;
         var g = ObjectManager.Get(index);
 
-        g.transform.localScale *= scale;
+        g.transform.localScale *= scalestep;
         var s = g.transform.localScale.x;
         s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
         g.transform.localScale = new Vector3(s, s, s);

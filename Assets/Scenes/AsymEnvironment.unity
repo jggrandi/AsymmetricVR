@@ -6449,6 +6449,7 @@ GameObject:
   - component: {fileID: 1111413129}
   - component: {fileID: 1111413130}
   - component: {fileID: 1111413132}
+  - component: {fileID: 1111413133}
   - component: {fileID: 1111413131}
   m_Layer: 0
   m_Name: ServerHandler
@@ -6482,7 +6483,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupID: 0
-  conditionIndex: 0
   conditionsOrder: 
   conditionsCompleted: 
   trialsCompleted: 
@@ -6538,6 +6538,17 @@ MonoBehaviour:
   errorRot: []
   errorRotAngle: []
   errorScale: []
+--- !u!114 &1111413133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1111413128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aaeb0062527a4e48928ad7d63971634, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1111445332
 GameObject:
   m_ObjectHideFlags: 0
@@ -8143,7 +8154,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1330342359}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1111413133}
+        m_MethodName: ConfirmInitialParameters
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1330342359
@@ -9468,7 +9490,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58f15fa54ebed204f9d55af6f4d38ded, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  conditionIndex: 0
+  prevConditionIndex: 0
   trialIndex: 0
+  prevTrialIndex: 0
+  restTime: 0
+  conditionCompleted: 0
 --- !u!114 &1623813272
 MonoBehaviour:
   m_ObjectHideFlags: 0

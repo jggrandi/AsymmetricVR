@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
-
 public class HandleTestParameters : NetworkBehaviour
 {
     public const int conditionsToPermute = 3;
@@ -258,6 +256,8 @@ public class HandleTestParameters : NetworkBehaviour
     {
         GreyTrialCompleted();
         syncParameters.conditionCompleted = true;
+        //SET HANDLE LOG CONFIRMED AS FALSE;
+        //CHANGE THE COLOR OF THE SET PARAMETERS BUTTON
 
     }
 

@@ -6,13 +6,13 @@ using UnityEngine.Networking;
 public class DockController : NetworkBehaviour {
 
     //original
-    //const float toleranceTrans = 0.05f;
-    //const float toleranceRot = 8.0f;
-    //const float toleranceScale = 0.03f;
+    const float toleranceTrans = 0.05f;
+    const float toleranceRot = 8.0f;
+    const float toleranceScale = 0.03f;
 
-    const float toleranceTrans = 12f;
-    const float toleranceRot = 190.0f;
-    const float toleranceScale = 1f;
+    //const float toleranceTrans = 12f;
+    //const float toleranceRot = 190.0f;
+    //const float toleranceScale = 1f;
 
 
     SyncTestParameters syncParameters;
@@ -55,17 +55,7 @@ public class DockController : NetworkBehaviour {
         CalculateDocking();
         bool isGoodEnough = EvaluateCurrentDocking();
         if (isGoodEnough)
-        {
                 testParameters.TrialCompleted();
-        }
-            //StartCoroutine("CoolDown");
-            //Time.timeScale = 1;
-            //if (syncParamRef.restTime) return;
-
-
-            //VERIFY IF IT IS THE LAST TRIAL, AND IF THERE IS TRIALS THAT WERE NOT COMPLETED
-
-        
     }
 
     IEnumerator CoolDown()
