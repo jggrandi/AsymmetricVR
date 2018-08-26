@@ -30,6 +30,8 @@ public class HandleTestParameters : NetworkBehaviour
     NetworkManager netMan;
     DockController dockController;
     SpawnInformation spawnInfo;
+    HandleLog handleLog;
+
     public List<GameObject> activeInScene;
     public List<GameObject> guiPlayer;
 
@@ -66,7 +68,8 @@ public class HandleTestParameters : NetworkBehaviour
         //qntTrials = interactableObjects.transform.childCount; // set the number of trials depending on the number of elements child of interactableObjects
 
         dockController = this.gameObject.GetComponent<DockController>();
-        
+        handleLog = this.gameObject.GetComponent<HandleLog>();
+
         GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text = "0";
 
         UpdateParameters();
@@ -164,6 +167,8 @@ public class HandleTestParameters : NetworkBehaviour
         ReorderConditionNames();
         UpdateConditionColor();
 
+        handleLog.StopLogRecording();
+
         UpdateTrial();
         syncParameters.conditionCompleted = false;
     }
@@ -248,6 +253,7 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickCondition(int newIndex)
     {
         if (newIndex == syncParameters.conditionIndex) return;
+        handleLog.StopLogRecording();
         NextCondition(newIndex);
         syncParameters.conditionCompleted = false;
     }
@@ -256,6 +262,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         GreyTrialCompleted();
         syncParameters.conditionCompleted = true;
+        handleLog.StopLogRecording();
         //SET HANDLE LOG CONFIRMED AS FALSE;
         //CHANGE THE COLOR OF THE SET PARAMETERS BUTTON
 

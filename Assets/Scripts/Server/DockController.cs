@@ -58,16 +58,7 @@ public class DockController : NetworkBehaviour {
                 testParameters.TrialCompleted();
     }
 
-    IEnumerator CoolDown()
-    {
-        syncParameters.restTime = true;
-        yield return new WaitForSeconds(5);
-        syncParameters.restTime = false;
-
-        yield return null;
-    }
-
-        public void ResetErrorDocking()
+    public void ResetErrorDocking()
     {
         errorTrans.Clear();
         errorRot.Clear();

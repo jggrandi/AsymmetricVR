@@ -20,7 +20,7 @@ public class SyncTestParameters : NetworkBehaviour {
     public int prevTrialIndex;
 
     [SyncVar]
-    public bool restTime = false;
+    public bool serverReady = false;
 
     [SyncVar]
     public bool conditionCompleted = false;
@@ -59,7 +59,7 @@ public class SyncTestParameters : NetworkBehaviour {
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
 
-        if (restTime) return; // dont do an
+        if (!serverReady) return; // dont do an
 
         if (conditionCompleted) return;
         ActivateObject(trialIndex, interactableObjects);
