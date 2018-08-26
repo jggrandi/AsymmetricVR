@@ -66,16 +66,13 @@ public class HandleLog : NetworkBehaviour
     {
         if (recording == false) return;
         syncParameters.serverReady = false;
-        PauseLogRecording();
         recording = false;
-        paused = false;
         log.Close();
         startLogRecording.GetComponent<Image>().color = Color.white;
     }
 
     public void PauseLogRecording()
     {
-        if (!recording) return;
         if (paused)
         {
             paused = false;

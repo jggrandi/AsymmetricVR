@@ -35,10 +35,7 @@ public class Log
                 default:
                     break;
             }
-
-            
         fUsersActions.WriteLine(header);
-
     }
 
     public void Close()
