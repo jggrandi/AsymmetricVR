@@ -33,11 +33,11 @@ public class HandleTestParameters : NetworkBehaviour
     HandleLog handleLog;
 
     public List<GameObject> activeInScene;
-    public List<GameObject> guiPlayer;
 
     GameObject interactableObjects;
 
     string[] conditionName = { "VR-VR", "AR-AR", "VR-AR" };
+
 
     // Use this for initialization
     void Start()
@@ -53,8 +53,6 @@ public class HandleTestParameters : NetworkBehaviour
         syncParameters = mainHandler.GetComponent<SyncTestParameters>();
         spawnInfo = mainHandler.GetComponent<SpawnInformation>();
 
-        guiPlayer = new List<GameObject>();
-        for (int i = 0; i < 10; i++) guiPlayer.Add(null);
         activeInScene = new List<GameObject>();
 
         panelModality = GameObject.Find("PanelModality");
@@ -80,24 +78,22 @@ public class HandleTestParameters : NetworkBehaviour
     void Update()
     {
         if (!isServer) return;
-        
-        //if (syncParameters.allConditionsCompleted)
-        //    Debug.Log("SHOULD FINISH THE TEST");
 
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
         var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
+        activeInScene.Clear();
+        for (int i = 0; i < panelConnected.transform.childCount; i++)
+            RemovePlayerOnDisplay(i);
 
         if (arObjs.Length > 0)
         {
             for (int i = 0; i < arObjs.Length; i++) // add all ar players connected
-                if(!activeInScene.Contains(arObjs[i]))
-                    activeInScene.Add(arObjs[i]); 
+                activeInScene.Add(arObjs[i]); 
         }
         if (vrObjs.Length > 0)
         {
             for (int i = 0; i < vrObjs.Length; i++) //add all vr players connected
-                if (!activeInScene.Contains(vrObjs[i]))
-                    activeInScene.Add(vrObjs[i]);
+                activeInScene.Add(vrObjs[i]);
         }
 
         if (activeInScene.Count == 0) //if there is no players connected , remove the text of all UI 
@@ -111,28 +107,20 @@ public class HandleTestParameters : NetworkBehaviour
             return; // dont need to do other things
         }
 
-        HandleDisplayPlayer(activeInScene); // handle the display of the player's name on the UI
-
-
+        DisplayPlayersInUI(activeInScene); // handle the display of the player's name on the UI
     }
 
-    void HandleDisplayPlayer(List<GameObject> _bjs)
+    void DisplayPlayersInUI(List<GameObject> _bjs)
     {
+        if(_bjs.Count > 1)
+            _bjs.Sort((x, y) => x.GetComponent<PlayerStuff>().id.CompareTo(y.GetComponent<PlayerStuff>().id)); //sort
+
         for (int i = 0; i < _bjs.Count; i++)
-        {
-            if (_bjs[i] == null) //if one player disconnected
-            {
-                _bjs.RemoveAt(i); //remove it
-                RemovePlayerOnDisplay(i); //remove the ui text
-            }
-            else if (!guiPlayer.Contains(_bjs[i])) //if the player is connected but dont have a ui text
-                AddPlayerOnDisplay(i, _bjs[i]);
-        }
+            AddPlayerOnDisplay(i, _bjs[i]);
     }
 
     void AddPlayerOnDisplay(int index, GameObject g )
     {
-        guiPlayer[index] = g;
         var slot = panelConnected.transform.GetChild(index);
         Text playerName = slot.GetComponent<Text>();
         var playerInfo = g.GetComponent<PlayerStuff>();
@@ -141,12 +129,10 @@ public class HandleTestParameters : NetworkBehaviour
 
     void RemovePlayerOnDisplay(int index)
     {
-        guiPlayer.RemoveAt(index);
         var slot = panelConnected.transform.GetChild(index);
         Text playerName = slot.GetComponent<Text>();
         playerName.text = "";
     }
-
 
     public void UpdateParameters()
     {
@@ -263,9 +249,6 @@ public class HandleTestParameters : NetworkBehaviour
         GreyTrialCompleted();
         syncParameters.conditionCompleted = true;
         handleLog.StopLogRecording();
-        //SET HANDLE LOG CONFIRMED AS FALSE;
-        //CHANGE THE COLOR OF THE SET PARAMETERS BUTTON
-
     }
 
     public void NextCondition(int newIndex)

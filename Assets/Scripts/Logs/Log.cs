@@ -9,32 +9,27 @@ public class Log
 {
 
     StreamWriter fUsersActions;
+    List<int> playerOrder = new List<int>();
 
-    public Log(int group, int condition, int qntUsers)
+    public Log(int group, int condition, List<GameObject> players)
     {
 
         Debug.Log(Application.persistentDataPath);
         fUsersActions = File.CreateText(Application.persistentDataPath + "/Group-" + group + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Verbose.csv");
-        
-        string header = "Time;ObjID;TError;RError;RAError;SError";
+        players.Sort((x, y) => x.GetComponent<PlayerStuff>().id.CompareTo(y.GetComponent<PlayerStuff>().id)); // sort players by ID 
+        playerOrder.Clear();
+        foreach (var p in players)
+            playerOrder.Add(p.GetComponent<PlayerStuff>().id);
 
-            switch (condition)
-            {
-                case 0:
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
-                break;
-                case 1:
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation";
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation";
-                break;
-                case 2:
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
-                    header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation";
-                break;
-                default:
-                    break;
-            }
+        string header = "Time;ObjID;TError;RError;RAError;SError";
+        foreach (var p in players)
+        {
+            if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.VR)
+                header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
+            else if(p.GetComponent<PlayerStuff>().type == Utils.PlayerType.AR)
+                header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
+        }
+
         fUsersActions.WriteLine(header);
     }
 
@@ -50,47 +45,70 @@ public class Log
 
     public void Save(int objId, float tError, float rError, float raError, float sError, List<GameObject> players)
     {
+        //if(players.Count > 1) // only sort if there is more than one player
+        //    players.Sort((x, y) => x.GetComponent<PlayerStuff>().id.CompareTo(y.GetComponent<PlayerStuff>().id)); // sort players by ID 
+
         String line = "";
         line += Time.realtimeSinceStartup + ";" + objId + ";" + tError + ";" + rError + ";" + raError + ";" + sError;
-        foreach(var p in players)
+
+        foreach (var c in playerOrder)
         {
-            var pStuff = p.GetComponent<PlayerStuff>();
-            var pTransformStep = p.GetComponent<HandleNetworkTransformations>();
-            Vector3 pPos = new Vector3();
-            Quaternion pRot = new Quaternion();
-            bool vrBimanual = false;
-            int vrLockCombo = 0;
-            int arOperation = 0;
-            if (pStuff.type == Utils.PlayerType.VR)
+            var playerFound = ContainsId(c, players);
+            if (playerFound != null)
             {
-                var pTransform = p.GetComponent<VRTransformSync>();
-                var pButton = p.GetComponent<ButtonSync>();
-                pPos = pTransform.headPos;
-                pRot = pTransform.headRot;
-                vrBimanual = pButton.bimanual;
-                vrLockCombo = pButton.lockCombination;
+                var pStuff = playerFound.GetComponent<PlayerStuff>();
+                var pTransformStep = playerFound.GetComponent<HandleNetworkTransformations>();
+                Vector3 pPos = new Vector3();
+                Quaternion pRot = new Quaternion();
+                bool vrBimanual = false;
+                int vrLockCombo = 0;
+                int arOperation = 0;
+                if (pStuff.type == Utils.PlayerType.VR)
+                {
+                    var pTransform = playerFound.GetComponent<VRTransformSync>();
+                    var pButton = playerFound.GetComponent<ButtonSync>();
+                    pPos = pTransform.headPos;
+                    pRot = pTransform.headRot;
+                    vrBimanual = pButton.bimanual;
+                    vrLockCombo = pButton.lockCombination;
+                }
+                else if (pStuff.type == Utils.PlayerType.AR)
+                {
+                    var pTransform = playerFound.GetComponent<ARTransformSync>();
+                    var pOperation = playerFound.GetComponent<Lean.Touch.ARInteractionManager>();
+                    pPos = pTransform.position;
+                    pRot = pTransform.rotation;
+                    arOperation = pOperation.currentOperation;
+                }
+
+                line += ";" + pStuff.id + ";" + pStuff.type;
+                line += ";" + pPos.x + ";" + pPos.y + ";" + pPos.z + ";" + pRot.x + ";" + pRot.y + ";" + pRot.z + ";" + pRot.w;
+                line += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
+                if (pStuff.type == Utils.PlayerType.VR)
+                    line += ";" + vrBimanual + ";" + vrLockCombo;
+                else if (pStuff.type == Utils.PlayerType.AR)
+                    line += ";" + arOperation + ";";
             }
-            else if (pStuff.type == Utils.PlayerType.AR)
+            else
             {
-                var pTransform = p.GetComponent<ARTransformSync>();
-                var pOperation = p.GetComponent<Lean.Touch.ARInteractionManager>();
-                pPos = pTransform.position;
-                pRot = pTransform.rotation;
-                arOperation = pOperation.currentOperation;
+                line += ";;;;;;;;;;;;;;;;;;;";
             }
-               
-            line += ";" + pStuff.id + ";" + pStuff.type;
-            line += ";" + pPos.x + ";" + pPos.y + ";" + pPos.z + ";" + pRot.x + ";" + pRot.y + ";" + pRot.z + ";" + pRot.w;
-            line += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
-            if(pStuff.type == Utils.PlayerType.VR)
-                line += ";" + vrBimanual + ";" + vrLockCombo;
-            else if (pStuff.type == Utils.PlayerType.AR)
-                line += ";" + arOperation;
         }
 
         fUsersActions.WriteLine(line);
         fUsersActions.Flush();
 
+    }
+
+    GameObject ContainsId(int _index, List<GameObject> _players)
+    {
+        foreach(var p in _players)
+        {
+            if (p == null) continue;
+            if (p.GetComponent<PlayerStuff>().id == _index)
+                return p;
+        }
+        return null;
     }
 
     //public void saveUserActions(GameObject[] gs)

@@ -176,11 +176,12 @@ public class HandleNetworkTransformations : NetworkBehaviour
         axis = GetLocalTransform().InverseTransformVector(axis);
         CmdARRotate(index, avg, axis, mag);
     }
+
+    [Command]
     public void CmdRotStep( Quaternion q)
     {
         rStep = q;
     }
-
 
     [Command]
     public void CmdARScale(int index, float scalestep)

@@ -47,7 +47,6 @@ public class HandleLog : NetworkBehaviour
         {
             var objId = syncParameters.trialIndex;
             log.Save(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
-            //SAVE LOG
         }
 
     }
@@ -55,7 +54,7 @@ public class HandleLog : NetworkBehaviour
     public void StartLogRecording()
     {
         if (recording) return;
-        log = new Log(testParameters.groupID, syncParameters.conditionIndex, 2);
+        log = new Log(testParameters.groupID, testParameters.conditionsOrder[syncParameters.conditionIndex], testParameters.activeInScene);
         syncParameters.serverReady = true;
         recording = true;
         paused = false;
