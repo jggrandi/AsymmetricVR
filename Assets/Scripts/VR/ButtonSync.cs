@@ -10,13 +10,20 @@ public class ButtonSync : NetworkBehaviour {
 
 
     public bool lTrigger = false;
-    public bool lApp = false;
-    public bool lA = false;
-    public bool lGrip = false;
     public bool rTrigger = false;
-    public bool rApp = false;
+
+    public bool lA = false;
     public bool rA = false;
+
+    public bool lApp = false;
+    public bool rApp = false;
+
+    public bool lGrip = false;
     public bool rGrip = false;
+
+    public Vector2 lJoystick = new Vector2();
+    public Vector2 rJoystick = new Vector2();
+
     public bool bimanual = false;
     public int lockCombination = 0; // 0=alltransforms, 1=trans, 3=rot, 5=scale, 4=trans+rot, 6=trans+scale, 8=rot+scale, 9=allblocked
 
@@ -61,11 +68,13 @@ public class ButtonSync : NetworkBehaviour {
         lA = refLeft.GetAPress();
         lApp = refLeft.GetAppPress();
         lGrip = refLeft.GetGripPress();
+        lJoystick = refLeft.GetJoystickCoord();
 
         rTrigger = refRight.GetTriggerPress();
         rA = refRight.GetAPress();
         rApp = refRight.GetAppPress();
         rGrip = refRight.GetGripPress();
+        rJoystick = refRight.GetJoystickCoord();
 
         bimanual = false;
         lockCombination = 0;
@@ -93,12 +102,12 @@ public class ButtonSync : NetworkBehaviour {
                 if (rGrip) lockCombination += 5;
             }
         }
-        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip); 
+        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick); 
         CmdUpdateActions(bimanual, lockCombination);
     }
 
     [Command]
-    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip)
+    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)
     {
         lTrigger = ltrigger;
         rTrigger = rtrigger;
@@ -108,15 +117,17 @@ public class ButtonSync : NetworkBehaviour {
         rApp = rapp;
         lGrip = lgrip;
         rGrip = rgrip;
+        lJoystick = ljoystick;
+        rJoystick = rjoystick;
 
         if(lTrigger || rTrigger)
             this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
 
-        RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip);
+        RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip, ljoystick, rjoystick);
     }
 
     [ClientRpc]
-    void RpcSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip)
+    void RpcSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)
     {
         lTrigger = ltrigger;
         rTrigger = rtrigger;
@@ -126,6 +137,8 @@ public class ButtonSync : NetworkBehaviour {
         rApp = rapp;
         lGrip = lgrip;
         rGrip = rgrip;
+        lJoystick = ljoystick;
+        rJoystick = rjoystick;
 
     }
 

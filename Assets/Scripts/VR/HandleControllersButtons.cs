@@ -112,6 +112,13 @@ public class HandleControllersButtons : MonoBehaviour
         return false;
     }
 
+    public Vector2 GetJoystickCoord()
+    {
+        if (!isControllerActive()) 
+            return Vector2.zero;
+
+        return hand.controller.GetAxis(EVRButtonId.k_EButton_SteamVR_Touchpad);
+    }
 
 }
 

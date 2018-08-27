@@ -112,21 +112,24 @@ public class VRInteractionManager : NetworkBehaviour {
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
-            //float rotX = interactingHands[0].transform.rotation.eulerAngles.x + interactingHands[1].transform.rotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
-
+            //float rotX = interactingHands[0].transform.localRotation.eulerAngles.x + interactingHands[1].transform.localRotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
             
-            Quaternion rotHands = interactingHands[0].gameObject.GetComponent<TransformStep>().rotationStep;
+            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.right);
+            //Quaternion rotHands = interactingHands[0].gameObject.GetComponent<TransformStep>().rotationStep;
             
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
             //var q2 = Quaternion.AngleAxis(, -direction2.normalized);
-
+            
+            Debug.DrawLine(interactingHands[0].transform.position, direction2.normalized + interactingHands[0].transform.position);
+            Debug.Log(interactingHands[0].GetComponent<TransformStep>().rotationStep.eulerAngles.x);
+            var asd = Quaternion.AngleAxis(interactingHands[0].GetComponent<TransformStep>().rotationStep.eulerAngles.x, direction2.normalized + interactingHands[0].transform.position);
             //var difRotX = rotX - rotXOld;
 
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
             q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            //q = q * Quaternion.Euler(difRotX, 0f, 0f);
+            q = q * asd;
             //q = q * rotHands;
             
             //rotXOld = rotX;
@@ -140,13 +143,10 @@ public class VRInteractionManager : NetworkBehaviour {
 
     float CalcScale(ObjSelected objSelected, List<Hand> interactingHands)
     {
-
-        //if (interactingHands.Count == 1)
-        //{
-        // RESERVED FOR ONE HAND SCALE
-        //}
-
         float scaleStep = 0f;
+        scaleStep += (buttonSync.lJoystick.y * 0.01f);
+        scaleStep += (buttonSync.rJoystick.y * 0.01f);
+
         if (interactingHands.Count == 2)
         {
             float avgScaleMag = 0f;
@@ -154,7 +154,7 @@ public class VRInteractionManager : NetworkBehaviour {
             avgScaleMag += (buttonSync.rightHand.transform.position - buttonSync.leftHand.transform.position).magnitude;
             avgScaleMag /= interactingHands.Count; // to scale the object in between both hands
 
-            scaleStep = avgScaleMag - oldScaleMag;
+            scaleStep += (avgScaleMag - oldScaleMag);
             
             oldScaleMag = avgScaleMag;
         }
