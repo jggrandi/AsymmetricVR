@@ -13,9 +13,9 @@ public class HandleTestParameters : NetworkBehaviour
     //public int conditionIndex = 0;
 
     public List<int> conditionsOrder = new List<int>();
-    public List<int> conditionsCompleted = new List<int>();
-
+    
     public List<bool> trialsCompleted = new List<bool>();
+    public List<bool> conditionsCompleted = new List<bool>();
 
     public List<int> condition0TrialOrder = new List<int>();
     public List<int> condition1TrialOrder = new List<int>();
@@ -156,7 +156,7 @@ public class HandleTestParameters : NetworkBehaviour
         handleLog.StopLogRecording();
 
         UpdateTrial();
-        syncParameters.conditionCompleted = false;
+        syncParameters.EVALUATIONSTARTED = false;
     }
 
     void UpdateTrial()
@@ -184,9 +184,15 @@ public class HandleTestParameters : NetworkBehaviour
     void UpdateConditionColor()
     {
         ClearConditionColor();
+        GreyConditionCompleted();
         panelModality.transform.GetChild(syncParameters.conditionIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
+
+    }
+    void GreyConditionCompleted()
+    {
         for (int i = 0; i < conditionsCompleted.Count; i++)
-            panelModality.transform.GetChild(conditionsCompleted[i]).gameObject.GetComponentInChildren<Image>().color = Color.grey;
+            if (conditionsCompleted[i])
+                panelModality.transform.GetChild(i).gameObject.GetComponentInChildren<Image>().color = Color.grey;
 
     }
 
@@ -213,13 +219,6 @@ public class HandleTestParameters : NetworkBehaviour
         panelTrial.transform.GetChild(syncParameters.trialIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
     }
 
-    void ResetConditionsCompleted()
-    {
-        syncParameters.conditionIndex = 0;
-        conditionsCompleted.Clear();
-        ClearConditionColor();
-    }
-
     void ResetSpawnOrder()
     {
         syncParameters.spawnPosition.Clear();
@@ -236,42 +235,73 @@ public class HandleTestParameters : NetworkBehaviour
         ClearTrialColor();
     }
 
-    public void OnClickCondition(int newIndex)
+    void ResetConditionsCompleted()
     {
-        if (newIndex == syncParameters.conditionIndex) return;
-        handleLog.StopLogRecording();
-        NextCondition(newIndex);
-        syncParameters.conditionCompleted = false;
+        syncParameters.conditionIndex = 0;
+        conditionsCompleted.Clear();
+        for (int i = 0; i < conditionsToPermute; i++)
+            conditionsCompleted.Add(false);
+        ClearConditionColor();
+
+    }
+
+
+
+    public void TrialCompleted()
+    {
+        trialsCompleted[syncParameters.trialIndex] = true;
+        if (!trialsCompleted.Contains(false))
+        {
+            ConditionCompleted();
+            return;
+        }
+        handleLog.SaveResumed(syncParameters.activeTrialOrder[syncParameters.trialIndex], Time.realtimeSinceStartup, activeInScene);
+        handleLog.ResetContributionTime();
+        syncParameters.trialIndex = trialsCompleted.IndexOf(false);
+        UpdateTrialColor();
     }
 
     public void ConditionCompleted()
     {
+        conditionsCompleted[syncParameters.conditionIndex] = true;
+
+        if (!conditionsCompleted.Contains(false))
+        {
+            TestFinished();
+            return;
+        }
+
+        syncParameters.conditionIndex = conditionsCompleted.IndexOf(false);
+
         GreyTrialCompleted();
-        syncParameters.conditionCompleted = true;
+        handleLog.StopLogRecording();
+        
+        UpdateConditionColor();
+        UpdateTrial();
+    }
+
+    public void TestFinished()
+    {
+        GreyConditionCompleted();
+        GreyTrialCompleted();
         handleLog.StopLogRecording();
     }
 
-    public void NextCondition(int newIndex)
+    public void OnClickCondition(int newIndex)
     {
-        if (conditionsCompleted.Contains(newIndex)) return;
+        if (newIndex == syncParameters.conditionIndex) return;
+        handleLog.StopLogRecording();
+        ConditonChange(newIndex);
+    }
 
-        AddToCompletedList(syncParameters.conditionIndex);
-        if (conditionsCompleted.Count == conditionsToPermute)
-        {
-            syncParameters.conditionCompleted = true;
-            return;
-        }
+    public void ConditonChange(int newIndex)
+    {
+        if (conditionsCompleted[newIndex] == true) return;
         
         syncParameters.conditionIndex = newIndex;
         UpdateConditionColor();
         UpdateTrial();
 
-    }
-
-    void AddToCompletedList(int oldIndex)
-    {
-        if (!conditionsCompleted.Contains(oldIndex))
-            conditionsCompleted.Add(oldIndex);
     }
 
     public void OnClickTrial(int newIndex)
@@ -280,33 +310,22 @@ public class HandleTestParameters : NetworkBehaviour
         TrialChange(newIndex);
     }
 
-    public void OnClickStartRecording()
-    {
-        handleLog.StartLogRecording();
-    }
-
     void TrialChange(int newIndex)
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
         syncParameters.UpdateSpawnInfo(syncParameters.activeTrialOrder[newIndex]);
         syncParameters.trialIndex = newIndex;
+        handleLog.previousTime = Time.realtimeSinceStartup;
+        handleLog.ResetContributionTime();
         UpdateTrialColor();
     }
 
-    public void TrialCompleted()
+
+    public void OnClickStartRecording()
     {
-        trialsCompleted[syncParameters.trialIndex] = true;
-        if (!trialsCompleted.Contains(false))
-        {
-            var nextCondition = syncParameters.conditionIndex + 1;
-            ConditionCompleted();
-            return;
-        }
-        handleLog.SaveResumed(syncParameters.activeTrialOrder[syncParameters.trialIndex],Time.realtimeSinceStartup);
-        syncParameters.trialIndex = trialsCompleted.IndexOf(false);
-        UpdateTrialColor();
+        handleLog.StartLogRecording();
     }
-    
+
     void DisplayTrialOrder()
     {
         for (int i = 0; i < panelTrial.transform.childCount; i++)

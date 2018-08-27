@@ -105,6 +105,8 @@ namespace Lean.Touch {
         [Command]
         public void CmdSetCurrentOperation(int ope)
         {
+            if (ope > 0)
+                this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
             currentOperation = ope;
         }
 
@@ -260,6 +262,6 @@ namespace Lean.Touch {
         void CmdUpdateModality(int m) {
             RpcUpdateModality(m);
         }
-            
+
     }
 }

@@ -109,10 +109,16 @@ public class Log
 
     }
 
-    public void SaveResumed(int objId, float time)
+    public void SaveResumed(int objId, float time, List<GameObject> players)
     {
         String line = "";
         line += objId + ";" + time;
+
+        foreach (var p in players)
+        {
+            var pStuff = p.GetComponent<PlayerStuff>();
+            line +=  ";" + pStuff.id + ";" + pStuff.type + ";" + pStuff.activeTime;
+        }
 
         logResumed.WriteLine(line);
         logResumed.Flush();

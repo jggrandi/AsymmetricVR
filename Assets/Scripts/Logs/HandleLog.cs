@@ -11,6 +11,8 @@ public class HandleLog : NetworkBehaviour
     public bool recording = false;
     public bool paused = false;
 
+    public float previousTime = 0f;
+
     GameObject mainHandler;
     SyncTestParameters syncParameters;
     HandleTestParameters testParameters;
@@ -55,7 +57,7 @@ public class HandleLog : NetworkBehaviour
     {
         if (recording) return;
         log = new Log(testParameters.groupID, testParameters.conditionsOrder[syncParameters.conditionIndex], testParameters.activeInScene);
-        syncParameters.serverReady = true;
+        syncParameters.EVALUATIONSTARTED = true;
         recording = true;
         paused = false;
         startLogRecording.GetComponent<Image>().color = Color.grey;
@@ -64,8 +66,9 @@ public class HandleLog : NetworkBehaviour
     public void StopLogRecording()
     {
         if (recording == false) return;
-        syncParameters.serverReady = false;
+        syncParameters.EVALUATIONSTARTED = false;
         recording = false;
+        previousTime = 0f;
         log.Close();
         startLogRecording.GetComponent<Image>().color = Color.white;
     }
@@ -87,15 +90,21 @@ public class HandleLog : NetworkBehaviour
     }
 
 
-    float previousTime = 0f;
-    public void SaveResumed(int objId, float time)
+
+    public void SaveResumed(int objId, float time, List<GameObject> players)
     {
         if (!recording) return;
         if (paused) return;
         var objTime = time - previousTime;
 
-        log.SaveResumed(objId, objTime);
+        log.SaveResumed(objId, objTime, players);
         previousTime = time;
+    }
+
+    public void ResetContributionTime()
+    {
+        foreach(var player in testParameters.activeInScene)
+            player.GetComponent<PlayerStuff>().activeTime = 0f;
     }
 
     void OnApplicationQuit()

@@ -50,7 +50,7 @@ public class DockController : NetworkBehaviour {
 	void Update () {
         if (!isServer) return;
         
-        if (syncParameters.conditionCompleted) return;
+        if (!syncParameters.EVALUATIONSTARTED) return;
 
         CalculateDocking();
         bool isGoodEnough = EvaluateCurrentDocking();

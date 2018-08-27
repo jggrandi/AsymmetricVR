@@ -93,7 +93,6 @@ public class ButtonSync : NetworkBehaviour {
                 if (rGrip) lockCombination += 5;
             }
         }
-
         CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip); 
         CmdUpdateActions(bimanual, lockCombination);
     }
@@ -109,6 +108,9 @@ public class ButtonSync : NetworkBehaviour {
         rApp = rapp;
         lGrip = lgrip;
         rGrip = rgrip;
+
+        if(lTrigger || rTrigger)
+            this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
 
         RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip);
     }
