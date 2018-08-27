@@ -46,7 +46,7 @@ public class HandleLog : NetworkBehaviour
         if(countFrames % 5 == 0)
         {
             var objId = syncParameters.trialIndex;
-            log.Save(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
+            log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
         }
 
     }
@@ -84,6 +84,18 @@ public class HandleLog : NetworkBehaviour
             pauseRecord.GetComponentInChildren<Text>().text = "Resume";
             pauseRecord.GetComponent<Image>().color = Color.grey;
         }
+    }
+
+
+    float previousTime = 0f;
+    public void SaveResumed(int objId, float time)
+    {
+        if (!recording) return;
+        if (paused) return;
+        var objTime = time - previousTime;
+
+        log.SaveResumed(objId, objTime);
+        previousTime = time;
     }
 
     void OnApplicationQuit()

@@ -8,16 +8,19 @@ using UnityEngine.Networking;
 public class Log
 {
 
-    StreamWriter fUsersActions;
+    StreamWriter logFull;
+    StreamWriter logResumed;
     List<int> playerOrder = new List<int>();
 
     public Log(int group, int condition, List<GameObject> players)
     {
-
         Debug.Log(Application.persistentDataPath);
-        fUsersActions = File.CreateText(Application.persistentDataPath + "/Group-" + group + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Verbose.csv");
+        logFull = File.CreateText(Application.persistentDataPath + "/Group-" + group + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Verbose.csv");
+        logResumed = File.CreateText(Application.persistentDataPath + "/Group-" + group + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Resumed.csv");
+
         players.Sort((x, y) => x.GetComponent<PlayerStuff>().id.CompareTo(y.GetComponent<PlayerStuff>().id)); // sort players by ID 
         playerOrder.Clear();
+
         foreach (var p in players)
             playerOrder.Add(p.GetComponent<PlayerStuff>().id);
 
@@ -25,29 +28,35 @@ public class Log
         foreach (var p in players)
         {
             if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.VR)
-                header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
-            else if(p.GetComponent<PlayerStuff>().type == Utils.PlayerType.AR)
-                header += ";PID;PModal;PCamPosX;PCamPosY;PCamPosZ;PCamRotX;P1CamRotY;P1CamRotZ;P1CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
+                header += ";PID;Modal;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
+            else if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.AR)
+                header += ";PID;Modal;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
         }
 
-        fUsersActions.WriteLine(header);
+        logFull.WriteLine(header);
+
+        header = "ObjID;Time";
+        foreach (var p in players)
+            header += ";PID;Modal;PieceTime";
+
+        logResumed.WriteLine(header);
+
     }
 
     public void Close()
     {
-        fUsersActions.Close();
+        logFull.Close();
+        logResumed.Close();
     }
 
     public void Flush()
     {
-        fUsersActions.Flush();
+        logFull.Flush();
+        logResumed.Flush();
     }
 
-    public void Save(int objId, float tError, float rError, float raError, float sError, List<GameObject> players)
+    public void SaveFull(int objId, float tError, float rError, float raError, float sError, List<GameObject> players)
     {
-        //if(players.Count > 1) // only sort if there is more than one player
-        //    players.Sort((x, y) => x.GetComponent<PlayerStuff>().id.CompareTo(y.GetComponent<PlayerStuff>().id)); // sort players by ID 
-
         String line = "";
         line += Time.realtimeSinceStartup + ";" + objId + ";" + tError + ";" + rError + ";" + raError + ";" + sError;
 
@@ -95,10 +104,20 @@ public class Log
             }
         }
 
-        fUsersActions.WriteLine(line);
-        fUsersActions.Flush();
+        logFull.WriteLine(line);
+        logFull.Flush();
 
     }
+
+    public void SaveResumed(int objId, float time)
+    {
+        String line = "";
+        line += objId + ";" + time;
+
+        logResumed.WriteLine(line);
+        logResumed.Flush();
+    }
+
 
     GameObject ContainsId(int _index, List<GameObject> _players)
     {
@@ -111,57 +130,7 @@ public class Log
         return null;
     }
 
-    //public void saveUserActions(GameObject[] gs)
-    //{
-    //    String line = "";
-    //    line += Time.realtimeSinceStartup + "";
-
-    //    foreach (GameObject player in gs)
-    //    {
-    //        if (player.GetComponent<NetworkIdentity>().isLocalPlayer) continue;
-    //        line += ";" + player.GetComponent<PlayerStuff>().userID;
-    //        Vector3 cam = player.GetComponent<Lean.Touch.NetHandleSelectionTouch>().CameraPosition;
-    //        line += ";" + cam.x + ";" + cam.y + ";" + cam.z;
-    //        if (player.GetComponent<Lean.Touch.NetHandleSelectionTouch>().objSelectedShared.Count <= 0) line += ";;;;;;;;;;;;";
-    //        else
-    //        {
-    //            line += ";" + player.GetComponent<Lean.Touch.NetHandleSelectionTouch>().objSelectedShared[0];
-    //            line += ";" + player.GetComponent<Lean.Touch.NetHandleTransformations>().modality;
-    //            line += ";" + player.GetComponent<Lean.Touch.NetHandleSelectionTouch>().currentOperation;
-    //            line += ";" + player.GetComponent<PlayerStuff>().targetsTracked;
-    //            Vector3 trans = player.GetComponent<HandleNetworkFunctions>().objTranslateStep;
-    //            Quaternion rot = player.GetComponent<HandleNetworkFunctions>().objRotStep;
-    //            line += ";" + trans.x + ";" + trans.y + ";" + trans.z;
-    //            line += ";" + rot.x + ";" + rot.y + ";" + rot.z + ";" + rot.w;
-    //            line += ";" + player.GetComponent<HandleNetworkFunctions>().objScaleStep;
-    //        }
-    //    }
-    //    fUsersActions.WriteLine(line);
-    //    fUsersActions.Flush();
-    //}
-
-
-    //public void savePiecesState(List<int> pieces, List<float> timers, List<float> errorTrans, List<float> errorRot, List<float> errorScale)
-    //{
-    //    String line = "";
-    //    line += Time.realtimeSinceStartup + "";
-
-    //    foreach (int piece in pieces)
-    //        line += ";" + timers[piece] + ";" + errorTrans[piece] + ";" + errorRot[piece] + ";" + errorScale[piece];
-
-    //    fPiecesState.WriteLine(line);
-    //    fPiecesState.Flush();
-
-    //}
-
-    //public void saveResumed(int piece, float time, float timeU1, float timeU2)
-    //{
-    //    String line = "";
-    //    line += Time.realtimeSinceStartup + "";
-    //    line += ";" + piece + ";" + time + ";" + timeU1 + ";" + timeU2;
-    //    fResumed.WriteLine(line);
-    //    fResumed.Flush();
-    //}
+    
 
 
 }

@@ -280,6 +280,11 @@ public class HandleTestParameters : NetworkBehaviour
         TrialChange(newIndex);
     }
 
+    public void OnClickStartRecording()
+    {
+        handleLog.StartLogRecording();
+    }
+
     void TrialChange(int newIndex)
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
@@ -297,6 +302,7 @@ public class HandleTestParameters : NetworkBehaviour
             ConditionCompleted();
             return;
         }
+        handleLog.SaveResumed(syncParameters.activeTrialOrder[syncParameters.trialIndex],Time.realtimeSinceStartup);
         syncParameters.trialIndex = trialsCompleted.IndexOf(false);
         UpdateTrialColor();
     }

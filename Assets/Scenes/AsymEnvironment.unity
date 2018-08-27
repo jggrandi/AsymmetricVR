@@ -6490,7 +6490,6 @@ MonoBehaviour:
   condition1TrialOrder: 
   condition2TrialOrder: 
   activeInScene: []
-  guiPlayer: []
 --- !u!114 &1111413131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6550,6 +6549,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recording: 0
+  paused: 0
 --- !u!1 &1111445332
 GameObject:
   m_ObjectHideFlags: 0
@@ -8156,8 +8156,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1111413133}
-        m_MethodName: StartLogRecording
+      - m_Target: {fileID: 1111413130}
+        m_MethodName: OnClickStartRecording
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9588,7 +9588,7 @@ MonoBehaviour:
   prevConditionIndex: 0
   trialIndex: 0
   prevTrialIndex: 0
-  restTime: 0
+  serverReady: 0
   conditionCompleted: 0
 --- !u!114 &1623813272
 MonoBehaviour:
