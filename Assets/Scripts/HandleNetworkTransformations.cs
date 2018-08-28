@@ -39,8 +39,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
         Quaternion r = new Quaternion(0, 0, 0, 0);
         Vector3 s = Vector3.zero;
         var g = ObjectManager.Get(index);
-        if (pos) p = g.transform.localPosition;
-        if (rot) r = g.transform.localRotation;
+        if (pos) p = g.transform.position;
+        if (rot) r = g.transform.rotation;
         if (scale) s = g.transform.localScale;
         RpcSyncObj(index, p, r, s);
     }
@@ -48,25 +48,26 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [ClientRpc]
     public void RpcSyncObj(int index, Vector3 pos, Quaternion rot, Vector3 scale)
     {
+        if (isLocalPlayer) return;
         var g = ObjectManager.Get(index);
-        if (pos != Vector3.zero) g.transform.localPosition = pos;
-        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.localRotation = rot;
+        if (pos != Vector3.zero) g.transform.position = pos;
+        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
         if (scale != Vector3.zero) g.transform.localScale = scale;
     }
 
     public void VRTranslate(int index, Vector3 translatestep)
     {
         var g = ObjectManager.Get(index);
+       // g.transform.position += translatestep;
         CmdVRTranslate(index, translatestep);
     }
 
     [Command]
     void CmdVRTranslate(int index, Vector3 translatestep)
     {
-        tStep = translatestep;
         var g = ObjectManager.Get(index);
-        //g.transform.localPosition += translatestep;
-        g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
+        g.transform.position += translatestep;
+        //g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
         SyncObj(index);
     }
 
@@ -80,8 +81,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         rStep = rotationstep;
         var g = ObjectManager.Get(index);
-        //g.transform.rotation = rotationstep * g.transform.rotation;
-        g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
+        g.transform.rotation = rotationstep * g.transform.rotation;
+        //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
         SyncObj(index);
     }
 

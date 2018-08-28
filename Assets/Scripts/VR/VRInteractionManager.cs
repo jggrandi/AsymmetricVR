@@ -16,32 +16,64 @@ public class VRInteractionManager : NetworkBehaviour {
     void Start () {
         if (!isLocalPlayer) return;
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
+        
     }
 	
-	// Update is called once per frame
-	void Update () {
+    Hand SmoothMovement( Hand tosmooth,  Hand reference)
+    {
+        Hand smoothed = new Hand();
+        smoothed.transform.position = Vector3.Lerp(tosmooth.transform.position, reference.transform.position, 0.3f);
+        smoothed.transform.rotation = Quaternion.Lerp(tosmooth.transform.rotation, reference.transform.rotation, 0.3f);
+        return smoothed;
+    }
+
+    private Vector3 _localPosition;
+    private Vector3 _lastPosition;
+
+    private bool stillPressed = false;
+
+    // Update is called once per frame
+    void Update () {
         if (!isLocalPlayer) return;
         if(buttonSync == null) this.gameObject.GetComponent<ButtonSync>();
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
 
-        
-
         List<Hand> interactingHands = new List<Hand>();
-        if (buttonSync.bimanual) 
+
+        if (buttonSync.bimanual)
         {
             interactingHands.Add(buttonSync.leftHand); //send both hands for transform functions
             interactingHands.Add(buttonSync.rightHand); //send both hands for transform functions
         }
-        else 
+        else
         {
-            if (buttonSync.lTrigger)
+            if (buttonSync.lTrigger )
+            {
                 interactingHands.Add(buttonSync.leftHand); //there is only one hand interacting. send it to the transform functions
-            else if (buttonSync.rTrigger)
-                interactingHands.Add(buttonSync.rightHand);
+                if (!stillPressed)
+                {
+                    
+                    _localPosition = interactingHands[0].transform.InverseTransformDirection(selected.gameobject.transform.position);
+
+                    stillPressed = true;
+                }
+            }
+            //else if (buttonSync.rTrigger)
+            //{
+            //    _localPosition = buttonSync.rightHand.transform.InverseTransformDirection(selected.gameobject.transform.position);
+            //    interactingHands.Add(buttonSync.rightHand);
+            //    stillPressed = true;
+            //}
+
+            if (!buttonSync.lTrigger && stillPressed)
+                stillPressed = false;
+            //if (!buttonSync.rTrigger && stillPressed)
+            //    stillPressed = false;
         }
 
+        
         
         if (interactingHands.Count <= 1)
         {
@@ -59,10 +91,11 @@ public class VRInteractionManager : NetworkBehaviour {
             return;
 
         
-        //var newTranslation = TryGambiarra(selected, interactingHands);
-        var newTranslation = CalcTranslation(selected, interactingHands);
+        var newTranslation = TryElegantSolution(selected, interactingHands);
+        //var newTranslation = CalcTranslation(selected, interactingHands);
         var newRotation = CalcRotation(selected, interactingHands);
         var newScale = CalcScale(selected, interactingHands);
+
 
         if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation); // add position changes to the object
@@ -71,27 +104,18 @@ public class VRInteractionManager : NetworkBehaviour {
         if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale); // add scale to the object
 
+        _lastPosition = selected.gameobject.transform.position;
     }
 
-
-    Vector3 _localPosition, _lastPosition;
-    bool firstPass = true;
-
-    Vector3  TryGambiarra(ObjSelected objSelected, List<Hand> interactingHands)
+    Vector3 TryElegantSolution(ObjSelected objSelected, List<Hand> interactingHands)
     {
-        //if (firstPass)
-        //{
-            _localPosition = interactingHands[0].transform.InverseTransformPoint(objSelected.gameobject.transform.position);
-        //    firstPass = false;
-        //}
+        if (!stillPressed) return Vector3.zero;
 
-        _localPosition += _lastPosition - objSelected.gameobject.transform.position;
-        //s1.transform.position = interactingHands[0].transform.TransformPoint(_localPosition);
-        
-        _lastPosition = objSelected.gameobject.transform.position;
-        return _localPosition;
-
+        var step = interactingHands[0].transform.TransformPoint(_localPosition) - _lastPosition;
+        objSelected.gameobject.transform.position += step;
+        return step;
     }
+
 
     Vector3 CalcTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {       
@@ -123,7 +147,7 @@ public class VRInteractionManager : NetworkBehaviour {
             
             Debug.DrawLine(interactingHands[0].transform.position, direction2.normalized + interactingHands[0].transform.position);
             Debug.Log(interactingHands[0].GetComponent<TransformStep>().rotationStep.eulerAngles.x);
-            var asd = Quaternion.AngleAxis(interactingHands[0].GetComponent<TransformStep>().rotationStep.eulerAngles.x, direction2.normalized + interactingHands[0].transform.position);
+            var asd = Quaternion.AngleAxis(30f, direction2.normalized + interactingHands[0].transform.position);
             //var difRotX = rotX - rotXOld;
 
             Vector3 cross = Vector3.Cross(direction1, direction2);

@@ -32,6 +32,12 @@ public class HandleControllersButtons : MonoBehaviour
             return true;
         return false;
     }
+    public bool GetARelease()
+    {
+        if (isControllerActive() && hand.controller.GetPressUp(EVRButtonId.k_EButton_A))
+            return true;
+        return false;
+    }
 
     public bool GetAPress()
     {
