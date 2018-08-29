@@ -40,6 +40,7 @@ public class MoveLikeHierarchyChild : MonoBehaviour
         smooth.transform.position = Vector3.Lerp(smooth.transform.position, TargetParent.transform.position, 0.3f);
 
         buttons = TargetParent.GetComponent<HandleControllersButtons>();
+        if (buttons == null) return;
 
         if (buttons.GetADown() && !pressed)
         {

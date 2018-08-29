@@ -15,6 +15,10 @@ public class VRTransformSync : NetworkBehaviour
     public Vector3 rightHPos;
     public Quaternion rightHRot;
 
+    public bool isTranslating = false;
+    public bool isRotating = false;
+    public bool isScaling = false;
+
     Player player;
 
     private void Start()
@@ -56,8 +60,26 @@ public class VRTransformSync : NetworkBehaviour
         CmdLeftHRot(leftHRot);
         CmdRightHPos(rightHPos);
         CmdRightHRot(rightHRot);
+        CmdIsTransforms(isTranslating, isRotating, isScaling);
+
+    }
 
 
+    [Command]
+    void CmdIsTransforms(bool _istranslating, bool _isrotating, bool _isscaling)
+    {
+        isTranslating = _istranslating;
+        isRotating = _isrotating;
+        isScaling = _isscaling;
+        RpcIsTransforms(_istranslating, _isrotating, _isscaling);
+    }
+
+    [ClientRpc]
+    void RpcIsTransforms(bool _istranslating, bool _isrotating, bool _isscaling)
+    {
+        isTranslating = _istranslating;
+        isRotating = _isrotating;
+        isScaling = _isscaling;
     }
 
     [Command]

@@ -397,4 +397,26 @@ public static class Utils {
     }
 
 
+    public static float AngleOffAroundAxis(Vector3 v, Vector3 forward, Vector3 axis)
+    {
+        Vector3 right = Vector3.Cross(axis, forward);
+        forward = Vector3.Cross(right, axis);
+        return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, forward));
+    }
+
+    // The angle between dirA and dirB around axis
+    public static float AngleAroundAxis(Vector3 dirA, Vector3 dirB, Vector3 axis)
+    {
+        // Project A and B onto the plane orthogonal target axis
+        dirA = dirA - Vector3.Project(dirA, axis);
+        dirB = dirB - Vector3.Project(dirB, axis);
+
+        // Find (positive) angle between A and B
+        float angle = Vector3.Angle(dirA, dirB);
+
+        // Return angle multiplied with 1 or -1
+        return angle * (Vector3.Dot(axis, Vector3.Cross(dirA, dirB)) < 0 ? -1 : 1);
+    }
+
+
 }

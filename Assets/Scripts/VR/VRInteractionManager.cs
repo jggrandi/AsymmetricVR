@@ -11,12 +11,17 @@ public class VRInteractionManager : NetworkBehaviour {
     float oldScaleMag = 0f;
 
     ButtonSync buttonSync;
+    VRTransformSync transformSync;
+
+    Vector3 prevTranslation = new Vector3();
+    Quaternion prevRotation = new Quaternion();
+    float prevScale = 0f;
 
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
-        
+        transformSync = this.gameObject.GetComponent<VRTransformSync>();
     }
 
     // Update is called once per frame
@@ -54,7 +59,7 @@ public class VRInteractionManager : NetworkBehaviour {
         {
             oldPointsForRotation[0] = buttonSync.leftHand.transform.position;
             oldPointsForRotation[1] = buttonSync.rightHand.transform.position;
-            rotXOld = buttonSync.leftHand.transform.rotation.eulerAngles.x + buttonSync.rightHand.transform.rotation.eulerAngles.x;
+
 
             oldScaleMag = 0f;
             oldScaleMag += (buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position).magnitude;
@@ -70,13 +75,35 @@ public class VRInteractionManager : NetworkBehaviour {
         var newRotation = CalcRotation(selected, interactingHands);
         var newScale = CalcScale(selected, interactingHands);
 
+        transformSync.isTranslating = false;
+        transformSync.isRotating = false;
+        transformSync.isScaling = false;
 
         if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        {
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation); // add position changes to the object
+            if (Vector3.Distance(newTranslation,prevTranslation) > 0.0001f)
+                transformSync.isTranslating = true;
+
+        }
         if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        {
+            //Debug.Log(newRotation);
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation); // add all rotations to the object
+            if (newRotation != Quaternion.identity)
+                transformSync.isRotating = true;
+
+        }
         if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        {
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale); // add scale to the object
+            if (Mathf.Abs(newScale) > 0.0001f)
+                transformSync.isScaling = true;
+        }
+
+        prevTranslation = newTranslation;
+        prevRotation = newRotation;
+        prevScale = newScale;
 
     }
 
@@ -93,6 +120,8 @@ public class VRInteractionManager : NetworkBehaviour {
         return averagePoint;
     }
 
+    float prevAngle = 0f;
+
     Quaternion CalcRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         Quaternion q = Quaternion.identity;
@@ -102,25 +131,32 @@ public class VRInteractionManager : NetworkBehaviour {
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
 
-            //float rotX = interactingHands[0].transform.localRotation.eulerAngles.x + interactingHands[1].transform.localRotation.eulerAngles.x; //calculate the rot difference between the controllers in the X axis.
-            
-            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.right);
-            //Quaternion rotHands = interactingHands[0].gameObject.GetComponent<TransformStep>().rotationStep;
             
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
-            //var q2 = Quaternion.AngleAxis(, -direction2.normalized);
+
+            var angle = Utils.AngleAroundAxis(direction2.normalized, interactingHands[0].transform.forward.normalized, Vector3.up);
+
+            Debug.Log(angle);
+
+            //var angle1H1 = Utils.AngleOffAroundAxis(direction2.normalized, interactingHands[0].transform.forward.normalized, Vector3.up);        
+            //angle1H1 *= 180 / Mathf.PI;
+
+            //var result = angle1H1 - prevAngle;
+            //var angle1H2 = Utils.AngleOffAroundAxis(direction2.normalized, interactingHands[1].transform.forward.normalized, Vector3.up);
+            //angle1H2 *= 180 / Mathf.PI;
+
+            //var finalAngle = (angle1H1 + angle1H2) / 2;
+            //Debug.Log( finalAngle);
+
+            //var rot = Quaternion.AngleAxis(result, direction2.normalized);
             
-            Debug.DrawLine(interactingHands[0].transform.position, direction2.normalized + interactingHands[0].transform.position);
-            Debug.Log(interactingHands[0].GetComponent<TransformStep>().rotationStep.eulerAngles.x);
-            var asd = Quaternion.AngleAxis(30f, direction2.normalized + interactingHands[0].transform.position);
-            //var difRotX = rotX - rotXOld;
+
 
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
             q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            //q = q * asd;
-            //q = q * rotHands;
+            //q =  rot;
             
             //rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
