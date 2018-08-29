@@ -120,8 +120,25 @@ public class VRInteractionManager : NetworkBehaviour {
         return averagePoint;
     }
 
-    float prevAngle = 0f;
 
+    public const float RAD_TO_DEG = 57.2957795130823f;
+
+
+    float AngleAroundAxis(Quaternion controllerRot, Vector3 dir)
+    {
+        var rot = controllerRot * Vector3.forward;
+        var cross1 = Vector3.Cross(rot, dir);
+        Vector3 right = Vector3.Cross(cross1, dir).normalized;
+        cross1 = Vector3.Cross(right, dir).normalized;
+
+        Vector3 v = Vector3.Cross(Vector3.forward, dir);
+        return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, cross1)) * RAD_TO_DEG;
+
+    }
+
+
+    Quaternion prevQuat1;
+    Quaternion prevQuat2;
     Quaternion CalcRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         Quaternion q = Quaternion.identity;
@@ -135,11 +152,35 @@ public class VRInteractionManager : NetworkBehaviour {
             Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
 
-            var angle = Utils.AngleAroundAxis(direction2.normalized, interactingHands[0].transform.forward.normalized, Vector3.up);
+            var q1 = interactingHands[0].transform.rotation * Quaternion.Inverse(prevQuat1);
+            var q2 = interactingHands[1].transform.rotation * Quaternion.Inverse(prevQuat2);
 
-            Debug.Log(angle);
+            var a1 = AngleAroundAxis(q1, direction2);
+            var a2 = AngleAroundAxis(q2, direction2);
 
-            //var angle1H1 = Utils.AngleOffAroundAxis(direction2.normalized, interactingHands[0].transform.forward.normalized, Vector3.up);        
+            
+            //var r =  Mathf.Cos(a1 * Mathf.PI / 180);
+
+            var alpha = (a1 - a2) / (a1 + a2);
+
+            var b = (alpha + 1) / 2;
+
+            var finalAngle = (a1 * b) + (a2 * (1 - b));
+
+            
+            Debug.Log(q1);
+            var qq = Quaternion.AngleAxis(finalAngle, direction2.normalized);
+            q = qq;
+            prevQuat1 = q1;
+            prevQuat2 = q2;
+            //Debug.Log(angle);
+
+
+            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + cross1.normalized);
+            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + right.normalized, Color.red);
+            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + rot, Color.blue);
+            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + v, Color.magenta);
+            //var angle1H1 = Utils.AngleOffAroundAxis(interactingHands[0].transform.forward, direction2);
             //angle1H1 *= 180 / Mathf.PI;
 
             //var result = angle1H1 - prevAngle;
@@ -150,13 +191,13 @@ public class VRInteractionManager : NetworkBehaviour {
             //Debug.Log( finalAngle);
 
             //var rot = Quaternion.AngleAxis(result, direction2.normalized);
-            
+
 
 
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
-            q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            //q =  rot;
+            //q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
+            //q =  qq;
             
             //rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
