@@ -18,19 +18,6 @@ public class VRInteractionManager : NetworkBehaviour {
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
         
     }
-	
-    Hand SmoothMovement( Hand tosmooth,  Hand reference)
-    {
-        Hand smoothed = new Hand();
-        smoothed.transform.position = Vector3.Lerp(tosmooth.transform.position, reference.transform.position, 0.3f);
-        smoothed.transform.rotation = Quaternion.Lerp(tosmooth.transform.rotation, reference.transform.rotation, 0.3f);
-        return smoothed;
-    }
-
-    private Vector3 _localPosition;
-    private Vector3 _lastPosition;
-
-    private bool stillPressed = false;
 
     // Update is called once per frame
     void Update () {
@@ -52,25 +39,13 @@ public class VRInteractionManager : NetworkBehaviour {
             if (buttonSync.lTrigger )
             {
                 interactingHands.Add(buttonSync.leftHand); //there is only one hand interacting. send it to the transform functions
-                if (!stillPressed)
-                {
-                    
-                    _localPosition = interactingHands[0].transform.InverseTransformDirection(selected.gameobject.transform.position);
-
-                    stillPressed = true;
-                }
             }
-            //else if (buttonSync.rTrigger)
-            //{
-            //    _localPosition = buttonSync.rightHand.transform.InverseTransformDirection(selected.gameobject.transform.position);
-            //    interactingHands.Add(buttonSync.rightHand);
-            //    stillPressed = true;
-            //}
+            else if (buttonSync.rTrigger)
+            {
+                interactingHands.Add(buttonSync.rightHand);
+            }
 
-            if (!buttonSync.lTrigger && stillPressed)
-                stillPressed = false;
-            //if (!buttonSync.rTrigger && stillPressed)
-            //    stillPressed = false;
+
         }
 
         
@@ -90,9 +65,8 @@ public class VRInteractionManager : NetworkBehaviour {
         if (interactingHands.Count == 0)
             return;
 
-        
-        var newTranslation = TryElegantSolution(selected, interactingHands);
-        //var newTranslation = CalcTranslation(selected, interactingHands);
+
+        var newTranslation = CalcTranslation(selected, interactingHands);
         var newRotation = CalcRotation(selected, interactingHands);
         var newScale = CalcScale(selected, interactingHands);
 
@@ -104,17 +78,9 @@ public class VRInteractionManager : NetworkBehaviour {
         if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale); // add scale to the object
 
-        _lastPosition = selected.gameobject.transform.position;
     }
 
-    Vector3 TryElegantSolution(ObjSelected objSelected, List<Hand> interactingHands)
-    {
-        if (!stillPressed) return Vector3.zero;
 
-        var step = interactingHands[0].transform.TransformPoint(_localPosition) - _lastPosition;
-        //objSelected.gameobject.transform.position += step;
-        return step;
-    }
 
 
     Vector3 CalcTranslation(ObjSelected objSelected, List<Hand> interactingHands)
@@ -153,7 +119,7 @@ public class VRInteractionManager : NetworkBehaviour {
             Vector3 cross = Vector3.Cross(direction1, direction2);
             float amountToRot = Vector3.Angle(direction1, direction2);
             q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            q = q * asd;
+            //q = q * asd;
             //q = q * rotHands;
             
             //rotXOld = rotX;
