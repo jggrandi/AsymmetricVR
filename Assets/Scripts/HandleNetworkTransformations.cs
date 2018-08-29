@@ -48,7 +48,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [ClientRpc]
     public void RpcSyncObj(int index, Vector3 pos, Quaternion rot, Vector3 scale)
     {
-        if (isLocalPlayer) return;
+        //if (isLocalPlayer) return;
         var g = ObjectManager.Get(index);
         if (pos != Vector3.zero) g.transform.position = pos;
         if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;

@@ -112,7 +112,7 @@ public class VRInteractionManager : NetworkBehaviour {
         if (!stillPressed) return Vector3.zero;
 
         var step = interactingHands[0].transform.TransformPoint(_localPosition) - _lastPosition;
-        objSelected.gameobject.transform.position += step;
+        //objSelected.gameobject.transform.position += step;
         return step;
     }
 
