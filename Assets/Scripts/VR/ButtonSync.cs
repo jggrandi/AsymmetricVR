@@ -114,14 +114,14 @@ public class ButtonSync : NetworkBehaviour {
         CmdUpdateActions(bimanual, lockCombination);
     }
 
-    bool AnyButtonPressedLeft()
+    public bool AnyButtonPressedLeft()
     {
         if (lTrigger || lA || lApp || lGrip)
             return true;
         return false;
     }
 
-    bool AnyButtonPressedRight()
+    public bool AnyButtonPressedRight()
     {
         if (rTrigger || rA || rApp || rGrip)
             return true;

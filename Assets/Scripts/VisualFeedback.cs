@@ -70,15 +70,15 @@ public class VisualFeedback : NetworkBehaviour {
             }
             else
             {
-                if (buttonSync.lTrigger)
+                if (buttonSync.AnyButtonPressedLeft())
                     controllersCenter = leftController.transform.position;
-                else if (buttonSync.rTrigger)
+                else if (buttonSync.AnyButtonPressedRight())
                     controllersCenter = rightController.transform.position;
             }
 
             if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
             {
-                if (buttonSync.bimanual || buttonSync.lTrigger || buttonSync.rTrigger) //only show the line if user is interacting
+                if (buttonSync.bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
                 {
                     AddLine(controllersCenter, ObjectManager.Get(indexObjSelected).transform.position, color); // line from the center of the controllers to the object
                     icons.position = controllersCenter * 0.7f + ObjectManager.Get(indexObjSelected).transform.position * 0.3f;
@@ -153,13 +153,15 @@ public class VisualFeedback : NetworkBehaviour {
 
     void ShowIcons(ButtonSync bsync, Transform icons)
     {
+        if (bsync.lTrigger || bsync.rTrigger)
+        {
+            icons.GetChild(0).gameObject.SetActive(true);
+            icons.GetChild(1).gameObject.SetActive(true);
+            icons.GetChild(2).gameObject.SetActive(true);
+        }
+
         switch (bsync.lockCombination)
         {
-            case 0: case 9:
-                icons.GetChild(0).gameObject.SetActive(true);
-                icons.GetChild(1).gameObject.SetActive(true);
-                icons.GetChild(2).gameObject.SetActive(true);
-                break;
             case 1:
                 icons.GetChild(0).gameObject.SetActive(true);
                 break;
