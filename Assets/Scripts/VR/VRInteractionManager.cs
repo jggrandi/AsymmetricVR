@@ -137,8 +137,14 @@ public class VRInteractionManager : NetworkBehaviour {
     }
 
 
-    Quaternion prevQuat1;
-    Quaternion prevQuat2;
+    float prevA1;
+    float prevA2;
+
+    float deltaAngle1;
+    float deltaAngle2;
+
+    float prevFinalAngle;
+
     Quaternion CalcRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
         Quaternion q = Quaternion.identity;
@@ -149,30 +155,31 @@ public class VRInteractionManager : NetworkBehaviour {
         {
 
             
-            Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
-            Vector3 direction2 = interactingHands[0].transform.position - interactingHands[1].transform.position;
+            Vector3 directionOld = oldPointsForRotation[0] - oldPointsForRotation[1];
+            Vector3 directionNew = interactingHands[0].transform.position - interactingHands[1].transform.position;
 
-            var q1 = interactingHands[0].transform.rotation * Quaternion.Inverse(prevQuat1);
-            var q2 = interactingHands[1].transform.rotation * Quaternion.Inverse(prevQuat2);
+            //var q1 = interactingHands[0].transform.rotation * Quaternion.Inverse(prevQuat1);
+            //var q2 = interactingHands[1].transform.rotation * Quaternion.Inverse(prevQuat2);
 
-            var a1 = AngleAroundAxis(q1, direction2);
-            var a2 = AngleAroundAxis(q2, direction2);
+            var a1 = AngleAroundAxis(interactingHands[0].transform.rotation, directionNew);
+            var a2 = AngleAroundAxis(interactingHands[1].transform.rotation, directionNew);
 
-            
-            //var r =  Mathf.Cos(a1 * Mathf.PI / 180);
+            deltaAngle1 += Mathf.DeltaAngle(prevA1, a1); 
+            deltaAngle2 += Mathf.DeltaAngle(prevA2, a2);
 
-            var alpha = (a1 - a2) / (a1 + a2);
 
+            var alpha = (deltaAngle1 - deltaAngle2) / (deltaAngle1 + deltaAngle2);
             var b = (alpha + 1) / 2;
+            var finalAngle = (deltaAngle1 * b) + (deltaAngle2 * (1 - b));
 
-            var finalAngle = (a1 * b) + (a2 * (1 - b));
-
-            
-            Debug.Log(q1);
-            var qq = Quaternion.AngleAxis(finalAngle, direction2.normalized);
+            var qq = Quaternion.AngleAxis(prevFinalAngle - finalAngle, directionNew.normalized);
             q = qq;
-            prevQuat1 = q1;
-            prevQuat2 = q2;
+            //prevAngle = finalAngle;
+
+            prevA1 = a1;
+            prevA2 = a2;
+            prevFinalAngle = finalAngle;
+
             //Debug.Log(angle);
 
 
@@ -194,8 +201,8 @@ public class VRInteractionManager : NetworkBehaviour {
 
 
 
-            Vector3 cross = Vector3.Cross(direction1, direction2);
-            float amountToRot = Vector3.Angle(direction1, direction2);
+            Vector3 cross = Vector3.Cross(directionOld, directionNew);
+            float amountToRot = Vector3.Angle(directionOld, directionNew);
             //q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
             //q =  qq;
             

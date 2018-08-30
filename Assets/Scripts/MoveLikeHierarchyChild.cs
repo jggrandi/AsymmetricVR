@@ -57,7 +57,7 @@ public class MoveLikeHierarchyChild : MonoBehaviour
 
         if (!pressed) return;
         asd = smooth.transform.TransformPoint(_localPosition) - _lastPosition;
-        Debug.Log(asd);
+        //Debug.Log(asd);
         transform.position += asd;
 
         _lastPosition = transform.position;
