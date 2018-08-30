@@ -60,6 +60,12 @@ public class VRInteractionManager : NetworkBehaviour {
             oldPointsForRotation[0] = buttonSync.leftHand.transform.position;
             oldPointsForRotation[1] = buttonSync.rightHand.transform.position;
 
+            Vector3 dir = buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position;
+
+
+            prevA1 = AngleAroundAxis(buttonSync.leftHand.transform.rotation, dir);
+            prevA2 = AngleAroundAxis(buttonSync.rightHand.transform.rotation, dir);
+
 
             oldScaleMag = 0f;
             oldScaleMag += (buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position).magnitude;
@@ -107,9 +113,6 @@ public class VRInteractionManager : NetworkBehaviour {
 
     }
 
-
-
-
     Vector3 CalcTranslation(ObjSelected objSelected, List<Hand> interactingHands)
     {       
         Vector3 averagePoint = new Vector3();
@@ -120,22 +123,24 @@ public class VRInteractionManager : NetworkBehaviour {
         return averagePoint;
     }
 
-
-    public const float RAD_TO_DEG = 57.2957795130823f;
-
-
     float AngleAroundAxis(Quaternion controllerRot, Vector3 dir)
     {
-        var rot = controllerRot * Vector3.forward;
-        var cross1 = Vector3.Cross(rot, dir);
-        Vector3 right = Vector3.Cross(cross1, dir).normalized;
+        var rot = controllerRot * Vector3.forward; //creates a new coordinate system
+        var cross1 = Vector3.Cross(rot, dir); //based on the axis of rotation 
+        Vector3 right = Vector3.Cross(cross1, dir).normalized; // and the controller
         cross1 = Vector3.Cross(right, dir).normalized;
 
         Vector3 v = Vector3.Cross(Vector3.forward, dir);
-        return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, cross1)) * RAD_TO_DEG;
+        return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, cross1)) * MathUtil.RAD_TO_DEG;
 
     }
 
+    float ContributionOfEachHand(float angleHand1, float angleHand2)
+    {
+        var alpha = (angleHand1 - angleHand2) / (angleHand1 + angleHand2);
+        var b = (alpha + 1) / 2;
+        return (angleHand1 * b) + (angleHand2 * (1 - b));
+    }
 
     float prevA1;
     float prevA2;
@@ -147,72 +152,39 @@ public class VRInteractionManager : NetworkBehaviour {
 
     Quaternion CalcRotation(ObjSelected objSelected, List<Hand> interactingHands)
     {
-        Quaternion q = Quaternion.identity;
+        Quaternion finalRotation = Quaternion.identity;
         if (interactingHands.Count == 1) // grabbing with one hand
-            q = interactingHands[0].GetComponent<TransformStep>().rotationStep;
+            finalRotation = interactingHands[0].GetComponent<TransformStep>().rotationStep;
 
         else if (interactingHands.Count == 2) // grabbing with both hands, bimanual rotation
         {
-
             
             Vector3 directionOld = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 directionNew = interactingHands[0].transform.position - interactingHands[1].transform.position;
 
-            //var q1 = interactingHands[0].transform.rotation * Quaternion.Inverse(prevQuat1);
-            //var q2 = interactingHands[1].transform.rotation * Quaternion.Inverse(prevQuat2);
+            Vector3 cross = Vector3.Cross(directionOld, directionNew);
+            float amountToRot = Vector3.Angle(directionOld, directionNew);
+            var rotationWithTwoHands = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
 
             var a1 = AngleAroundAxis(interactingHands[0].transform.rotation, directionNew);
             var a2 = AngleAroundAxis(interactingHands[1].transform.rotation, directionNew);
 
-            deltaAngle1 += Mathf.DeltaAngle(prevA1, a1); 
+            deltaAngle1 += Mathf.DeltaAngle(prevA1, a1); // return the shortest angle between two angles (359 -> 5) will return 6
             deltaAngle2 += Mathf.DeltaAngle(prevA2, a2);
+            var finalAngle = ContributionOfEachHand(deltaAngle1, deltaAngle2);
 
-
-            var alpha = (deltaAngle1 - deltaAngle2) / (deltaAngle1 + deltaAngle2);
-            var b = (alpha + 1) / 2;
-            var finalAngle = (deltaAngle1 * b) + (deltaAngle2 * (1 - b));
-
-            var qq = Quaternion.AngleAxis(prevFinalAngle - finalAngle, directionNew.normalized);
-            q = qq;
-            //prevAngle = finalAngle;
+            var rotationXAxisController = Quaternion.AngleAxis(prevFinalAngle - finalAngle, directionNew.normalized);
+            
+            finalRotation = rotationWithTwoHands * rotationXAxisController;
 
             prevA1 = a1;
             prevA2 = a2;
             prevFinalAngle = finalAngle;
-
-            //Debug.Log(angle);
-
-
-            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + cross1.normalized);
-            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + right.normalized, Color.red);
-            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + rot, Color.blue);
-            //Debug.DrawLine(interactingHands[0].transform.position, interactingHands[0].transform.position + v, Color.magenta);
-            //var angle1H1 = Utils.AngleOffAroundAxis(interactingHands[0].transform.forward, direction2);
-            //angle1H1 *= 180 / Mathf.PI;
-
-            //var result = angle1H1 - prevAngle;
-            //var angle1H2 = Utils.AngleOffAroundAxis(direction2.normalized, interactingHands[1].transform.forward.normalized, Vector3.up);
-            //angle1H2 *= 180 / Mathf.PI;
-
-            //var finalAngle = (angle1H1 + angle1H2) / 2;
-            //Debug.Log( finalAngle);
-
-            //var rot = Quaternion.AngleAxis(result, direction2.normalized);
-
-
-
-            Vector3 cross = Vector3.Cross(directionOld, directionNew);
-            float amountToRot = Vector3.Angle(directionOld, directionNew);
-            //q = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
-            //q =  qq;
-            
-            //rotXOld = rotX;
             oldPointsForRotation[0] = interactingHands[0].transform.position;
             oldPointsForRotation[1] = interactingHands[1].transform.position;
 
-            
         }
-        return q;
+        return finalRotation;
     }
 
     float CalcScale(ObjSelected objSelected, List<Hand> interactingHands)
