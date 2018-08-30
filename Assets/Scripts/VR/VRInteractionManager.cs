@@ -7,7 +7,6 @@ using Valve.VR.InteractionSystem;
 public class VRInteractionManager : NetworkBehaviour {
 
     Vector3[] oldPointsForRotation = new Vector3[2];
-    float rotXOld = 0f;
     float oldScaleMag = 0f;
 
     ButtonSync buttonSync;
@@ -41,31 +40,20 @@ public class VRInteractionManager : NetworkBehaviour {
         }
         else
         {
-            if (buttonSync.lTrigger )
-            {
+            if (buttonSync.lTrigger || buttonSync.lA || buttonSync.lApp || buttonSync.lGrip)
                 interactingHands.Add(buttonSync.leftHand); //there is only one hand interacting. send it to the transform functions
-            }
-            else if (buttonSync.rTrigger)
-            {
+            else if (buttonSync.rTrigger || buttonSync.rA || buttonSync.rApp || buttonSync.rGrip)
                 interactingHands.Add(buttonSync.rightHand);
-            }
-
-
         }
 
-        
-        
         if (interactingHands.Count <= 1)
         {
             oldPointsForRotation[0] = buttonSync.leftHand.transform.position;
             oldPointsForRotation[1] = buttonSync.rightHand.transform.position;
 
             Vector3 dir = buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position;
-
-
             prevA1 = AngleAroundAxis(buttonSync.leftHand.transform.rotation, dir);
             prevA2 = AngleAroundAxis(buttonSync.rightHand.transform.rotation, dir);
-
 
             oldScaleMag = 0f;
             oldScaleMag += (buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position).magnitude;
@@ -85,14 +73,14 @@ public class VRInteractionManager : NetworkBehaviour {
         transformSync.isRotating = false;
         transformSync.isScaling = false;
 
-        if (buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 9)
         {
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation); // add position changes to the object
             if (Vector3.Distance(newTranslation,prevTranslation) > 0.0001f)
                 transformSync.isTranslating = true;
 
         }
-        if (buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6  || buttonSync.lockCombination == 9)
         {
             //Debug.Log(newRotation);
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation); // add all rotations to the object
@@ -100,7 +88,7 @@ public class VRInteractionManager : NetworkBehaviour {
                 transformSync.isRotating = true;
 
         }
-        if (buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 0 || buttonSync.lockCombination == 9)
+        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 ||  buttonSync.lockCombination == 9)
         {
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale); // add scale to the object
             if (Mathf.Abs(newScale) > 0.0001f)

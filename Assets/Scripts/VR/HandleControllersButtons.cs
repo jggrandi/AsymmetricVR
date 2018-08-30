@@ -19,6 +19,30 @@ public class HandleControllersButtons : MonoBehaviour
         handleButtons = this;
     }
 
+    
+    private void Update()
+    {
+        if (!isControllerActive()) return;
+        //bool isShowingHint = !string.IsNullOrEmpty(ControllerButtonHints.GetActiveHintText(hand, EVRButtonId.k_EButton_SteamVR_Trigger)) || ControllerButtonHints.IsButtonHintActive(hand, EVRButtonId.k_EButton_SteamVR_Trigger);
+
+        //if (!isShowingHint){
+        //    ControllerButtonHints.ShowTextHint(hand, EVRButtonId.k_EButton_SteamVR_Trigger, "Grab");
+        //    Debug.Log("1");
+        //}
+        //if (hand.controller.GetPressDown(EVRButtonId.k_EButton_SteamVR_Trigger) ) { 
+        //    ControllerButtonHints.ShowButtonHint(hand, EVRButtonId.k_EButton_SteamVR_Trigger);
+        //    ControllerButtonHints.HideTextHint(hand, EVRButtonId.k_EButton_SteamVR_Trigger);
+        //    Debug.Log("2");
+        //}
+        //if (hand.controller.GetPressUp(EVRButtonId.k_EButton_SteamVR_Trigger))
+        //{
+        //    Debug.Log("3");
+        //    ControllerButtonHints.HideButtonHint(hand, EVRButtonId.k_EButton_SteamVR_Trigger);
+        //    ControllerButtonHints.ShowTextHint(hand, EVRButtonId.k_EButton_SteamVR_Trigger, "Grab");
+        //}
+
+    }
+
     bool isControllerActive()
     {
         if (hand.controller != null)
@@ -125,6 +149,9 @@ public class HandleControllersButtons : MonoBehaviour
 
         return hand.controller.GetAxis(EVRButtonId.k_EButton_SteamVR_Touchpad);
     }
+
+
+
 
 }
 

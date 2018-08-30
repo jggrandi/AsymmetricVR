@@ -79,32 +79,55 @@ public class ButtonSync : NetworkBehaviour {
         bimanual = false;
         lockCombination = 0;
 
-        if (lTrigger && rTrigger)
+        if (AnyButtonPressedLeft() && AnyButtonPressedRight())
             bimanual = true;
+        //if ((lTrigger && rTrigger) || (lA && rA) || (lApp && rApp) || (lGrip && rGrip))
+        //    bimanual = true;
+
+        if (!(AnyButtonPressedLeft() || AnyButtonPressedRight()))
+            return;
+
         if (bimanual)
         {
+            //if (lTrigger && rTrigger) lockCombination = 0;
             if (lA && rA) lockCombination += 1;
             if (lApp && rApp) lockCombination += 3;
             if (lGrip && rGrip) lockCombination += 5;
         }
         else
         {
-            if (lTrigger)
+            if (!lTrigger && !rTrigger)
             {
-                if (lA) lockCombination += 1;
-                if (lApp) lockCombination += 3;
-                if (lGrip) lockCombination += 5;
+              //  if (lTrigger || rTrigger) lockCombination = 0;
+                if (lA || rA) lockCombination += 1;
+                if (lApp || rApp) lockCombination += 3;
+                if (lGrip || rGrip) lockCombination += 5;
             }
-            else if (rTrigger)
-            {
-                if (rA) lockCombination += 1;
-                if (rApp) lockCombination += 3;
-                if (rGrip) lockCombination += 5;
-            }
+            //else if (rTrigger)
+            //{
+                //if (rA) lockCombination += 1;
+                //if (rApp) lockCombination += 3;
+                //if (rGrip) lockCombination += 5;
+            //}
         }
         CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick); 
         CmdUpdateActions(bimanual, lockCombination);
     }
+
+    bool AnyButtonPressedLeft()
+    {
+        if (lTrigger || lA || lApp || lGrip)
+            return true;
+        return false;
+    }
+
+    bool AnyButtonPressedRight()
+    {
+        if (rTrigger || rA || rApp || rGrip)
+            return true;
+        return false;
+    }
+
 
     [Command]
     void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)

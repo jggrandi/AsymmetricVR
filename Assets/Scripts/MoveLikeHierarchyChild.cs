@@ -28,11 +28,7 @@ public class MoveLikeHierarchyChild : MonoBehaviour
     }
 
     bool pressed = false;
-
-
     public Vector3 asd = new Vector3();
-
-
 
     void Update()
     {
