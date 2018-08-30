@@ -61,26 +61,25 @@ public class VRInteractionManager : NetworkBehaviour {
             oldScaleMag /= 2;
         }
 
+        transformSync.isTranslating = false;
+        transformSync.isRotating = false;
+        transformSync.isScaling = false;
+
         if (interactingHands.Count == 0)
             return;
-
 
         var newTranslation = CalcTranslation(selected, interactingHands);
         var newRotation = CalcRotation(selected, interactingHands);
         var newScale = CalcScale(selected, interactingHands);
 
-        transformSync.isTranslating = false;
-        transformSync.isRotating = false;
-        transformSync.isScaling = false;
-
-        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8 || buttonSync.lockCombination == 9)
+        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 9)
         {
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation); // add position changes to the object
             if (Vector3.Distance(newTranslation,prevTranslation) > 0.0001f)
                 transformSync.isTranslating = true;
 
         }
-        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6  || buttonSync.lockCombination == 9)
+        if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8  || buttonSync.lockCombination == 9)
         {
             //Debug.Log(newRotation);
             this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation); // add all rotations to the object
