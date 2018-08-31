@@ -7,6 +7,7 @@ public class ControlObjectsInScene : MonoBehaviour {
     public GameObject VRStuff;
     public GameObject ARStuff;
     public GameObject ServerStuff;
+    public GameObject SceneObjects;
 
 
     GameObject netMan;
@@ -26,6 +27,7 @@ public class ControlObjectsInScene : MonoBehaviour {
             ARStuff.SetActive(true);
             VRStuff.SetActive(false);
             ServerStuff.SetActive(false);
+            SceneObjects.SetActive(false);
             Debug.Log("Activating AR Stuff");
         }
         else 

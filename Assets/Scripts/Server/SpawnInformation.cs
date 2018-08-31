@@ -14,7 +14,7 @@ public class SpawnInformation : MonoBehaviour
 
     private void Awake()
     {
-        table = GameObject.Find("Table");
+        table = GameObject.Find("TablePosition");
         if (table == null) return;
 
         CreatePositions();
