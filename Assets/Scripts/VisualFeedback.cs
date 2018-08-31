@@ -9,13 +9,19 @@ public class VisualFeedback : NetworkBehaviour {
     Color greyColor = new Color(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
     Color blueColor = new Color(0 / 255.0f, 118 / 255.0f, 255 / 255.0f);
     public GameObject lines;
-    
+    GameObject netMan;
+    Utils.PlayerType playerType;
+
     int linesUsed = 0;
 
     int indexObjSelected;
     // Use this for initialization
     void Start () {
         lines = GameObject.Find("Lines");
+
+        netMan = GameObject.Find("NetworkManager");
+        playerType = netMan.GetComponent<MyNetworkManager>().playerType;
+
         ClearLines();
     }
 
@@ -49,6 +55,12 @@ public class VisualFeedback : NetworkBehaviour {
             rightController.transform.position = vrTransform.rightHPos;
             rightController.transform.rotation = vrTransform.rightHRot;
 
+            if (playerType == Utils.PlayerType.AR) // dont need to show the VR avatar in AR
+            {
+                head.gameObject.SetActive(false);
+                leftController.gameObject.SetActive(false);
+                rightController.gameObject.SetActive(false);
+            }
             //var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
             if (indexObjSelected == -1) continue;
 
@@ -111,8 +123,8 @@ public class VisualFeedback : NetworkBehaviour {
             DisableIcons(icons);
             var arTransform = player.GetComponent<ARTransformSync>();
 
-            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.01f);
-            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.01f);
+            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.1f);
+            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.1f);
             //tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
             //tablet.transform.rotation = arTransform.rotation;
 

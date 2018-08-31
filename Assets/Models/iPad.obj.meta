@@ -1,0 +1,155 @@
+fileFormatVersion: 2
+guid: e1229827ebbf13c4789ef97c51e669a2
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: iPad_iPad1_iPad2_Back
+    100004: iPad_iPad1_iPad2_Buttons_Home_Button
+    100006: iPad_iPad1_iPad2_Buttons_On_Off_Switch
+    100008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Cube
+    100010: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Plane
+    100012: iPad_iPad1_iPad2_Buttons_Speakers
+    100014: iPad_iPad1_iPad2_Buttons_Speakers_1
+    100016: iPad_iPad1_iPad2_Buttons_Volume_button
+    100018: iPad_iPad1_iPad2_Front
+    100020: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREEN
+    100022: iPad_iPad1_iPad2_Screen_Edge
+    400000: //RootNode
+    400002: iPad_iPad1_iPad2_Back
+    400004: iPad_iPad1_iPad2_Buttons_Home_Button
+    400006: iPad_iPad1_iPad2_Buttons_On_Off_Switch
+    400008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Cube
+    400010: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Plane
+    400012: iPad_iPad1_iPad2_Buttons_Speakers
+    400014: iPad_iPad1_iPad2_Buttons_Speakers_1
+    400016: iPad_iPad1_iPad2_Buttons_Volume_button
+    400018: iPad_iPad1_iPad2_Front
+    400020: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREEN
+    400022: iPad_iPad1_iPad2_Screen_Edge
+    2100000: iPad_iPad1_iPad2_BackMat
+    2100002: iPad_iPad1_iPad2_Buttons_Home_ButtonMat
+    2100004: iPad_iPad1_iPad2_Buttons_On_Off_SwitchMat
+    2100006: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_CubeMat
+    2100008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_PlaneMat
+    2100010: iPad_iPad1_iPad2_Buttons_SpeakersMat
+    2100012: iPad_iPad1_iPad2_Buttons_Speakers_1Mat
+    2100014: iPad_iPad1_iPad2_Buttons_Volume_buttonMat
+    2100016: iPad_iPad1_iPad2_FrontMat
+    2100018: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREENMat
+    2100020: iPad_iPad1_iPad2_Screen_EdgeMat
+    2300000: iPad_iPad1_iPad2_Back
+    2300002: iPad_iPad1_iPad2_Buttons_Home_Button
+    2300004: iPad_iPad1_iPad2_Buttons_On_Off_Switch
+    2300006: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Cube
+    2300008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Plane
+    2300010: iPad_iPad1_iPad2_Buttons_Speakers
+    2300012: iPad_iPad1_iPad2_Buttons_Speakers_1
+    2300014: iPad_iPad1_iPad2_Buttons_Volume_button
+    2300016: iPad_iPad1_iPad2_Front
+    2300018: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREEN
+    2300020: iPad_iPad1_iPad2_Screen_Edge
+    3300000: iPad_iPad1_iPad2_Back
+    3300002: iPad_iPad1_iPad2_Buttons_Home_Button
+    3300004: iPad_iPad1_iPad2_Buttons_On_Off_Switch
+    3300006: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Cube
+    3300008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Plane
+    3300010: iPad_iPad1_iPad2_Buttons_Speakers
+    3300012: iPad_iPad1_iPad2_Buttons_Speakers_1
+    3300014: iPad_iPad1_iPad2_Buttons_Volume_button
+    3300016: iPad_iPad1_iPad2_Front
+    3300018: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREEN
+    3300020: iPad_iPad1_iPad2_Screen_Edge
+    4300000: iPad_iPad1_iPad2_Back
+    4300002: iPad_iPad1_iPad2_Buttons_Home_Button
+    4300004: iPad_iPad1_iPad2_Buttons_On_Off_Switch
+    4300006: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Cube
+    4300008: iPad_iPad1_iPad2_Buttons_Orientation_Lock_Switch_Plane
+    4300010: iPad_iPad1_iPad2_Buttons_Speakers
+    4300012: iPad_iPad1_iPad2_Buttons_Speakers_1
+    4300014: iPad_iPad1_iPad2_Buttons_Volume_button
+    4300016: iPad_iPad1_iPad2_Front
+    4300018: iPad_iPad1_iPad2_Screen_CHANGEABLE_SCREEN
+    4300020: iPad_iPad1_iPad2_Screen_Edge
+    2186277476908879412: ImportLogs
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.0005
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

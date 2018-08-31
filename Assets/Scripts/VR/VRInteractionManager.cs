@@ -160,6 +160,9 @@ public class VRInteractionManager : NetworkBehaviour {
             deltaAngle2 += Mathf.DeltaAngle(prevA2, a2);
             var finalAngle = ContributionOfEachHand(deltaAngle1, deltaAngle2);
 
+            Debug.Log(prevFinalAngle - finalAngle);
+
+
             var rotationXAxisController = Quaternion.AngleAxis(prevFinalAngle - finalAngle, directionNew.normalized);
             
             finalRotation = rotationWithTwoHands * rotationXAxisController;
