@@ -84,8 +84,8 @@ public class ButtonSync : NetworkBehaviour {
         //if ((lTrigger && rTrigger) || (lA && rA) || (lApp && rApp) || (lGrip && rGrip))
         //    bimanual = true;
 
-        if (!(AnyButtonPressedLeft() || AnyButtonPressedRight()))
-            return;
+        //if (!(AnyButtonPressedLeft() || AnyButtonPressedRight()))
+        //    return;
 
         if (bimanual)
         {
@@ -143,7 +143,7 @@ public class ButtonSync : NetworkBehaviour {
         lJoystick = ljoystick;
         rJoystick = rjoystick;
 
-        if(lTrigger || rTrigger)
+        if(AnyButtonPressedLeft() || AnyButtonPressedRight())
             this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
 
         RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip, ljoystick, rjoystick);
