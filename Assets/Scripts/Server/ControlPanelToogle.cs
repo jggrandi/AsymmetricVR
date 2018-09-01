@@ -12,7 +12,7 @@ public class ControlPanelToogle : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.S))
+        if (Input.GetKeyUp(KeyCode.Tab))
         {
             CanvasObject.enabled = !CanvasObject.enabled;
         }

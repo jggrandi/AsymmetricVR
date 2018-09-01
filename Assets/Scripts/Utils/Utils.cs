@@ -48,7 +48,7 @@ public static class Utils {
          * iPad 350 ~
          * 
          * */
-        ToutchSensibility = 350/Screen.dpi;
+        ToutchSensibility = 100/Screen.dpi;
         if (ToutchSensibility < 1) {
             ToutchSensibility *= ToutchSensibility;
         }
