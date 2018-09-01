@@ -8,8 +8,8 @@ public class HandleLog : NetworkBehaviour
 {
     Log log;
     int countFrames = 0;
-    public bool recording = false;
-    public bool paused = false;
+    public bool isRecording = false;
+    public float timePaused = 0f;
 
     public float previousTime = 0f;
 
@@ -42,8 +42,8 @@ public class HandleLog : NetworkBehaviour
 	// Update is called once per frame
 	void FixedUpdate () {
         if (!isServer) return;
-        if (!recording) return;
-        if (paused) return;
+        if (!isRecording) return;
+        if (syncParameters.isPaused) return;
 
         if(countFrames % 5 == 0)
         {
@@ -55,35 +55,39 @@ public class HandleLog : NetworkBehaviour
 
     public void StartLogRecording()
     {
-        if (recording) return;
+        if (isRecording) return;
         log = new Log(testParameters.groupID, testParameters.conditionsOrder[syncParameters.conditionIndex], testParameters.activeInScene);
         syncParameters.EVALUATIONSTARTED = true;
-        recording = true;
-        paused = false;
+        isRecording = true;
+        syncParameters.isPaused = false;
         startLogRecording.GetComponent<Image>().color = Color.grey;
     }
 
     public void StopLogRecording()
     {
-        if (recording == false) return;
+        if (isRecording == false) return;
         syncParameters.EVALUATIONSTARTED = false;
-        recording = false;
+        isRecording = false;
         previousTime = 0f;
         log.Close();
         startLogRecording.GetComponent<Image>().color = Color.white;
     }
 
+    float timeWhenStartPause = 0f;
+
     public void PauseLogRecording()
     {
-        if (paused)
+        if (syncParameters.isPaused)
         {
-            paused = false;
+            syncParameters.isPaused = false;
+            timePaused += (Time.realtimeSinceStartup - timeWhenStartPause);
             pauseRecord.GetComponentInChildren<Text>().text = "Pause";
             pauseRecord.GetComponent<Image>().color = Color.white;
         }
         else
         {
-            paused = true;
+            syncParameters.isPaused = true;
+            timeWhenStartPause = Time.realtimeSinceStartup;
             pauseRecord.GetComponentInChildren<Text>().text = "Resume";
             pauseRecord.GetComponent<Image>().color = Color.grey;
         }
@@ -93,12 +97,13 @@ public class HandleLog : NetworkBehaviour
 
     public void SaveResumed(int objId, float time, List<GameObject> players)
     {
-        if (!recording) return;
-        if (paused) return;
-        var objTime = time - previousTime;
+        if (!isRecording) return;
+        if (syncParameters.isPaused) return;
+        var timeWithoutPause = time - timePaused;
+        var objTime = timeWithoutPause - previousTime;
 
         log.SaveResumed(objId, objTime, players);
-        previousTime = time;
+        previousTime = timeWithoutPause;
     }
 
     public void ResetContributionTime()

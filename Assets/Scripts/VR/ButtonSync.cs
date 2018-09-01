@@ -31,10 +31,16 @@ public class ButtonSync : NetworkBehaviour {
     public Hand leftHand, rightHand;
     HandleControllersButtons refLeft, refRight;
 
+    SyncTestParameters syncParameters;
+
     // Use this for initialization
     void Start() {
         if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
         if (!isLocalPlayer) return;
+
+        var mainHandler = GameObject.Find("MainHandler");
+        if (mainHandler == null) Debug.Log("WHAATTTTTTT");
+        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
         player = Player.instance;
         if (player == null)
@@ -48,6 +54,8 @@ public class ButtonSync : NetworkBehaviour {
         rightHand = player.rightHand;
         if(leftHand != null) refLeft = leftHand.gameObject.GetComponent<HandleControllersButtons>(); // Get the reference of "HandleControllerButtons" script. "HandleControllerButtons" script updates the buttons state.
         if(rightHand != null) refRight = rightHand.gameObject.GetComponent<HandleControllersButtons>();
+
+
 
     }
 	
@@ -110,7 +118,7 @@ public class ButtonSync : NetworkBehaviour {
                 //if (rGrip) lockCombination += 5;
             //}
         }
-        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick); 
+        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick, syncParameters.isPaused ); 
         CmdUpdateActions(bimanual, lockCombination);
     }
 
@@ -130,7 +138,7 @@ public class ButtonSync : NetworkBehaviour {
 
 
     [Command]
-    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)
+    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick, bool isPaused)
     {
         lTrigger = ltrigger;
         rTrigger = rtrigger;
@@ -143,7 +151,7 @@ public class ButtonSync : NetworkBehaviour {
         lJoystick = ljoystick;
         rJoystick = rjoystick;
 
-        if(AnyButtonPressedLeft() || AnyButtonPressedRight())
+        if((AnyButtonPressedLeft() || AnyButtonPressedRight()) && !isPaused)
             this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
 
         RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip, ljoystick, rjoystick);
