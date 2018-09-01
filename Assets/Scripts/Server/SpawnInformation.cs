@@ -26,8 +26,8 @@ public class SpawnInformation : MonoBehaviour
     void CreatePositions()
     {
         var height = 1.0f;
-        var xDist = 1.0f;
-        var zDist = 0.5f;
+        var xDist = 0.6f;
+        var zDist = 0.2f;
 
         var centerPos = new Vector3(table.transform.position.x, height, table.transform.position.z);
 
@@ -48,9 +48,9 @@ public class SpawnInformation : MonoBehaviour
     }
 
     void CreateScales() {
-        var scaleNormal = 1f;
-        var scale1 = .25f;
-        var scale2 = .5f;
+        var scaleNormal = .0625f;
+        var scale1 = .015f;
+        var scale2 = .025f;
 
         scale.Add(scaleNormal + scale1);
         scale.Add(scaleNormal - scale1);
