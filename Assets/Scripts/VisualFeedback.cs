@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+//[NetworkSettings(channel = 1, sendInterval = 0.001f)]
 public class VisualFeedback : NetworkBehaviour {
 
     Color greyColor = new Color(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
@@ -47,12 +48,15 @@ public class VisualFeedback : NetworkBehaviour {
             var rightController = player.transform.GetChild(2);
             var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
 
+            DisableIcons(icons); // disable all icons. Only show when an action is performed.
+
             var vrTransform = player.GetComponent<VRTransformSync>();
-            head.transform.position = vrTransform.headPos; // set the virtual avatar pos and rot
+
+            head.transform.position = Vector3.Lerp(head.transform.position, vrTransform.headPos, 0.4f); // set the virtual avatar pos and rot
             head.transform.rotation = vrTransform.headRot;
-            leftController.transform.position = vrTransform.leftHPos;
+            leftController.transform.position = Vector3.Lerp(leftController.transform.position, vrTransform.leftHPos, 0.4f);
             leftController.transform.rotation = vrTransform.leftHRot;
-            rightController.transform.position = vrTransform.rightHPos;
+            rightController.transform.position = Vector3.Lerp(rightController.transform.position, vrTransform.rightHPos, 0.4f);
             rightController.transform.rotation = vrTransform.rightHRot;
 
             if (playerType == Utils.PlayerType.AR) // dont need to show the VR avatar in AR
@@ -66,8 +70,6 @@ public class VisualFeedback : NetworkBehaviour {
 
             var buttonSync = player.GetComponent<ButtonSync>();
             if (buttonSync == null) return;
-
-            DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
@@ -159,13 +161,14 @@ public class VisualFeedback : NetworkBehaviour {
 
     void UpdateIconsPosition(Transform icons, Vector3 pos)
     {
+        //icons.position = Vector3.Lerp(icons.position, pos, 0.3f);
         icons.position = pos;
         icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
     }
 
     void ShowIcons(ButtonSync bsync, Transform icons)
     {
-        if (bsync.lTrigger || bsync.rTrigger)
+        if (bsync.lTrigger || bsync.rTrigger || bsync.lockCombination == 9)
         {
             icons.GetChild(0).gameObject.SetActive(true);
             icons.GetChild(1).gameObject.SetActive(true);

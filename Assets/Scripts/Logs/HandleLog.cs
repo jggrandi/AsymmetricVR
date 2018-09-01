@@ -109,6 +109,7 @@ public class HandleLog : NetworkBehaviour
 
     void OnApplicationQuit()
     {
+        //TODO: NEED TO VERIFY IF LOG WAS CREATED BEFORE CLOSING
         log.Close();
 
     }
