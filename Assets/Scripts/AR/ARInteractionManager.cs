@@ -28,8 +28,6 @@ namespace Lean.Touch {
 
         ObjSelected selected;
 
-        SyncTestParameters syncParameters;
-
         void Start()
         {
             if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
@@ -38,9 +36,6 @@ namespace Lean.Touch {
             canvas = GameObject.Find("CanvasAR");
             if (canvas != null)
                 refGUI = canvas.GetComponent<HandleARGUI>();
-
-            var mainHandler = GameObject.Find("MainHandler");
-            syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
             Utils.UpdateTouchSensibilty();
         }
@@ -108,15 +103,13 @@ namespace Lean.Touch {
         [SyncVar]
         public int currentOperation = 0;
         [Command]
-        public void CmdSetCurrentOperation(int ope, bool isPaused)
+        public void CmdSetCurrentOperation(int ope)
         {
-            if (ope > 0 && !isPaused) 
-                this.gameObject.GetComponent<PlayerStuff>().activeTime += Time.deltaTime;
             currentOperation = ope;
         }
 
         void setCurrentOperation(Utils.Transformations op) {
-            CmdSetCurrentOperation((int)op, syncParameters.isPaused);
+            CmdSetCurrentOperation((int)op);
         }
 
        protected virtual void OnEnable() {

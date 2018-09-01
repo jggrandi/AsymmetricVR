@@ -130,6 +130,9 @@ public class VisualFeedback : NetworkBehaviour {
             //tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
             //tablet.transform.rotation = arTransform.rotation;
 
+            if (playerType == Utils.PlayerType.AR) // dont need to show the AR avatar in AR
+                tablet.gameObject.SetActive(false);
+
             var rayAdjust = tablet.transform.position;
 
             Color color = greyColor; // other players' ray are grey

@@ -45,7 +45,9 @@ public class HandleLog : NetworkBehaviour
         if (!isRecording) return;
         if (syncParameters.isPaused) return;
 
-        if(countFrames % 5 == 0)
+        RecordActiveTime();
+
+        if (countFrames % 5 == 0)
         {
             var objId = syncParameters.trialIndex;
             log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
@@ -110,6 +112,26 @@ public class HandleLog : NetworkBehaviour
     {
         foreach(var player in testParameters.activeInScene)
             player.GetComponent<PlayerStuff>().activeTime = 0f;
+    }
+
+    public void RecordActiveTime()
+    {
+        foreach (var player in testParameters.activeInScene)
+        {
+            var pStuff = player.GetComponent<PlayerStuff>();
+            if(pStuff.type == Utils.PlayerType.AR)
+            {
+                var arInteraction = player.GetComponent<Lean.Touch.ARInteractionManager>();
+                if(arInteraction.currentOperation > 0)
+                    pStuff.activeTime += Time.deltaTime;
+            }
+            else if (pStuff.type == Utils.PlayerType.VR)
+            {
+                var bSync = player.GetComponent<ButtonSync>();
+                if (bSync.AnyButtonPressedLeft() || bSync.AnyButtonPressedRight())
+                    pStuff.activeTime += Time.deltaTime;
+            }
+        }
     }
 
     void OnApplicationQuit()

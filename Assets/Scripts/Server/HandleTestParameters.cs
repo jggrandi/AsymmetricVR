@@ -166,6 +166,7 @@ public class HandleTestParameters : NetworkBehaviour
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
         UpdateTrialColor();
+        handleLog.ResetContributionTime();
     }
 
 
