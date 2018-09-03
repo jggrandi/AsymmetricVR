@@ -13,6 +13,9 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public Quaternion rStep = new Quaternion();
     public float sStep = 1f;
 
+    public const float minScale = 0.03f;
+    public const float maxScale = 0.4f;
+
     void Start()
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
@@ -137,7 +140,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
         else g = ObjectManager.Get(index);
 
         var finalScale = g.transform.localScale.x + scalestep;
-        finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+        finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
         g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
         CmdVRScale(index, scalestep, isghost);
     }
@@ -152,7 +155,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
         else g = ObjectManager.Get(index);
 
         var finalScale = g.transform.localScale.x + scalestep;
-        finalScale = Mathf.Min(Mathf.Max(finalScale, 0.05f), 1.0f); //limit the scale min and max
+        finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
         g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
         SyncObj(index, isghost);
 
@@ -260,7 +263,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
         g.transform.localScale *= scalestep;
         var s = g.transform.localScale.x;
-        s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
+        s = Mathf.Min(Mathf.Max(s, minScale), maxScale);
         g.transform.localScale = new Vector3(s, s, s);
         CmdARScale(index, scalestep, isghost);
     }
@@ -275,7 +278,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
         g.transform.localScale *= scalestep;
         var s = g.transform.localScale.x;
-        s = Mathf.Min(Mathf.Max(s, 0.1f), 4.0f);
+        s = Mathf.Min(Mathf.Max(s, minScale), maxScale);
         g.transform.localScale = new Vector3(s, s, s);
 
         SyncObj(index, isghost);

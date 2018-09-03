@@ -197,8 +197,8 @@ public class VRInteractionManager : NetworkBehaviour {
     float CalcScale(ObjSelected objSelected, List<Hand> interactingHands)
     {
         float scaleStep = 0f;
-        scaleStep += (buttonSync.lJoystick.y * 0.01f);
-        scaleStep += (buttonSync.rJoystick.y * 0.01f);
+        scaleStep += (buttonSync.lJoystick.y * 0.001f);
+        scaleStep += (buttonSync.rJoystick.y * 0.001f);
 
         if (interactingHands.Count == 2)
         {
