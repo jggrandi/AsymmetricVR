@@ -62,6 +62,7 @@ public class HandleLog : NetworkBehaviour
         syncParameters.EVALUATIONSTARTED = true;
         isRecording = true;
         syncParameters.isPaused = false;
+        SetPauseButtonColor();
         startLogRecording.GetComponent<Image>().color = Color.grey;
     }
 
@@ -71,6 +72,8 @@ public class HandleLog : NetworkBehaviour
         syncParameters.EVALUATIONSTARTED = false;
         isRecording = false;
         previousTime = 0f;
+        syncParameters.isPaused = false;
+        SetPauseButtonColor();
         log.Close();
         startLogRecording.GetComponent<Image>().color = Color.white;
     }
@@ -83,15 +86,27 @@ public class HandleLog : NetworkBehaviour
         {
             syncParameters.isPaused = false;
             timePaused += (Time.realtimeSinceStartup - timeWhenStartPause);
-            pauseRecord.GetComponentInChildren<Text>().text = "Pause";
-            pauseRecord.GetComponent<Image>().color = Color.white;
+            SetPauseButtonColor();
         }
         else
         {
             syncParameters.isPaused = true;
             timeWhenStartPause = Time.realtimeSinceStartup;
+            SetPauseButtonColor();
+        }
+    }
+
+    public void SetPauseButtonColor()
+    {
+        if (syncParameters.isPaused)
+        {
             pauseRecord.GetComponentInChildren<Text>().text = "Resume";
             pauseRecord.GetComponent<Image>().color = Color.grey;
+        }
+        else
+        {
+            pauseRecord.GetComponentInChildren<Text>().text = "Pause";
+            pauseRecord.GetComponent<Image>().color = Color.white;
         }
     }
 
