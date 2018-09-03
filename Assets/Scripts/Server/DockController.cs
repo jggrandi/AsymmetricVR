@@ -6,9 +6,9 @@ using UnityEngine.Networking;
 public class DockController : NetworkBehaviour {
 
     //original
-    const float toleranceTrans = 0.05f;
-    const float toleranceRot = 8.0f;
-    const float toleranceScale = 0.03f;
+    const float toleranceTrans = 0.005f;
+    const float toleranceRot = 1.0f;
+    const float toleranceScale = 0.003f;
 
     //const float toleranceTrans = 12f;
     //const float toleranceRot = 190.0f;
