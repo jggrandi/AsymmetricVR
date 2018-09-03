@@ -51,9 +51,10 @@ public class VRInteractionManager : NetworkBehaviour {
             oldPointsForRotation[0] = buttonSync.leftHand.transform.position;
             oldPointsForRotation[1] = buttonSync.rightHand.transform.position;
 
-            Vector3 dir = buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position;
-            prevA1 = AngleAroundAxis(buttonSync.leftHand.transform.rotation, dir);
-            prevA2 = AngleAroundAxis(buttonSync.rightHand.transform.rotation, dir);
+            Vector3 dir1 = buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position;
+            Vector3 dir2 = buttonSync.rightHand.transform.position - buttonSync.leftHand.transform.position ;
+            prevA1 = AngleAroundAxis(buttonSync.leftHand.transform.rotation, dir1);
+            prevA2 = AngleAroundAxis(buttonSync.rightHand.transform.rotation, dir2);
 
             oldScaleMag = 0f;
             oldScaleMag += (buttonSync.leftHand.transform.position - buttonSync.rightHand.transform.position).magnitude;
@@ -148,24 +149,25 @@ public class VRInteractionManager : NetworkBehaviour {
             
             Vector3 directionOld = oldPointsForRotation[0] - oldPointsForRotation[1];
             Vector3 directionNew = interactingHands[0].transform.position - interactingHands[1].transform.position;
+            Vector3 directionOpp = interactingHands[1].transform.position - interactingHands[0].transform.position ;
 
             Vector3 cross = Vector3.Cross(directionOld, directionNew);
             float amountToRot = Vector3.Angle(directionOld, directionNew);
             var rotationWithTwoHands = Quaternion.AngleAxis(amountToRot, cross.normalized); //calculate the rotation with 2 hands
 
             var a1 = AngleAroundAxis(interactingHands[0].transform.rotation, directionNew);
-            var a2 = AngleAroundAxis(interactingHands[1].transform.rotation, directionNew);
+            var a2 = AngleAroundAxis(interactingHands[1].transform.rotation, directionOpp);
 
             deltaAngle1 += Mathf.DeltaAngle(prevA1, a1); // return the shortest angle between two angles (359 -> 5) will return 6
             deltaAngle2 += Mathf.DeltaAngle(prevA2, a2);
-            var finalAngle = ContributionOfEachHand(deltaAngle1, deltaAngle2);
 
-            Debug.Log(prevFinalAngle - finalAngle);
-
+            //var finalAngle = ContributionOfEachHand(deltaAngle1, deltaAngle2);
+            var finalAngle = (deltaAngle1 - deltaAngle2) /2 ;
 
             var rotationXAxisController = Quaternion.AngleAxis(prevFinalAngle - finalAngle, directionNew.normalized);
-            
+
             finalRotation = rotationWithTwoHands * rotationXAxisController;
+
 
             prevA1 = a1;
             prevA2 = a2;
