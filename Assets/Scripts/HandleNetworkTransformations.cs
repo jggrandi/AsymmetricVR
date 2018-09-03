@@ -30,8 +30,31 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
-            SyncObj(i);
+            SyncConnect(i);
     }
+
+    public void SyncConnect(int index, bool pos = true, bool rot = true, bool scale = true)
+    {
+        Vector3 p = Vector3.zero;
+        Quaternion r = new Quaternion(0, 0, 0, 0);
+        Vector3 s = Vector3.zero;
+        var g = ObjectManager.Get(index);
+        if (pos) p = g.transform.position;
+        if (rot) r = g.transform.rotation;
+        if (scale) s = g.transform.localScale;
+        RpcSyncConnect(index, p, r, s);
+    }
+
+    [ClientRpc]
+    public void RpcSyncConnect(int index, Vector3 pos, Quaternion rot, Vector3 scale)
+    {
+        Debug.Log("RpcSyncConnect");
+        var g = ObjectManager.Get(index);
+        if (pos != Vector3.zero) g.transform.position = pos;
+        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
+        if (scale != Vector3.zero) g.transform.localScale = scale;
+    }
+
 
     public void SyncObj(int index, bool pos = true, bool rot = true, bool scale = true)
     {
@@ -48,10 +71,11 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [ClientRpc]
     public void RpcSyncObj(int index, Vector3 pos, Quaternion rot, Vector3 scale)
     {
+        Debug.Log("RpcSyncObj");
         if (isLocalPlayer) return;
         var g = ObjectManager.Get(index);
-        if (pos != Vector3.zero) g.transform.position = Vector3.Lerp(g.transform.position, pos, 0.2f);
-        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = Quaternion.Lerp(g.transform.rotation, rot, 0.2f);
+        if (pos != Vector3.zero) g.transform.position = pos;
+        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
         if (scale != Vector3.zero) g.transform.localScale = scale;
     }
 
