@@ -94,8 +94,12 @@ public class VisualFeedback : NetworkBehaviour {
             {
                 if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
                 {
-                    AddLine(controllersCenter, ObjectManager.Get(indexObjSelected).transform.position, color); // line from the center of the controllers to the object
-                    icons.position = controllersCenter * 0.7f + ObjectManager.Get(indexObjSelected).transform.position * 0.3f;
+                    GameObject obj = null;
+                    if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
+                    else obj = ObjectManager.Get(indexObjSelected);
+
+                    AddLine(controllersCenter, obj.transform.position, color); // line from the center of the controllers to the object
+                    icons.position = controllersCenter * 0.7f + obj.transform.position * 0.3f;
                     icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
                     if (vrTransform.isTranslating) icons.GetChild(0).gameObject.SetActive(true);
                     if (vrTransform.isRotating) icons.GetChild(1).gameObject.SetActive(true);
@@ -144,15 +148,17 @@ public class VisualFeedback : NetworkBehaviour {
 
             int operation = player.GetComponent<ARInteractionManager>().currentOperation;
 
-            if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
-                if(operation != (int)Utils.Transformations.None) //only show the line if user is interacting
-                    AddLine(rayAdjust, ObjectManager.Get(indexObjSelected).transform.position, color); // add line 
-
-            if (operation > 0 && !player.GetComponent<NetworkIdentity>().isLocalPlayer)
+            if (operation != (int)Utils.Transformations.None && !player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player //only show feedback if user is interacting
             {
                 var OperationObj = icons.transform.GetChild(operation - 1);
                 OperationObj.gameObject.SetActive(true);
-                OperationObj.position = rayAdjust * 0.7f + ObjectManager.Get(indexObjSelected).transform.position * 0.3f;
+
+                GameObject obj = null;
+                if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
+                else obj = ObjectManager.Get(indexObjSelected);
+
+                AddLine(rayAdjust, obj.transform.position, color); // add line 
+                OperationObj.position = rayAdjust * 0.7f + obj.transform.position * 0.3f;
 
                 OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
                 OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);

@@ -18,17 +18,24 @@ public class ObjectManager : NetworkBehaviour
     //public int objSelectedShared = 1; // the user selections visible by other players
 
     public List<GameObject> list;
+    public List<GameObject> listGhost;
     public static ObjectManager manager;
     public ObjSelected objSelected;
     public GameObject allObjects;
+    public GameObject allGhosts;
 
     // Use this for initialization
     void Awake()
     {
         allObjects = GameObject.Find("InteractableObjects");
+        allGhosts = GameObject.Find("GhostObjects");
 
         for (int i = 0; i < allObjects.transform.childCount; i++)
             list.Add(allObjects.transform.GetChild(i).gameObject);
+
+        for (int i = 0; i < allGhosts.transform.childCount; i++)
+            listGhost.Add(allGhosts.transform.GetChild(i).gameObject);
+
 
         manager = this;
 
@@ -40,6 +47,14 @@ public class ObjectManager : NetworkBehaviour
             return manager.list[i];
         return null;
     }
+
+    public static GameObject GetGhost(int i)
+    {
+        if (i < manager.listGhost.Count && i >= 0)
+            return manager.listGhost[i];
+        return null;
+    }
+
 
     public static void Set(int i, GameObject obj)
     {

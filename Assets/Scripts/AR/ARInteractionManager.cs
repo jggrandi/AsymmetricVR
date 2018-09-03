@@ -27,6 +27,8 @@ namespace Lean.Touch {
         //int currentOperation = 0; /* move rotate resize move_cel */
 
         ObjSelected selected;
+        SyncTestParameters syncParameters;
+        PlayerStuff playerStuff;
 
         void Start()
         {
@@ -38,6 +40,11 @@ namespace Lean.Touch {
                 refGUI = canvas.GetComponent<HandleARGUI>();
 
             Utils.UpdateTouchSensibilty();
+
+            playerStuff = this.gameObject.GetComponent<PlayerStuff>();
+            var mainHandler = GameObject.Find("MainHandler");
+            syncParameters = mainHandler.GetComponent<SyncTestParameters>();
+
         }
 
         //string log ="";
@@ -57,6 +64,9 @@ namespace Lean.Touch {
             selected = ObjectManager.GetSelected();
             if (selected == null) return; // there is no object to interact with
 
+            playerStuff.CmdSetIsGhost(false);
+            if (syncParameters.trialIndex > 6 && playerStuff.id == 1)
+                playerStuff.CmdSetIsGhost(true);
 
             Matrix4x4 camMatrix = Camera.main.worldToCameraMatrix;
 
@@ -72,7 +82,7 @@ namespace Lean.Touch {
                 modelMatrix = prevMatrix.inverse * modelMatrix; // put the object in the world coordinates
                 g.transform.position = Utils.GetPositionn(modelMatrix);
                 g.transform.rotation = Utils.GetRotationn(modelMatrix);
-                this.gameObject.transform.GetComponent<HandleNetworkTransformations>().LockTransform(selected.index, Utils.GetPositionn(modelMatrix), Utils.GetRotationn(modelMatrix));
+                this.gameObject.transform.GetComponent<HandleNetworkTransformations>().LockTransform(selected.index, Utils.GetPositionn(modelMatrix), Utils.GetRotationn(modelMatrix), playerStuff.isGhost);
 
                 setCurrentOperation(Utils.Transformations.Lock);
             }
@@ -170,13 +180,13 @@ namespace Lean.Touch {
                 if (translationZ < 2) {
                     Vector3 right = Camera.main.transform.right.normalized * finger.ScreenDelta.x * transFactor * Utils.ToutchSensibility;
                     Vector3 up = Camera.main.transform.up.normalized * finger.ScreenDelta.y * transFactor * Utils.ToutchSensibility;
-                    this.gameObject.transform.GetComponent<HandleNetworkTransformations>().ARTranslate(selected.index, Utils.PowVec3(right + up, 1.2f));
+                    this.gameObject.transform.GetComponent<HandleNetworkTransformations>().ARTranslate(selected.index, Utils.PowVec3(right + up, 1.2f), playerStuff.isGhost);
                 } else if (translationZ == 2) {
                     //Vector3 avg = avgCenterOfObjects(gameObject.GetComponent<Lean.Touch.NetHandleSelectionTouch>().objSelected);
                     Vector3 translate = (selected.gameobject.transform.position - Camera.main.transform.position).normalized * finger.ScreenDelta.y * transFactor * Utils.ToutchSensibility; // obj pos - cam pos
 
                     //this.gameObject.GetComponent<HandleNetworkFunctions>().Translate(index, Utils.PowVec3(translate, 1.2f));
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARTranslate(selected.index, translate);
+                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARTranslate(selected.index, translate, playerStuff.isGhost);
                 }
 
             setCurrentOperation(Utils.Transformations.Translation);
@@ -226,13 +236,13 @@ namespace Lean.Touch {
                     Quaternion q = Quaternion.AngleAxis(angleTwist, axisTwist);
                     q *= Quaternion.AngleAxis(pos, axis);
                     this.gameObject.GetComponent<HandleNetworkTransformations>().CmdRotStep(q);
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axisTwist, angleTwist);
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axis, pos);
+                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axisTwist, angleTwist, playerStuff.isGhost);
+                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axis, pos, playerStuff.isGhost);
                     //this.gameObject.GetComponent<HandleNetworkFunctions>().Rotate(index, avg, Vector3.Scale (axis, axisTwist), pos * angleTwist);
                 }
                 if (gestureOperation != 1) {
                     //Vector3 dir = g.transform.position - avg;
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARScale(selected.index, scale);
+                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARScale(selected.index, scale, playerStuff.isGhost);
                 }
             //}
         }

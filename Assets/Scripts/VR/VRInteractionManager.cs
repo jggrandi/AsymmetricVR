@@ -16,12 +16,22 @@ public class VRInteractionManager : NetworkBehaviour {
     Quaternion prevRotation = new Quaternion();
     float prevScale = 0f;
 
+
+    SyncTestParameters syncParameters;
+    PlayerStuff playerStuff;
+
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
         transformSync = this.gameObject.GetComponent<VRTransformSync>();
+        playerStuff = this.gameObject.GetComponent<PlayerStuff>();
+
+        var mainHandler = GameObject.Find("MainHandler");
+        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
+
     }
+
 
     // Update is called once per frame
     void Update () {
@@ -30,6 +40,11 @@ public class VRInteractionManager : NetworkBehaviour {
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
+
+        playerStuff.CmdSetIsGhost(false);
+        if (syncParameters.trialIndex > 6 && playerStuff.id == 1)
+            playerStuff.CmdSetIsGhost(true);
+        
 
         List<Hand> interactingHands = new List<Hand>();
 
@@ -75,7 +90,7 @@ public class VRInteractionManager : NetworkBehaviour {
 
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 9)
         {
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation); // add position changes to the object
+            this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation, playerStuff.isGhost); // add position changes to the object
             if (Vector3.Distance(newTranslation,prevTranslation) > 0.0001f)
                 transformSync.isTranslating = true;
 
@@ -83,14 +98,14 @@ public class VRInteractionManager : NetworkBehaviour {
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8  || buttonSync.lockCombination == 9)
         {
             //Debug.Log(newRotation);
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation); // add all rotations to the object
+            this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation, playerStuff.isGhost); // add all rotations to the object
             if (newRotation != Quaternion.identity)
                 transformSync.isRotating = true;
 
         }
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 ||  buttonSync.lockCombination == 9)
         {
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale); // add scale to the object
+            this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale, playerStuff.isGhost); // add scale to the object
             if (Mathf.Abs(newScale) > 0.0001f)
                 transformSync.isScaling = true;
         }
