@@ -33,7 +33,7 @@ public class VRInteractionManager : NetworkBehaviour {
 
         List<Hand> interactingHands = new List<Hand>();
 
-        if (buttonSync.bimanual)
+        if (buttonSync.whichHand == Utils.Hand.Bimanual)
         {
             interactingHands.Add(buttonSync.leftHand); //send both hands for transform functions
             interactingHands.Add(buttonSync.rightHand); //send both hands for transform functions

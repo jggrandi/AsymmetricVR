@@ -76,7 +76,7 @@ public class VisualFeedback : NetworkBehaviour {
                 color = blueColor; // localplayer's ray is blue
 
             var controllersCenter = Vector3.zero;
-            if (buttonSync.bimanual) // the rays drawn are different from one hand.
+            if (buttonSync.whichHand == Utils.Hand.Bimanual) // the rays drawn are different from one hand.
             {
                 AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
                 controllersCenter = (leftController.transform.position - rightController.transform.position);
@@ -92,7 +92,7 @@ public class VisualFeedback : NetworkBehaviour {
 
             if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
             {
-                if (buttonSync.bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
+                if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
                 {
                     AddLine(controllersCenter, ObjectManager.Get(indexObjSelected).transform.position, color); // line from the center of the controllers to the object
                     icons.position = controllersCenter * 0.7f + ObjectManager.Get(indexObjSelected).transform.position * 0.3f;

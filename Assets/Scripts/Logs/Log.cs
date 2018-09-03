@@ -69,7 +69,7 @@ public class Log
                 var pTransformStep = playerFound.GetComponent<HandleNetworkTransformations>();
                 Vector3 pPos = new Vector3();
                 Quaternion pRot = new Quaternion();
-                bool vrBimanual = false;
+                Utils.Hand vrBimanual = Utils.Hand.None;
                 int vrLockCombo = 0;
                 int arOperation = 0;
                 if (pStuff.type == Utils.PlayerType.VR)
@@ -78,7 +78,7 @@ public class Log
                     var pButton = playerFound.GetComponent<ButtonSync>();
                     pPos = pTransform.headPos;
                     pRot = pTransform.headRot;
-                    vrBimanual = pButton.bimanual;
+                    vrBimanual = pButton.whichHand;
                     vrLockCombo = pButton.lockCombination;
                 }
                 else if (pStuff.type == Utils.PlayerType.AR)

@@ -6,6 +6,7 @@ using System.Threading;
 public static class Utils {
     public enum Transformations { None, Translation, Rotation, Scale, Lock };
     public enum PlayerType { VR, AR, None };
+    public enum Hand { None, Left, Right, Bimanual};
 
 
     //public static void FromMatrix4x4(this Transform transform, Matrix4x4 matrix)

@@ -24,7 +24,7 @@ public class ButtonSync : NetworkBehaviour {
     public Vector2 lJoystick = new Vector2();
     public Vector2 rJoystick = new Vector2();
 
-    public bool bimanual = false;
+    public Utils.Hand whichHand = Utils.Hand.None; // 0=none; 1=left; 2=right; 3=bimanual
     public int lockCombination = 0; // 0=alltransforms, 1=trans, 3=rot, 5=scale, 4=trans+rot, 6=trans+scale, 8=rot+scale, 9=allblocked
 
     Player player;
@@ -78,18 +78,23 @@ public class ButtonSync : NetworkBehaviour {
         rGrip = refRight.GetGripPress();
         rJoystick = refRight.GetJoystickCoord();
 
-        bimanual = false;
+        whichHand = Utils.Hand.None;
         lockCombination = 0;
 
         if (AnyButtonPressedLeft() && AnyButtonPressedRight())
-            bimanual = true;
+            whichHand = Utils.Hand.Bimanual;
+        else if (AnyButtonPressedLeft())
+            whichHand = Utils.Hand.Left ;
+        else if (AnyButtonPressedRight())
+            whichHand = Utils.Hand.Right;
+
         //if ((lTrigger && rTrigger) || (lA && rA) || (lApp && rApp) || (lGrip && rGrip))
         //    bimanual = true;
 
         //if (!(AnyButtonPressedLeft() || AnyButtonPressedRight()))
         //    return;
 
-        if (bimanual)
+        if (whichHand == Utils.Hand.Bimanual)
         {
             //if (lTrigger && rTrigger) lockCombination = 0;
             if (lA && rA) lockCombination += 1;
@@ -100,20 +105,20 @@ public class ButtonSync : NetworkBehaviour {
         {
             if (!lTrigger && !rTrigger)
             {
-              //  if (lTrigger || rTrigger) lockCombination = 0;
+                //  if (lTrigger || rTrigger) lockCombination = 0;
                 if (lA || rA) lockCombination += 1;
                 if (lApp || rApp) lockCombination += 3;
                 if (lGrip || rGrip) lockCombination += 5;
             }
             //else if (rTrigger)
             //{
-                //if (rA) lockCombination += 1;
-                //if (rApp) lockCombination += 3;
-                //if (rGrip) lockCombination += 5;
+            //if (rA) lockCombination += 1;
+            //if (rApp) lockCombination += 3;
+            //if (rGrip) lockCombination += 5;
             //}
         }
         CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick ); 
-        CmdUpdateActions(bimanual, lockCombination);
+        CmdUpdateActions(whichHand, lockCombination);
     }
 
     public bool AnyButtonPressedLeft()
@@ -165,17 +170,17 @@ public class ButtonSync : NetworkBehaviour {
     }
 
     [Command]
-    void CmdUpdateActions(bool biman, int lockcomb)
+    void CmdUpdateActions(Utils.Hand biman, int lockcomb)
     {
-        bimanual = biman;
+        whichHand = biman;
         lockCombination = lockcomb;
         RpcUpdateActions(biman, lockcomb);
     }
 
     [ClientRpc]
-    void RpcUpdateActions(bool biman, int lockcomb)
+    void RpcUpdateActions(Utils.Hand biman, int lockcomb)
     {
-        bimanual = biman;
+        whichHand = biman;
         lockCombination = lockcomb;
     }
 }

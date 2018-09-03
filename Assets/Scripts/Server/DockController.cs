@@ -5,10 +5,16 @@ using UnityEngine.Networking;
 
 public class DockController : NetworkBehaviour {
 
-    //original
-    const float toleranceTrans = 0.005f;
-    const float toleranceRot = 1.0f;
-    const float toleranceScale = 0.003f;
+    ////hard
+    //const float toleranceTrans = 0.005f;
+    //const float toleranceRot = 1.0f;
+    //const float toleranceScale = 0.003f;
+
+    //medium
+    const float toleranceTrans = 0.05f;
+    const float toleranceRot = 5.0f;
+    const float toleranceScale = 0.03f;
+
 
     //const float toleranceTrans = 12f;
     //const float toleranceRot = 190.0f;
