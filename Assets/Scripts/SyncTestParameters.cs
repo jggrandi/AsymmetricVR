@@ -118,7 +118,7 @@ public class SyncTestParameters : NetworkBehaviour {
                 var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
                 var centerPos = new Vector3 (-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
                 obj.transform.position = centerPos;
-                obj.transform.rotation = Random.rotationUniform;
+                obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotation[i]].eulerAngles); //pega a rotação oposta
             }
         }
     }
