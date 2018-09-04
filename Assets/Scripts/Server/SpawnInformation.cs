@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class SpawnInformation : MonoBehaviour
+public class SpawnInformation : NetworkBehaviour
 {
 
     public List<Vector3> pos = new List<Vector3>();
-    public List<Vector3> ghostPos = new List<Vector3>();
     public List<Quaternion> rot = new List<Quaternion>();
+    public List<Vector3> ghostPos = new List<Vector3>();
+    public List<Quaternion> ghostRot = new List<Quaternion>();
     public List<float> scale = new List<float>();
 
     public GameObject table;
+
+    float baseAngle = 30.0f;
 
     private void Awake()
     {
@@ -19,6 +23,7 @@ public class SpawnInformation : MonoBehaviour
 
         CreatePositions();
         CreateGhostPos();
+        CreateGhostRot();
         CreateRotations();
         CreateScales();
     }
@@ -39,8 +44,6 @@ public class SpawnInformation : MonoBehaviour
 
     void CreateRotations()
     {
-        var baseAngle = 30;
-
         rot.Add(Quaternion.AngleAxis(baseAngle, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
         rot.Add(Quaternion.AngleAxis(baseAngle*2, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
         rot.Add(Quaternion.AngleAxis(baseAngle*3, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
@@ -63,7 +66,7 @@ public class SpawnInformation : MonoBehaviour
         ghostPos.Clear();
         var centerPos = new Vector3(table.transform.position.x, 1.0f, table.transform.position.z);
         for (int i = 0; i < 7; i++) // tree training + 4 first trials
-            ghostPos.Add(new Vector3(table.transform.position.x, 1f, table.transform.position.z));
+            ghostPos.Add(new Vector3(table.transform.position.x, 1.0f, table.transform.position.z));
         for (int i = 0; i < 4; i++)
         {
 
@@ -73,4 +76,16 @@ public class SpawnInformation : MonoBehaviour
             ghostPos.Add(newPos);
         }             
     }
+
+    void CreateGhostRot()
+    {
+        int j = 1;
+        for (int i = 0; i < 11; i++)
+        {
+            ghostRot.Add(Quaternion.AngleAxis(baseAngle * (j), new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
+            if (j % 4 == 0) j = 1;
+            else j++;
+        }
+    }
+
 }

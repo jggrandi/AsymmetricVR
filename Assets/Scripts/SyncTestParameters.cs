@@ -7,9 +7,9 @@ public class SyncTestParameters : NetworkBehaviour {
 
     public SyncListInt activeTrialOrder = new SyncListInt();
 
-    public SyncListInt spawnPosition = new SyncListInt();
-    public SyncListInt spawnRotation = new SyncListInt();
-    public SyncListInt spawnScale = new SyncListInt();
+    public List<int> spawnPosItem = new List<int>();
+    public List<int> spawnRotItem = new List<int>();
+    public List<int> spawnScaleItem = new List<int>();
 
     [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
     public int conditionIndex;
@@ -31,10 +31,59 @@ public class SyncTestParameters : NetworkBehaviour {
     SpawnInformation spawnInfo;
 
 
-    // Use this for initialization
-    void Start () {
-        //if (!isClient) return;
+    public override void OnStartLocalPlayer()
+    {
+        if (isServer) return;
+            CmdSyncAll(); // sync all test parameters when connected
+    }
+
+    [Command]
+    void CmdSyncAll()
+    {
+        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        bool isghost = false;
+        for (int i = 0; i < interactableObjects.transform.childCount; i++)
+            SyncAll(i,isghost);
+
+        isghost = true;
+        if (ghostObjects == null) ghostObjects = GameObject.Find("GhostObjects");
+        for (int i = 0; i < ghostObjects.transform.childCount; i++)
+            SyncAll(i, isghost);
+
+    }
+
+    public void SyncAll(int index,bool isghost, bool pos = true, bool rot = true, bool scale = true)
+    {
+        Vector3 p = Vector3.zero;
+        Quaternion r = new Quaternion(0, 0, 0, 0);
+        Vector3 s = Vector3.zero;
+
+        GameObject g = null;
+        if (isghost) g = ObjectManager.GetGhost(index);
+        else g = ObjectManager.Get(index);
+
+        if (pos) p = g.transform.position;
+        if (rot) r = g.transform.rotation;
+        if (scale) s = g.transform.localScale;
+        RpcSyncAll(index,isghost, p, r, s);
+    }
+
+    [ClientRpc]
+    public void RpcSyncAll(int index, bool isghost, Vector3 pos, Quaternion rot, Vector3 scale)
+    {
+        GameObject g = null;
+        if (isghost) g = ObjectManager.GetGhost(index);
+        else g = ObjectManager.Get(index);
+
+        if (pos != Vector3.zero) g.transform.position = pos;
+        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
+        if (scale != Vector3.zero) g.transform.localScale = scale;
+    }
+
+    public override void OnStartServer()
+    {
         
+
         interactableObjects = GameObject.Find("InteractableObjects");
         if (interactableObjects == null) return;
 
@@ -85,9 +134,9 @@ public class SyncTestParameters : NetworkBehaviour {
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
         {
             var obj = interactableObjects.transform.GetChild(i);
-            obj.transform.position = spawnInfo.pos[spawnPosition[i]];
-            obj.transform.rotation = spawnInfo.rot[spawnRotation[i]];
-            var uniformScale = spawnInfo.scale[spawnScale[i]];
+            obj.transform.position = spawnInfo.pos[spawnPosItem[i]];
+            obj.transform.rotation = spawnInfo.rot[spawnRotItem[i]];
+            var uniformScale = spawnInfo.scale[spawnScaleItem[i]];
             obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
         }
     }
@@ -95,32 +144,43 @@ public class SyncTestParameters : NetworkBehaviour {
     public void UpdateSpawnInfo(int index)
     {
         var obj = interactableObjects.transform.GetChild(index);
-        obj.transform.position = spawnInfo.pos[spawnPosition[index]];
-        obj.transform.rotation = spawnInfo.rot[spawnRotation[index]];
-        var uniformScale = spawnInfo.scale[spawnScale[index]];
+        obj.transform.position = spawnInfo.pos[spawnPosItem[index]];
+        obj.transform.rotation = spawnInfo.rot[spawnRotItem[index]];
+        var uniformScale = spawnInfo.scale[spawnScaleItem[index]];
         obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
     }
 
+    [ClientRpc]
+    public void RpcUpdateSpawnInfo()
+    {
+        UpdateSpawnInfo();
+    }
 
     void UpdateGhost()
     {
-        for(int i = 0; i < ghostObjects.transform.childCount; i++)
+        for (int i = 0; i < ghostObjects.transform.childCount; i++)
         {
             var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
             var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
             if (i < 7)
             {
-                
+
                 obj.transform.position = centerTable;
             }
             else
             {
                 var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
-                var centerPos = new Vector3 (-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
+                var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
                 obj.transform.position = centerPos;
-                obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotation[i]].eulerAngles); //pega a rotação oposta
+                obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotItem[i]].eulerAngles); //pega a rotação oposta
             }
         }
+    }
+
+    [ClientRpc]
+    public void RpcUpdateGhost()
+    {
+        UpdateGhost();
     }
 
 

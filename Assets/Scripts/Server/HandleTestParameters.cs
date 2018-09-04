@@ -152,8 +152,11 @@ public class HandleTestParameters : NetworkBehaviour
         ResetConditionsCompleted();
         ReorderConditionNames();
         UpdateConditionColor();
-
         handleLog.StopLogRecording();
+
+
+        //syncParameters.RpcUpdateSpawnInfo(); //NEED TO CHECK THIS
+        //syncParameters.RpcUpdateGhost();
 
         UpdateTrial();
         syncParameters.EVALUATIONSTARTED = false;
@@ -222,9 +225,9 @@ public class HandleTestParameters : NetworkBehaviour
 
     void ResetSpawnOrder()
     {
-        syncParameters.spawnPosition.Clear();
-        syncParameters.spawnRotation.Clear();
-        syncParameters.spawnScale.Clear();
+        syncParameters.spawnPosItem.Clear();
+        syncParameters.spawnRotItem.Clear();
+        syncParameters.spawnScaleItem.Clear();
     }
 
     void ResetTrialsCompleted()
@@ -343,9 +346,9 @@ public class HandleTestParameters : NetworkBehaviour
 
     void RandomizeTrialSpawn()
     {
-        RandomizeTrialSpawnTransform(syncParameters.spawnPosition, spawnInfo.pos.Count);
-        RandomizeTrialSpawnTransform(syncParameters.spawnRotation, spawnInfo.rot.Count);
-        RandomizeTrialSpawnTransform(syncParameters.spawnScale, spawnInfo.scale.Count);
+        RandomizeTrialSpawnTransform(syncParameters.spawnPosItem, spawnInfo.pos.Count);
+        RandomizeTrialSpawnTransform(syncParameters.spawnRotItem, spawnInfo.rot.Count);
+        RandomizeTrialSpawnTransform(syncParameters.spawnScaleItem, spawnInfo.scale.Count);
     }
 
     void RandomizeTrialSpawnTransform(SyncListInt _spawnT, int size)

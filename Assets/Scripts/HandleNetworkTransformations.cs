@@ -23,44 +23,6 @@ public class HandleNetworkTransformations : NetworkBehaviour
         if (ghostObjects == null) ghostObjects = GameObject.Find("GhostObjects");
     }
 
-    public override void OnStartLocalPlayer()
-    {
-        if (isServer) return;
-        if (SceneManager.GetActiveScene().name != "SetupTest")
-            CmdSyncAll(); // sync objects prosition when connected.
-    }
-
-    [Command]
-    void CmdSyncAll()
-    {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        for (int i = 0; i < interactableObjects.transform.childCount; i++)
-            SyncConnect(i);
-    }
-
-    public void SyncConnect(int index, bool pos = true, bool rot = true, bool scale = true)
-    {
-        Vector3 p = Vector3.zero;
-        Quaternion r = new Quaternion(0, 0, 0, 0);
-        Vector3 s = Vector3.zero;
-        var g = ObjectManager.Get(index);
-        if (pos) p = g.transform.position;
-        if (rot) r = g.transform.rotation;
-        if (scale) s = g.transform.localScale;
-        RpcSyncConnect(index, p, r, s);
-    }
-
-    [ClientRpc]
-    public void RpcSyncConnect(int index, Vector3 pos, Quaternion rot, Vector3 scale)
-    {
-        //Debug.Log("RpcSyncConnect");
-        var g = ObjectManager.Get(index);
-        if (pos != Vector3.zero) g.transform.position = pos;
-        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
-        if (scale != Vector3.zero) g.transform.localScale = scale;
-    }
-
-
     public void SyncObj(int index, bool isghost, bool pos = true, bool rot = true, bool scale = true)
     {
         Vector3 p = Vector3.zero;
