@@ -73,8 +73,9 @@ namespace Lean.Touch {
             if (refGUI.lockTransform) {
                 CmdUpdateModality(1);
                 Matrix4x4 step = prevMatrix * camMatrix.inverse;
-                
-                var g = ObjectManager.Get(selected.index);
+                GameObject g = null;
+                if (playerStuff.isGhost) g = ObjectManager.GetGhost(selected.index);
+                else g = ObjectManager.Get(selected.index);
 
                 Matrix4x4 modelMatrix = Matrix4x4.TRS(g.transform.position, g.transform.rotation, new Vector3(1, 1, 1)); // get the object matrix
                 modelMatrix = prevMatrix * modelMatrix; // transform the model matrix to the camera space matrix
@@ -214,36 +215,45 @@ namespace Lean.Touch {
             axis = Camera.main.transform.right.normalized * LeanGesture.GetScreenDelta(fingers).y + Camera.main.transform.up.normalized * -LeanGesture.GetScreenDelta(fingers).x;
             float pos = LeanGesture.GetScreenDelta(fingers).magnitude * 0.3f;
             float scale = LeanGesture.GetPinchScale(fingers);
-            
+
             //foreach (int index in gameObject.GetComponent<Lean.Touch.NetHandleSelectionTouch>().objSelected) {
-                var g = ObjectManager.Get(selected.index);
-                float rotationMagnitude = Mathf.Max(Mathf.Abs(angleTwist) * 2, pos); ;
-                float scallingMagnitude = Mathf.Abs(scale-1)*100;
+            GameObject g = null;
+            if (playerStuff.isGhost) g = ObjectManager.GetGhost(selected.index);
+            else g = ObjectManager.Get(selected.index);
+            
+            float rotationMagnitude = Mathf.Max(Mathf.Abs(angleTwist) * 2, pos); ;
+            float scallingMagnitude = Mathf.Abs(scale-1)*100;
 
-                if (gestureOperation == 0 && (rotationMagnitude > 2 || scallingMagnitude > 2)) {
-                    //log = angleTwist + "|" + pos + "|" + scallingMagnitude;
-                    if (rotationMagnitude > scallingMagnitude) {
-                        gestureOperation = 1;
-                    } else {
-                        gestureOperation = 2;
-                    }
+            if (gestureOperation == 0 && (rotationMagnitude > 2 || scallingMagnitude > 2))
+            {
+                //log = angleTwist + "|" + pos + "|" + scallingMagnitude;
+                if (rotationMagnitude > scallingMagnitude)
+                {
+                    gestureOperation = 1;
                 }
-                if (gestureOperation == 0) setCurrentOperation(Utils.Transformations.None);
-                else if (gestureOperation == 1) setCurrentOperation(Utils.Transformations.Rotation);
-                else if (gestureOperation == 2) setCurrentOperation(Utils.Transformations.Scale);
+                else
+                {
+                    gestureOperation = 2;
+                }
+            }
+            if (gestureOperation == 0) setCurrentOperation(Utils.Transformations.None);
+            else if (gestureOperation == 1) setCurrentOperation(Utils.Transformations.Rotation);
+            else if (gestureOperation == 2) setCurrentOperation(Utils.Transformations.Scale);
 
-                if (gestureOperation != 2) {
-                    Quaternion q = Quaternion.AngleAxis(angleTwist, axisTwist);
-                    q *= Quaternion.AngleAxis(pos, axis);
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().CmdRotStep(q);
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axisTwist, angleTwist, playerStuff.isGhost);
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axis, pos, playerStuff.isGhost);
-                    //this.gameObject.GetComponent<HandleNetworkFunctions>().Rotate(index, avg, Vector3.Scale (axis, axisTwist), pos * angleTwist);
-                }
-                if (gestureOperation != 1) {
-                    //Vector3 dir = g.transform.position - avg;
-                    this.gameObject.GetComponent<HandleNetworkTransformations>().ARScale(selected.index, scale, playerStuff.isGhost);
-                }
+            if (gestureOperation != 2)
+            {
+                Quaternion q = Quaternion.AngleAxis(angleTwist, axisTwist);
+                q *= Quaternion.AngleAxis(pos, axis);
+                this.gameObject.GetComponent<HandleNetworkTransformations>().CmdRotStep(q);
+                this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axisTwist, angleTwist, playerStuff.isGhost);
+                this.gameObject.GetComponent<HandleNetworkTransformations>().ARRotate(selected.index, g.transform.position, axis, pos, playerStuff.isGhost);
+                //this.gameObject.GetComponent<HandleNetworkFunctions>().Rotate(index, avg, Vector3.Scale (axis, axisTwist), pos * angleTwist);
+            }
+            if (gestureOperation != 1)
+            {
+                //Vector3 dir = g.transform.position - avg;
+                this.gameObject.GetComponent<HandleNetworkTransformations>().ARScale(selected.index, scale, playerStuff.isGhost);
+            }
             //}
         }
 

@@ -8,6 +8,7 @@ using Valve.VR.InteractionSystem;
 public class HandleNetworkTransformations : NetworkBehaviour
 {
     public GameObject interactableObjects;
+    public GameObject ghostObjects;
 
     public Vector3 tStep = new Vector3();
     public Quaternion rStep = new Quaternion();
@@ -19,6 +20,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     void Start()
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        if (ghostObjects == null) ghostObjects = GameObject.Find("GhostObjects");
     }
 
     public override void OnStartLocalPlayer()
@@ -163,8 +165,10 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     //AR methods////////////////
 
-    public Transform GetLocalTransform()
+    public Transform GetLocalTransform(bool isghost)
     {
+        if (isghost)
+            return ghostObjects.transform;
         return interactableObjects.transform;
     }
 
@@ -173,8 +177,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         if (isLocalPlayer) return;
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        position = GetLocalTransform().TransformPoint(position);
-        rotation = rotation * GetLocalTransform().rotation;
+        position = GetLocalTransform(isghost).TransformPoint(position);
+        rotation = rotation * GetLocalTransform(isghost).rotation;
         GameObject g = null;
         if (isghost) g = ObjectManager.GetGhost(index);
         else g = ObjectManager.Get(index);
@@ -186,8 +190,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void CmdLockTransform(int index, Vector3 position, Quaternion rotation, bool isghost)
     {
         if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        position = GetLocalTransform().TransformPoint(position);
-        rotation = rotation * GetLocalTransform().rotation;
+        position = GetLocalTransform(isghost).TransformPoint(position);
+        rotation = rotation * GetLocalTransform(isghost).rotation;
         GameObject g = null;
         if (isghost) g = ObjectManager.GetGhost(index);
         else g = ObjectManager.Get(index);
@@ -200,8 +204,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
     }
     public void LockTransform(int index, Vector3 position, Quaternion rotation, bool isghost)
     {
-        position = GetLocalTransform().InverseTransformPoint(position);
-        rotation = Quaternion.Inverse(GetLocalTransform().rotation) * rotation;
+        position = GetLocalTransform(isghost).InverseTransformPoint(position);
+        rotation = Quaternion.Inverse(GetLocalTransform(isghost).rotation) * rotation;
         CmdLockTransform(index, position, rotation, isghost);
     }
 
@@ -232,8 +236,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
         GameObject g = null;
         if (isghost) g = ObjectManager.GetGhost(index);
         else g = ObjectManager.Get(index);
-        avg = GetLocalTransform().TransformPoint(avg);
-        axis = GetLocalTransform().TransformVector(axis);
+        avg = GetLocalTransform(isghost).TransformPoint(avg);
+        axis = GetLocalTransform(isghost).TransformVector(axis);
         g.transform.RotateAround(avg, axis, mag);
         SyncObj(index, isghost);
     }
@@ -243,8 +247,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
         GameObject g = null;
         if (isghost) g = ObjectManager.GetGhost(index);
         else g = ObjectManager.Get(index);
-        avg = GetLocalTransform().InverseTransformPoint(avg);
-        axis = GetLocalTransform().InverseTransformVector(axis);
+        avg = GetLocalTransform(isghost).InverseTransformPoint(avg);
+        axis = GetLocalTransform(isghost).InverseTransformVector(axis);
         g.transform.RotateAround(avg, axis, mag);
         CmdARRotate(index, avg, axis, mag, isghost);
     }
