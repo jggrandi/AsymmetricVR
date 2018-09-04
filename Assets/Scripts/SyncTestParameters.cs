@@ -46,7 +46,7 @@ public class SyncTestParameters : NetworkBehaviour {
         prevConditionIndex = conditionIndex;
         prevTrialIndex = trialIndex;
 
-        UpdateGhostPos();
+        UpdateGhost();
         UpdateSpawnInfo();
 
         ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
@@ -68,11 +68,13 @@ public class SyncTestParameters : NetworkBehaviour {
         if (prevConditionIndex != conditionIndex)
         {
             UpdateSpawnInfo();
+            UpdateGhost();
             prevConditionIndex = conditionIndex;
         }
 
         if (prevTrialIndex != trialIndex)
         {
+            UpdateGhost();
             ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
             prevTrialIndex = trialIndex;
         }
@@ -100,12 +102,24 @@ public class SyncTestParameters : NetworkBehaviour {
     }
 
 
-    void UpdateGhostPos()
+    void UpdateGhost()
     {
-        for(int i=0; i < ghostObjects.transform.childCount; i++)
+        for(int i = 0; i < ghostObjects.transform.childCount; i++)
         {
-            var obj = ghostObjects.transform.GetChild(i);
-            obj.transform.position = spawnInfo.ghostPos;
+            var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
+            var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
+            if (i < 7)
+            {
+                
+                obj.transform.position = centerTable;
+            }
+            else
+            {
+                var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
+                var centerPos = new Vector3 (-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
+                obj.transform.position = centerPos;
+                obj.transform.rotation = Random.rotationUniform;
+            }
         }
     }
 

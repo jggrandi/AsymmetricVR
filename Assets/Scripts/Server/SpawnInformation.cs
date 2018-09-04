@@ -6,7 +6,7 @@ public class SpawnInformation : MonoBehaviour
 {
 
     public List<Vector3> pos = new List<Vector3>();
-    public Vector3 ghostPos = new Vector3();
+    public List<Vector3> ghostPos = new List<Vector3>();
     public List<Quaternion> rot = new List<Quaternion>();
     public List<float> scale = new List<float>();
 
@@ -60,6 +60,17 @@ public class SpawnInformation : MonoBehaviour
 
     void CreateGhostPos()
     {
-        ghostPos = new Vector3(table.transform.position.x, 1f, table.transform.position.z);
+        ghostPos.Clear();
+        var centerPos = new Vector3(table.transform.position.x, 1.0f, table.transform.position.z);
+        for (int i = 0; i < 7; i++) // tree training + 4 first trials
+            ghostPos.Add(new Vector3(table.transform.position.x, 1f, table.transform.position.z));
+        for (int i = 0; i < 4; i++)
+        {
+
+            Vector3 newPos = -pos[i];
+            //newPos = new Vector3(newPos.x * (-1), newPos.y, centerPos.y * (-1));
+
+            ghostPos.Add(newPos);
+        }             
     }
 }
