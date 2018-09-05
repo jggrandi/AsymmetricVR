@@ -17,39 +17,26 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public const float minScale = 0.03f;
     public const float maxScale = 0.4f;
 
+    SyncTestParameters syncParameters;
     void Start()
     {
         if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
     }
 
-    public void SyncObj(int index, bool isghost, bool pos = true, bool rot = true, bool scale = true)
+    public override void OnStartLocalPlayer()
     {
-        Vector3 p = Vector3.zero;
-        Quaternion r = new Quaternion(0, 0, 0, 0);
-        Vector3 s = Vector3.zero;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
-
-        if (pos) p = g.transform.position;
-        if (rot) r = g.transform.rotation;
-        if (scale) s = g.transform.localScale;
-        RpcSyncObj(index, p, r, s, isghost);
+        if (isServer) return;
+        CmdSyncAll();
     }
 
-    [ClientRpc]
-    public void RpcSyncObj(int index, Vector3 pos, Quaternion rot, Vector3 scale, bool isghost)
+    [Command]
+    public void CmdSyncAll()
     {
-        //Debug.Log("RpcSyncObj");
-        if (isLocalPlayer) return;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
-
-        if (pos != Vector3.zero) g.transform.position = pos;
-        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
-        if (scale != Vector3.zero) g.transform.localScale = scale;
+        var mainHandler = GameObject.Find("MainHandler");
+        if (mainHandler == null) return;
+        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
+        syncParameters.SYNC();
     }
 
     public void VRTranslate(int index, Vector3 translatestep, bool isghost)
@@ -71,7 +58,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
         g.transform.position += translatestep;
         //g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
     }
 
     public void VRRotate(int index, Quaternion rotationstep, bool isghost)
@@ -94,7 +81,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
         g.transform.rotation = rotationstep * g.transform.rotation;
         //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
     }
 
     public void VRScale(int index, float scalestep, bool isghost)
@@ -121,7 +108,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
         var finalScale = g.transform.localScale.x + scalestep;
         finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
         g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
 
     }
 
@@ -189,7 +176,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
         else g = ObjectManager.Get(index);
         //objTranslateStep = vec;
         g.transform.localPosition += translatestep;
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
     }
 
     [Command]
@@ -201,7 +188,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
         avg = GetLocalTransform(isghost).TransformPoint(avg);
         axis = GetLocalTransform(isghost).TransformVector(axis);
         g.transform.RotateAround(avg, axis, mag);
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
     }
 
     public void ARRotate(int index, Vector3 avg, Vector3 axis, float mag, bool isghost)
@@ -247,6 +234,6 @@ public class HandleNetworkTransformations : NetworkBehaviour
         s = Mathf.Min(Mathf.Max(s, minScale), maxScale);
         g.transform.localScale = new Vector3(s, s, s);
 
-        SyncObj(index, isghost);
+        syncParameters.SyncObj(index, isghost);
     }
 }

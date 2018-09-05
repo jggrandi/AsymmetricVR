@@ -22,15 +22,15 @@ public class SyncTestParameters : NetworkBehaviour {
         if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         bool isghost = false;
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
-            SyncAll(i, isghost);
+            SyncObj(i, isghost);
 
         isghost = true;
         if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
         for (int i = 0; i < ghostObjects.transform.childCount; i++)
-            SyncAll(i, isghost);
+            SyncObj(i, isghost);
     }
 
-    public void SyncAll(int index,bool isghost, bool pos = true, bool rot = true, bool scale = true)
+    public void SyncObj(int index,bool isghost, bool pos = true, bool rot = true, bool scale = true)
     {
         Vector3 p = Vector3.zero;
         Quaternion r = new Quaternion(0, 0, 0, 0);
@@ -43,11 +43,11 @@ public class SyncTestParameters : NetworkBehaviour {
         if (pos) p = g.transform.position;
         if (rot) r = g.transform.rotation;
         if (scale) s = g.transform.localScale;
-        RpcSyncAll(index,isghost, p, r, s);
+        RpcSyncObj(index,isghost, p, r, s);
     }
 
     [ClientRpc]
-    public void RpcSyncAll(int index, bool isghost, Vector3 pos, Quaternion rot, Vector3 scale)
+    public void RpcSyncObj(int index, bool isghost, Vector3 pos, Quaternion rot, Vector3 scale)
     {
 
         GameObject g = null;
