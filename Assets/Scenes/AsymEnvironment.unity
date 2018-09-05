@@ -7103,6 +7103,7 @@ GameObject:
   - component: {fileID: 1111413130}
   - component: {fileID: 1111413132}
   - component: {fileID: 1111413133}
+  - component: {fileID: 1111413134}
   - component: {fileID: 1111413131}
   m_Layer: 0
   m_Name: ServerHandler
@@ -7204,6 +7205,23 @@ MonoBehaviour:
   isRecording: 0
   timePaused: 0
   previousTime: 0
+--- !u!114 &1111413134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1111413128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76d38daf370364e815343245fa253a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pos: []
+  rot: []
+  ghostPos: []
+  ghostRot: []
+  scale: []
+  table: {fileID: 0}
 --- !u!1 &1111445332
 GameObject:
   m_ObjectHideFlags: 0
@@ -10557,7 +10575,6 @@ GameObject:
   - component: {fileID: 1623813268}
   - component: {fileID: 1623813270}
   - component: {fileID: 1623813271}
-  - component: {fileID: 1623813272}
   - component: {fileID: 1623813269}
   m_Layer: 0
   m_Name: MainHandler
@@ -10579,7 +10596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   list: []
   listGhost: []
-  allObjects: {fileID: 0}
+  allInteractable: {fileID: 0}
   allGhosts: {fileID: 0}
 --- !u!4 &1623813267
 Transform:
@@ -10673,26 +10690,6 @@ MonoBehaviour:
   prevTrialIndex: 0
   EVALUATIONSTARTED: 0
   isPaused: 0
---- !u!114 &1623813272
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1623813265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a76d38daf370364e815343245fa253a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pos: []
-  rot: []
-  ghostPos:
-  - {x: 6.654997e+11, y: 0, z: 0}
-  - {x: 0, y: 9.4342395e+29, z: 0}
-  - {x: 4.6e-44, y: 0, z: 6.654997e+11}
-  ghostRot: []
-  scale: []
-  table: {fileID: 0}
 --- !u!1 &1625928989
 GameObject:
   m_ObjectHideFlags: 0

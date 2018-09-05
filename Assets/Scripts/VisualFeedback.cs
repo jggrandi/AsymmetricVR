@@ -10,7 +10,7 @@ public class VisualFeedback : NetworkBehaviour {
     Color greyColor = new Color(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
     Color blueColor = new Color(0 / 255.0f, 118 / 255.0f, 255 / 255.0f);
     public GameObject lines;
-    GameObject netMan;
+    NetworkManager netMan;
     Utils.PlayerType playerType;
 
     int linesUsed = 0;
@@ -20,7 +20,7 @@ public class VisualFeedback : NetworkBehaviour {
     void Start () {
         lines = GameObject.Find("Lines");
 
-        netMan = GameObject.Find("NetworkManager");
+        netMan = NetworkManager.singleton;
         playerType = netMan.GetComponent<MyNetworkManager>().playerType;
 
         ClearLines();

@@ -33,8 +33,8 @@ public class SyncTestParameters : NetworkBehaviour {
 
     public override void OnStartLocalPlayer()
     {
-        if (isServer) return;
-            CmdSyncAll(); // sync all test parameters when connected
+        CmdSyncAll(); // sync all test parameters when connected
+        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
     }
 
     [Command]

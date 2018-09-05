@@ -10,12 +10,12 @@ public class ControlObjectsInScene : NetworkBehaviour {
     public GameObject serverStuff;
     public GameObject sceneObjects;
 
-    GameObject netMan;
+    NetworkManager netMan;
     // Use this for initialization
 
     public override void OnStartServer()
     {
-        netMan = GameObject.Find("NetworkManager");
+        netMan = NetworkManager.singleton;
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         refMyNetMan.playerType = Utils.PlayerType.None;
         arStuff.SetActive(false);
@@ -27,7 +27,7 @@ public class ControlObjectsInScene : NetworkBehaviour {
 
     public override void OnStartClient()
     {
-        netMan = GameObject.Find("NetworkManager");
+        netMan = NetworkManager.singleton;
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         if (refMyNetMan.playerType == Utils.PlayerType.VR)
         {
