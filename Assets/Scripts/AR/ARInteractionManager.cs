@@ -34,7 +34,7 @@ namespace Lean.Touch {
         {
             if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
             if (!isLocalPlayer) return;
-            interactableObjects = GameObject.Find("InteractableObjects");
+            interactableObjects = ObjectManager.manager.allInteractable;
             canvas = GameObject.Find("CanvasAR");
             if (canvas != null)
                 refGUI = canvas.GetComponent<HandleARGUI>();

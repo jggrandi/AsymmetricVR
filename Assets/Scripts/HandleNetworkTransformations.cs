@@ -19,8 +19,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     void Start()
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
-        if (ghostObjects == null) ghostObjects = GameObject.Find("GhostObjects");
+        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
+        if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
     }
 
     public void SyncObj(int index, bool isghost, bool pos = true, bool rot = true, bool scale = true)
@@ -138,7 +138,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void RpcLockTransform(int index, Vector3 position, Quaternion rotation, bool isghost)
     {
         if (isLocalPlayer) return;
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         position = GetLocalTransform(isghost).TransformPoint(position);
         rotation = rotation * GetLocalTransform(isghost).rotation;
         GameObject g = null;
@@ -151,7 +151,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     public void CmdLockTransform(int index, Vector3 position, Quaternion rotation, bool isghost)
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         position = GetLocalTransform(isghost).TransformPoint(position);
         rotation = rotation * GetLocalTransform(isghost).rotation;
         GameObject g = null;

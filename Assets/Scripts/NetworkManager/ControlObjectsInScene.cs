@@ -5,10 +5,10 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class ControlObjectsInScene : NetworkBehaviour {
-    public GameObject VRStuff;
-    public GameObject ARStuff;
-    public GameObject ServerStuff;
-    public GameObject SceneObjects;
+    public GameObject vrStuff;
+    public GameObject arStuff;
+    public GameObject serverStuff;
+    public GameObject sceneObjects;
 
     GameObject netMan;
     // Use this for initialization
@@ -18,9 +18,9 @@ public class ControlObjectsInScene : NetworkBehaviour {
         netMan = GameObject.Find("NetworkManager");
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         refMyNetMan.playerType = Utils.PlayerType.None;
-        ARStuff.SetActive(false);
-        VRStuff.SetActive(false);
-        ServerStuff.SetActive(true);
+        arStuff.SetActive(false);
+        vrStuff.SetActive(false);
+        serverStuff.SetActive(true);
         Debug.Log("Activating Server Stuff");
         base.OnStartServer();
     }
@@ -31,17 +31,17 @@ public class ControlObjectsInScene : NetworkBehaviour {
         var refMyNetMan = netMan.GetComponent<MyNetworkManager>();
         if (refMyNetMan.playerType == Utils.PlayerType.VR)
         {
-            VRStuff.SetActive(true);
-            ARStuff.SetActive(false);
-            ServerStuff.SetActive(false);
+            vrStuff.SetActive(true);
+            arStuff.SetActive(false);
+            serverStuff.SetActive(false);
             Debug.Log("Activating VR Stuff");
         }
         else if (refMyNetMan.playerType == Utils.PlayerType.AR)
         {
-            ARStuff.SetActive(true);
-            VRStuff.SetActive(false);
-            ServerStuff.SetActive(false);
-            SceneObjects.SetActive(false);
+            arStuff.SetActive(true);
+            vrStuff.SetActive(false);
+            serverStuff.SetActive(false);
+            sceneObjects.SetActive(false);
             Debug.Log("Activating AR Stuff");
         }
 

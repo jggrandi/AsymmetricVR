@@ -61,7 +61,7 @@ public class HandleTestParameters : NetworkBehaviour
         panelTrial = GameObject.Find("PanelTrial");
         if (panelTrial == null) return;
 
-        interactableObjects = GameObject.Find("InteractableObjects");
+        interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
         //qntTrials = interactableObjects.transform.childCount; // set the number of trials depending on the number of elements child of interactableObjects
 

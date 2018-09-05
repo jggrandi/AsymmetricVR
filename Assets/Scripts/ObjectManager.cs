@@ -21,17 +21,17 @@ public class ObjectManager : NetworkBehaviour
     public List<GameObject> listGhost;
     public static ObjectManager manager;
     public ObjSelected objSelected;
-    public GameObject allObjects;
+    public GameObject allInteractable;
     public GameObject allGhosts;
 
     // Use this for initialization
     void Awake()
     {
-        allObjects = GameObject.Find("InteractableObjects");
+        allInteractable = GameObject.Find("InteractableObjects");
         allGhosts = GameObject.Find("GhostObjects");
 
-        for (int i = 0; i < allObjects.transform.childCount; i++)
-            list.Add(allObjects.transform.GetChild(i).gameObject);
+        for (int i = 0; i < allInteractable.transform.childCount; i++)
+            list.Add(allInteractable.transform.GetChild(i).gameObject);
 
         for (int i = 0; i < allGhosts.transform.childCount; i++)
             listGhost.Add(allGhosts.transform.GetChild(i).gameObject);

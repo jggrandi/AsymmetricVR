@@ -41,10 +41,10 @@ public class DockController : NetworkBehaviour {
         if (mainHandler == null) return;
         syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
-        interactableObjects = GameObject.Find("InteractableObjects");
+        interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
 
-        ghostObjects = GameObject.Find("GhostObjects");
+        ghostObjects = ObjectManager.manager.allInteractable;
         if (ghostObjects == null) return;
 
         testParameters = this.gameObject.GetComponent<HandleTestParameters>();

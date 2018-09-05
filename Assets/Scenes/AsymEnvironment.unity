@@ -7201,8 +7201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aaeb0062527a4e48928ad7d63971634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recording: 0
-  paused: 0
+  isRecording: 0
+  timePaused: 0
   previousTime: 0
 --- !u!1 &1111445332
 GameObject:
@@ -10578,7 +10578,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   list: []
+  listGhost: []
   allObjects: {fileID: 0}
+  allGhosts: {fileID: 0}
 --- !u!4 &1623813267
 Transform:
   m_ObjectHideFlags: 0
@@ -10603,9 +10605,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 400e52a70d219d140a9220951ed80656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VRStuff: {fileID: 1981850342}
-  ARStuff: {fileID: 1321170108}
-  ServerStuff: {fileID: 1386148102}
+  vrStuff: {fileID: 1981850342}
+  arStuff: {fileID: 1321170108}
+  serverStuff: {fileID: 1386148102}
+  sceneObjects: {fileID: 1924179839}
 --- !u!114 &1623813269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10661,11 +10664,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58f15fa54ebed204f9d55af6f4d38ded, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPosItem: 
+  spawnRotItem: 
+  spawnScaleItem: 
   conditionIndex: 0
   prevConditionIndex: 0
   trialIndex: 0
   prevTrialIndex: 0
   EVALUATIONSTARTED: 0
+  isPaused: 0
 --- !u!114 &1623813272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10678,8 +10685,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos: []
-  ghostPos: {x: 0, y: 0, z: 0}
   rot: []
+  ghostPos:
+  - {x: 6.654997e+11, y: 0, z: 0}
+  - {x: 0, y: 9.4342395e+29, z: 0}
+  - {x: 4.6e-44, y: 0, z: 6.654997e+11}
+  ghostRot: []
   scale: []
   table: {fileID: 0}
 --- !u!1 &1625928989

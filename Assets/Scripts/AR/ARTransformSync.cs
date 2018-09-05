@@ -12,7 +12,7 @@ public class ARTransformSync : NetworkBehaviour {
     // Use this for initialization
     void Start () {
         if (!isLocalPlayer) return;
-        interactableObjects = GameObject.Find("InteractableObjects");
+        interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
     }
 	
@@ -21,20 +21,24 @@ public class ARTransformSync : NetworkBehaviour {
         if (!isLocalPlayer) return;
         CmdSetARCameraPosition(interactableObjects.transform.InverseTransformPoint(Camera.main.transform.position));
         CmdSetARCameraRotation(Camera.main.transform.rotation);
-        
+    }
+
+    void FindInteractable()
+    {
+        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
     }
 
     [ClientRpc]
     public void RpcSetARCameraPosition(Vector3 p)
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        FindInteractable();
         p = interactableObjects.transform.TransformPoint(p);
         position = p;
     }
     [Command]
     public void CmdSetARCameraPosition(Vector3 p)
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        FindInteractable();
         p = interactableObjects.transform.TransformPoint(p);
         position = p;
         RpcSetARCameraPosition(p);
@@ -43,7 +47,7 @@ public class ARTransformSync : NetworkBehaviour {
     [ClientRpc]
     void RpcSetARCameraRotation(Quaternion q)
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        FindInteractable();
         rotation = q;
     }
 
@@ -52,7 +56,7 @@ public class ARTransformSync : NetworkBehaviour {
     [Command]
     public void CmdSetARCameraRotation(Quaternion q)
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        FindInteractable();
         rotation = q;
         RpcSetARCameraRotation(q);
     }

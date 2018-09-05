@@ -40,13 +40,13 @@ public class SyncTestParameters : NetworkBehaviour {
     [Command]
     void CmdSyncAll()
     {
-        if (interactableObjects == null) interactableObjects = GameObject.Find("InteractableObjects");
+        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         bool isghost = false;
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
             SyncAll(i,isghost);
 
         isghost = true;
-        if (ghostObjects == null) ghostObjects = GameObject.Find("GhostObjects");
+        if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
         for (int i = 0; i < ghostObjects.transform.childCount; i++)
             SyncAll(i, isghost);
 
@@ -84,10 +84,10 @@ public class SyncTestParameters : NetworkBehaviour {
     {
         
 
-        interactableObjects = GameObject.Find("InteractableObjects");
+        interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
 
-        ghostObjects = GameObject.Find("GhostObjects");
+        ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
 
         spawnInfo = this.gameObject.GetComponent<SpawnInformation>();
@@ -95,17 +95,15 @@ public class SyncTestParameters : NetworkBehaviour {
         prevConditionIndex = conditionIndex;
         prevTrialIndex = trialIndex;
 
-        //UpdateGhost();
-        //UpdateSpawnInfo();
+        UpdateGhost();
+        UpdateSpawnInfo();
 
-        //ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
-        ObjectManager.SetSelected(0);
-
+        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
 
     }
-
-    // Update is called once per frame
-    void Update () {
+	
+	// Update is called once per frame
+	void Update () {
         //if (!isClient) return;
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
