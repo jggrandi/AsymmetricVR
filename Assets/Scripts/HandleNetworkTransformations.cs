@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
+//[NetworkSettings(channel = 1, sendInterval = 0.001f)]
 public class HandleNetworkTransformations : NetworkBehaviour
 {
     public GameObject interactableObjects;
@@ -49,7 +50,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         GameObject g = RetrieveObject(index, isghost);
 
-        g.transform.position += translatestep;
+        //g.transform.position += translatestep;
         CmdVRTranslate(index, translatestep, isghost);
     }
 
@@ -67,7 +68,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         GameObject g = RetrieveObject(index, isghost);
 
-        g.transform.rotation = rotationstep * g.transform.rotation;
+        //g.transform.rotation = rotationstep * g.transform.rotation;
         CmdVRRotate(index, rotationstep, isghost);
     }
 
@@ -86,9 +87,9 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         GameObject g = RetrieveObject(index, isghost);
 
-        var finalScale = g.transform.localScale.x + scalestep;
-        finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
-        g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
+        //var finalScale = g.transform.localScale.x + scalestep;
+        //finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
+        //g.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
         CmdVRScale(index, scalestep, isghost);
     }
 
@@ -152,7 +153,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void ARTranslate(int index, Vector3 vec, bool isghost)
     {
         GameObject g = RetrieveObject(index, isghost);
-        g.transform.localPosition += vec;
+       // g.transform.localPosition += vec;
         CmdARTranslate(index, vec, isghost);
     }
 
@@ -179,9 +180,9 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void ARRotate(int index, Vector3 avg, Vector3 axis, float mag, bool isghost)
     {
         GameObject g = RetrieveObject(index, isghost);
-        avg = GetLocalTransform(isghost).InverseTransformPoint(avg);
-        axis = GetLocalTransform(isghost).InverseTransformVector(axis);
-        g.transform.RotateAround(avg, axis, mag);
+        //avg = GetLocalTransform(isghost).InverseTransformPoint(avg);
+        //axis = GetLocalTransform(isghost).InverseTransformVector(axis);
+        //g.transform.RotateAround(avg, axis, mag);
         CmdARRotate(index, avg, axis, mag, isghost);
     }
 
@@ -195,10 +196,10 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         GameObject g = RetrieveObject(index, isghost);
 
-        g.transform.localScale *= scalestep;
-        var s = g.transform.localScale.x;
-        s = Mathf.Min(Mathf.Max(s, minScale), maxScale);
-        g.transform.localScale = new Vector3(s, s, s);
+        //g.transform.localScale *= scalestep;
+        //var s = g.transform.localScale.x;
+        //s = Mathf.Min(Mathf.Max(s, minScale), maxScale);
+        //g.transform.localScale = new Vector3(s, s, s);
         CmdARScale(index, scalestep, isghost);
     }
 

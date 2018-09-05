@@ -122,13 +122,6 @@ public class HandleLog : NetworkBehaviour
         previousTime = timeWithoutPause;
     }
 
-    public void ResetContributionTime()
-    {
-        if (testParameters.activeInScene.Count <= 0) return;
-        foreach(var player in testParameters.activeInScene)
-            player.GetComponent<PlayerStuff>().activeTime = 0f;
-    }
-
     public void RecordActiveTime()
     {
         foreach (var player in testParameters.activeInScene)

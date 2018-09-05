@@ -1182,6 +1182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactableObjects: {fileID: 0}
+  ghostObjects: {fileID: 0}
   tStep: {x: 0, y: 0, z: 0}
   rStep: {x: 0, y: 0, z: 0, w: 0}
   sStep: 1
@@ -1199,6 +1200,7 @@ MonoBehaviour:
   id: -1
   type: 2
   activeTime: 0
+  isGhost: 0
 --- !u!114 &114345443872499918
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1297,7 +1299,7 @@ MonoBehaviour:
   rGrip: 0
   lJoystick: {x: 0, y: 0}
   rJoystick: {x: 0, y: 0}
-  bimanual: 0
+  whichHand: 0
   lockCombination: 0
   leftHand: {fileID: 0}
   rightHand: {fileID: 0}

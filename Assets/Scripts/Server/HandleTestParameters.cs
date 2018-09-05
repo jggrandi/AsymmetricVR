@@ -90,51 +90,35 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (!isServer) return;
 
+        RetrieveAllPlayersConnected();
+
+        if (activeInScene.Count == 0) //if there is no players connected , remove the text of all UI 
+        {
+            for (int i = 0; i < panelConnected.transform.childCount; i++)
+                RemovePlayerOnDisplay(i);
+            return; // dont need to do other things
+        }
+
+        DisplayPlayersInUI(activeInScene); // handle the display of the player's name on the UI
+    }
+
+
+
+    public void RetrieveAllPlayersConnected()
+    {
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
         var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
         activeInScene.Clear();
-        for (int i = 0; i < panelConnected.transform.childCount; i++)
-            RemovePlayerOnDisplay(i);
-
         if (arObjs.Length > 0)
         {
             for (int i = 0; i < arObjs.Length; i++) // add all ar players connected
-                activeInScene.Add(arObjs[i]); 
+                activeInScene.Add(arObjs[i]);
         }
         if (vrObjs.Length > 0)
         {
             for (int i = 0; i < vrObjs.Length; i++) //add all vr players connected
                 activeInScene.Add(vrObjs[i]);
         }
-
-        if (activeInScene.Count == 0) //if there is no players connected , remove the text of all UI 
-        {
-            for (int i = 0; i < panelConnected.transform.childCount; i++)
-            {
-                var slot = panelConnected.transform.GetChild(i);
-                Text playerName = slot.GetComponent<Text>();
-                playerName.text = "";
-            }
-            return; // dont need to do other things
-        }
-
-        DisplayPlayersInUI(activeInScene); // handle the display of the player's name on the UI
-
-        // TODO: NEED TO CHECK THE USEFULNESS OF THIS HERE
-        //if (prevConditionIndex != conditionIndex)
-        //{
-        //    UpdateSpawnInfo();
-        //    UpdateGhost();
-        //    prevConditionIndex = conditionIndex;
-        //}
-
-        //if (prevTrialIndex != trialIndex)
-        //{
-        //    UpdateGhost();
-        //    ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
-        //    prevTrialIndex = trialIndex;
-        //}
-
     }
 
     public void UpdateParameters()
@@ -156,8 +140,8 @@ public class HandleTestParameters : NetworkBehaviour
         ReorderConditionNames();
         UpdateConditionColor();
         handleLog.StopLogRecording();
-
-        UpdateTrial();
+        SetGhostManipulation(false);
+        UpdateTrials();
         syncParameters.EVALUATIONSTARTED = false;
     }
 
@@ -167,20 +151,18 @@ public class HandleTestParameters : NetworkBehaviour
         syncParameters.SYNC();
     }
 
-    void UpdateTrial()
+    void UpdateTrials()
     {
         RandomizeTrialsSpawnTransform();
         SetActiveTrialOrder();
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
         UpdateTrialColor();
-        //handleLog.ResetContributionTime(); NEED TO CHECK WHEN TO RESET THE PLAYERS CONTRIBUTION TIME
+        ResetContributionTime();
         SetObjectsTransform();
         SetGhostsTransform();
-        SetTrialIndex(trialIndex);
-
+        SetCurrentTrialIndex(trialIndex);
     }
-
 
     void DisplayPlayersInUI(List<GameObject> _bjs)
     {
@@ -264,16 +246,43 @@ public class HandleTestParameters : NetworkBehaviour
         spawnScale.Clear();
     }
 
-    void SetTrialIndex(int index)
+    void SetCurrentTrialIndex(int index)
     {
         trialIndex = index;
         syncParameters.activeTrial = activeTrialOrder[trialIndex];
         ObjectManager.SetSelected(syncParameters.activeTrial); // set only for the server. the sync var hook will set for clients
+        Debug.Log(trialIndex);
+        if (trialIndex > qntTraining + (qntTrials / 2))
+            SetGhostManipulation(true);
+    }
+
+    void SetGhostManipulation(bool _isghost)
+    {
+        GameObject g;
+        g = activeInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
+        if (g == null) return;
+
+        if(_isghost)
+            g.GetComponent<PlayerStuff>().isGhost = true; 
+        else
+            g.GetComponent<PlayerStuff>().isGhost = false;
+        RpcSyncGhostManipulation(_isghost); //sync clients.
+    }
+
+    [ClientRpc]
+    void RpcSyncGhostManipulation(bool isghost)
+    {
+        GameObject g;
+        RetrieveAllPlayersConnected();
+        g = activeInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
+        if (g == null) return;
+
+        g.GetComponent<PlayerStuff>().isGhost = isghost;
     }
 
     void ResetTrialsCompleted()
     {
-        SetTrialIndex(0);
+        SetCurrentTrialIndex(0);
         trialsCompleted.Clear();
         for (int i = 0; i < activeTrialOrder.Count; i++)
             trialsCompleted.Add(false);
@@ -292,14 +301,15 @@ public class HandleTestParameters : NetworkBehaviour
     public void TrialCompleted()
     {
         trialsCompleted[trialIndex] = true;
+        handleLog.SaveResumed(activeTrialOrder[trialIndex], Time.realtimeSinceStartup, activeInScene);
+        ResetContributionTime();
+
         if (!trialsCompleted.Contains(false))
         {
             ConditionCompleted();
             return;
         }
-        handleLog.SaveResumed(activeTrialOrder[trialIndex], Time.realtimeSinceStartup, activeInScene);
-        handleLog.ResetContributionTime();
-        SetTrialIndex(trialsCompleted.IndexOf(false));
+        SetCurrentTrialIndex(trialsCompleted.IndexOf(false));
         UpdateTrialColor();
     }
 
@@ -319,7 +329,8 @@ public class HandleTestParameters : NetworkBehaviour
         handleLog.StopLogRecording();
         
         UpdateConditionColor();
-        UpdateTrial();
+        UpdateTrials();
+        SetGhostManipulation(false);
         syncParameters.SYNC();
     }
 
@@ -343,7 +354,8 @@ public class HandleTestParameters : NetworkBehaviour
         
         conditionIndex = newIndex;
         UpdateConditionColor();
-        UpdateTrial();
+        UpdateTrials();
+        SetGhostManipulation(false);
         syncParameters.SYNC();
     }
 
@@ -357,9 +369,9 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
         SetObjectTransform(activeTrialOrder[newIndex]);
-        SetTrialIndex(newIndex);
+        SetCurrentTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
-        handleLog.ResetContributionTime();
+        ResetContributionTime();
         UpdateTrialColor();
         syncParameters.SYNC();
     }
@@ -428,24 +440,22 @@ public class HandleTestParameters : NetworkBehaviour
 
         for (int i = 0; i < ghostObjects.transform.childCount; i++)
         {
-            var obj = ghostObjects.transform.GetChild(i);
+            var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
             obj.position = centerTable;
-        //    if(i < qntTraining + halfTrials) // trials where both players manipulate the same object
-        //    {
-        //        obj.position = centerTable;
-        //    }
-        //    else
-        //    {
-        //        var intObj = interactableObjects.transform.GetChild(syncParameters.activeTrial);
-        //        var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
-        //        obj.transform.position = centerPos;
-        //        obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
-        //    }
+            if (i < qntTraining + halfTrials) // trials where both players manipulate the same object
+            {
+                obj.position = centerTable;
+                obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
+            }
+            else
+            {
+                var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
+                var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
+                obj.transform.position = centerPos;
+                obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
+            }
         }
     }
-
-
-
 
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
@@ -486,28 +496,12 @@ public class HandleTestParameters : NetworkBehaviour
     }
 
 
-
-
-
-    void UpdateGhost()
+    public void ResetContributionTime()
     {
-        //for (int i = 0; i < ghostObjects.transform.childCount; i++)
-        //{
-        //    var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
-        //    var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
-        //    if (i < 7)
-        //    {
-
-        //        obj.transform.position = centerTable;
-        //    }
-        //    else
-        //    {
-        //        var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
-        //        var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
-        //        obj.transform.position = centerPos;
-        //        obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotItem[i]].eulerAngles); //pega a rotação oposta
-        //    }
-        //}
+        if (activeInScene.Count <= 0) return;
+        foreach (var player in activeInScene)
+            player.GetComponent<PlayerStuff>().activeTime = 0f;
     }
+
 
 }
