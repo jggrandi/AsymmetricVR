@@ -5,10 +5,8 @@ using UnityEngine.Networking;
 
 public class SyncTestParameters : NetworkBehaviour {
 
-    //[SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
-    //public int activeCondition;
 
-    [SyncVar (hook = "UpdateSelected")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
+    [SyncVar (hook = "UpdateSelected")]// hooks dont syncronize in server
     public int activeTrial;
 
     [SyncVar]

@@ -39,11 +39,15 @@ public class HandleNetworkTransformations : NetworkBehaviour
         syncParameters.SYNC();
     }
 
+    public GameObject RetrieveObject(int index, bool isghost)
+    {
+        if (isghost) return ObjectManager.GetGhost(index);
+        else return ObjectManager.Get(index);
+    }
+
     public void VRTranslate(int index, Vector3 translatestep, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.position += translatestep;
         CmdVRTranslate(index, translatestep, isghost);
@@ -52,9 +56,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     void CmdVRTranslate(int index, Vector3 translatestep, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.position += translatestep;
         //g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
@@ -63,9 +65,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public void VRRotate(int index, Quaternion rotationstep, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.rotation = rotationstep * g.transform.rotation;
         CmdVRRotate(index, rotationstep, isghost);
@@ -75,9 +75,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     void CmdVRRotate(int index, Quaternion rotationstep, bool isghost)
     {
         rStep = rotationstep;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.rotation = rotationstep * g.transform.rotation;
         //g.transform.rotation = Quaternion.Slerp(g.transform.rotation, rotationstep * g.transform.rotation, 0.7f);
@@ -86,9 +84,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public void VRScale(int index, float scalestep, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         var finalScale = g.transform.localScale.x + scalestep;
         finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
@@ -101,9 +97,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     {
         sStep = scalestep;
 
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         var finalScale = g.transform.localScale.x + scalestep;
         finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
@@ -128,9 +122,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
         if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         position = GetLocalTransform(isghost).TransformPoint(position);
         rotation = rotation * GetLocalTransform(isghost).rotation;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+
+        GameObject g = RetrieveObject(index, isghost);
         g.transform.position = position;
         g.transform.rotation = rotation;
     }
@@ -141,10 +134,8 @@ public class HandleNetworkTransformations : NetworkBehaviour
         if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         position = GetLocalTransform(isghost).TransformPoint(position);
         rotation = rotation * GetLocalTransform(isghost).rotation;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
 
+        GameObject g = RetrieveObject(index, isghost);
         g.transform.position = position;
         g.transform.rotation = rotation;
 
@@ -160,9 +151,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public void ARTranslate(int index, Vector3 vec, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
         g.transform.localPosition += vec;
         CmdARTranslate(index, vec, isghost);
     }
@@ -171,9 +160,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void CmdARTranslate(int index, Vector3 translatestep, bool isghost)
     {
         tStep = translatestep;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
         //objTranslateStep = vec;
         g.transform.localPosition += translatestep;
         syncParameters.SyncObj(index, isghost);
@@ -182,9 +169,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     public void CmdARRotate(int index, Vector3 avg, Vector3 axis, float mag, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
         avg = GetLocalTransform(isghost).TransformPoint(avg);
         axis = GetLocalTransform(isghost).TransformVector(axis);
         g.transform.RotateAround(avg, axis, mag);
@@ -193,9 +178,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public void ARRotate(int index, Vector3 avg, Vector3 axis, float mag, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
         avg = GetLocalTransform(isghost).InverseTransformPoint(avg);
         axis = GetLocalTransform(isghost).InverseTransformVector(axis);
         g.transform.RotateAround(avg, axis, mag);
@@ -210,9 +193,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
 
     public void ARScale(int index, float scalestep, bool isghost)
     {
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.localScale *= scalestep;
         var s = g.transform.localScale.x;
@@ -225,9 +206,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     public void CmdARScale(int index, float scalestep, bool isghost)
     {
         sStep = scalestep;
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
+        GameObject g = RetrieveObject(index, isghost);
 
         g.transform.localScale *= scalestep;
         var s = g.transform.localScale.x;
