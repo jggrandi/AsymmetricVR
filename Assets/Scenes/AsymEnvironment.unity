@@ -244,7 +244,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1111413130}
-        m_MethodName: UpdateParameters
+        m_MethodName: OnClickUpdate
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7145,9 +7145,9 @@ MonoBehaviour:
   condition2TrialOrder: 
   activeInScene: []
   activeTrialOrder: 
-  spawnPosItem: 
-  spawnRotItem: 
-  spawnScaleItem: 
+  spawnPos: []
+  spawnRot: []
+  spawnScale: []
   conditionIndex: 0
   trialIndex: 0
 --- !u!114 &1111413131
@@ -10688,7 +10688,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58f15fa54ebed204f9d55af6f4d38ded, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeCondition: 0
   activeTrial: 0
   EVALUATIONSTARTED: 0
 --- !u!1 &1625928989

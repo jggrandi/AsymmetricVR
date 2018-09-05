@@ -5,10 +5,10 @@ using UnityEngine.Networking;
 
 public class SyncTestParameters : NetworkBehaviour {
 
-    [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
-    public int activeCondition;
+    //[SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
+    //public int activeCondition;
 
-    [SyncVar (hook = "OnTrialChanged")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
+    [SyncVar (hook = "UpdateSelected")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
     public int activeTrial;
 
     [SyncVar]
@@ -17,28 +17,17 @@ public class SyncTestParameters : NetworkBehaviour {
     GameObject interactableObjects;
     GameObject ghostObjects;
 
-    SpawnInformation spawnInfo;
-
-
-    public override void OnStartLocalPlayer()
-    {
-        CmdSyncAll(); // sync all test parameters when connected
-        ObjectManager.SetSelected(activeTrial);
-    }
-
-    [Command]
-    void CmdSyncAll()
+    public void SYNC()
     {
         if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
         bool isghost = false;
         for (int i = 0; i < interactableObjects.transform.childCount; i++)
-            SyncAll(i,isghost);
+            SyncAll(i, isghost);
 
         isghost = true;
         if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
         for (int i = 0; i < ghostObjects.transform.childCount; i++)
             SyncAll(i, isghost);
-
     }
 
     public void SyncAll(int index,bool isghost, bool pos = true, bool rot = true, bool scale = true)
@@ -60,6 +49,7 @@ public class SyncTestParameters : NetworkBehaviour {
     [ClientRpc]
     public void RpcSyncAll(int index, bool isghost, Vector3 pos, Quaternion rot, Vector3 scale)
     {
+
         GameObject g = null;
         if (isghost) g = ObjectManager.GetGhost(index);
         else g = ObjectManager.Get(index);
@@ -76,11 +66,13 @@ public class SyncTestParameters : NetworkBehaviour {
 
         ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
+
+        UpdateSelected(activeTrial);
+
     }
 
-    // Update is called once per frame
     void Update () {
-        //if (!isClient) return;
+
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
 
@@ -88,8 +80,6 @@ public class SyncTestParameters : NetworkBehaviour {
 
         ActivateObject(activeTrial, interactableObjects);
         ActivateObject(activeTrial, ghostObjects);
-
-
     }
 
     void DeactivateAllObjects(GameObject parent)
@@ -104,7 +94,7 @@ public class SyncTestParameters : NetworkBehaviour {
         parent.transform.GetChild(index).gameObject.SetActive(true);
     }
 
-    void OnTrialChanged( int trial)
+    void UpdateSelected( int trial)
     {
         activeTrial = trial;
         ObjectManager.SetSelected(activeTrial);

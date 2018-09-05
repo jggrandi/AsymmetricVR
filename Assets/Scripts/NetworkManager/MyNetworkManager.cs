@@ -18,6 +18,15 @@ public class MyNetworkManager : NetworkManager
         //base.OnClientConnect(conn);
     }
 
+    //public override void OnServerConnect(NetworkConnection conn)
+    //{
+    //    Debug.Log("OnServerConnect HUGILAUGLAUIGUIGALSI");
+    //    var mainHandler = GameObject.Find("MainHandler");
+    //    var syncParamenters = mainHandler.GetComponent<SyncTestParameters>();
+    //    syncParamenters.SYNC(); // sync all test parameters when connected
+    //    base.OnServerConnect(conn);
+    //}
+
     // Server
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
     {

@@ -137,6 +137,51 @@ public class HandleTestParameters : NetworkBehaviour
 
     }
 
+    public void UpdateParameters()
+    {
+        groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
+
+        int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
+        conditionsOrder.Clear();
+
+        for (int i = 0; i < order.Length; i++)
+            conditionsOrder.Add(order[i]);
+
+        condition0TrialOrder = RandomizeTrialOrder(); //three because we have 3 conditions....
+        condition1TrialOrder = RandomizeTrialOrder();
+        condition2TrialOrder = RandomizeTrialOrder();
+        conditionIndex = 0;
+
+        ResetConditionsCompleted();
+        ReorderConditionNames();
+        UpdateConditionColor();
+        handleLog.StopLogRecording();
+
+        UpdateTrial();
+        syncParameters.EVALUATIONSTARTED = false;
+    }
+
+    public void OnClickUpdate()
+    {
+        UpdateParameters();
+        syncParameters.SYNC();
+    }
+
+    void UpdateTrial()
+    {
+        RandomizeTrialsSpawnTransform();
+        SetActiveTrialOrder();
+        ResetTrialsCompleted();
+        dockController.ResetErrorDocking();
+        UpdateTrialColor();
+        //handleLog.ResetContributionTime(); NEED TO CHECK WHEN TO RESET THE PLAYERS CONTRIBUTION TIME
+        SetObjectsTransform();
+        SetGhostsTransform();
+        SetTrialIndex(trialIndex);
+
+    }
+
+
     void DisplayPlayersInUI(List<GameObject> _bjs)
     {
         if(_bjs.Count > 1)
@@ -161,52 +206,6 @@ public class HandleTestParameters : NetworkBehaviour
         playerName.text = "";
     }
 
-    public void UpdateParameters()
-    {
-        groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
-
-        int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        conditionsOrder.Clear();
-
-        for (int i = 0; i < order.Length; i++)
-            conditionsOrder.Add(order[i]);
-
-        condition0TrialOrder = RandomizeTrialOrder(); //three because we have 3 conditions....
-        condition1TrialOrder = RandomizeTrialOrder();
-        condition2TrialOrder = RandomizeTrialOrder();
-        conditionIndex = 0;
-
-        ResetConditionsCompleted();
-        ReorderConditionNames();
-        UpdateConditionColor();
-        handleLog.StopLogRecording();
-
-
-        //syncParameters.RpcUpdateSpawnInfo(); //NEED TO CHECK THIS
-        //syncParameters.RpcUpdateGhost();
-
-        UpdateTrial();
-        syncParameters.EVALUATIONSTARTED = false;
-    }
-
-    void UpdateTrial()
-    {
-        RandomizeTrialsSpawnTransform();
-        SetActiveTrialOrder();
-        ResetTrialsCompleted();
-        dockController.ResetErrorDocking();
-        UpdateTrialColor();
-        //handleLog.ResetContributionTime(); NEED TO CHECK WHEN TO RESET THE PLAYERS CONTRIBUTION TIME
-        SetObjectsTransform();
-        SetGhostsTransform();
-        //UpdateGhost();
-        //UpdateSpawnInfo();
-        syncParameters.activeTrial = activeTrialOrder[trialIndex];
-        ObjectManager.SetSelected(syncParameters.activeTrial);
-
-    }
-
-
     void ReorderConditionNames()
     {
         for (int i = 0; i < panelModality.transform.childCount; i++)
@@ -226,6 +225,7 @@ public class HandleTestParameters : NetworkBehaviour
         panelModality.transform.GetChild(conditionIndex).gameObject.GetComponentInChildren<Image>().color = Color.green;
 
     }
+
     void GreyConditionCompleted()
     {
         for (int i = 0; i < conditionsCompleted.Count; i++)
@@ -268,6 +268,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         trialIndex = index;
         syncParameters.activeTrial = activeTrialOrder[trialIndex];
+        ObjectManager.SetSelected(syncParameters.activeTrial); // set only for the server. the sync var hook will set for clients
     }
 
     void ResetTrialsCompleted()
@@ -286,10 +287,7 @@ public class HandleTestParameters : NetworkBehaviour
         for (int i = 0; i < conditionsToPermute; i++)
             conditionsCompleted.Add(false);
         ClearConditionColor();
-
     }
-
-
 
     public void TrialCompleted()
     {
@@ -322,6 +320,7 @@ public class HandleTestParameters : NetworkBehaviour
         
         UpdateConditionColor();
         UpdateTrial();
+        syncParameters.SYNC();
     }
 
     public void TestFinished()
@@ -345,13 +344,13 @@ public class HandleTestParameters : NetworkBehaviour
         conditionIndex = newIndex;
         UpdateConditionColor();
         UpdateTrial();
-
+        syncParameters.SYNC();
     }
 
     public void OnClickTrial(int newIndex)
     {
         if (newIndex == trialIndex) return;
-        TrialChange(newIndex);
+        TrialChange(newIndex); 
     }
 
     void TrialChange(int newIndex)
@@ -362,12 +361,13 @@ public class HandleTestParameters : NetworkBehaviour
         handleLog.previousTime = Time.realtimeSinceStartup;
         handleLog.ResetContributionTime();
         UpdateTrialColor();
+        syncParameters.SYNC();
     }
-
 
     public void OnClickStartRecording()
     {
         handleLog.StartLogRecording();
+        syncParameters.SYNC();
     }
 
     void DisplayTrialOrder()
@@ -386,27 +386,14 @@ public class HandleTestParameters : NetworkBehaviour
 
     void RandomizeTrialsSpawnTransform()
     {
-        //RandomizeTrialSpawnTransform(ref spawnPos, spawnInfo.pos.Count);
-        //RandomizeTrialSpawnTransform(ref spawnRot, spawnInfo.rot.Count);
-        //RandomizeTrialSpawnTransform(ref spawnScale, spawnInfo.scale.Count);
         CreateTrialsTransform<Vector3>(spawnInfo.pos, spawnPos);
         CreateTrialsTransform<Quaternion>(spawnInfo.rot, spawnRot);
         CreateTrialsTransform<float>(spawnInfo.scale, spawnScale);
     }
 
-    //void RandomizeTrialSpawnTransform(ref List<int> _spawnT, int size)
-    //{
-    //    if (_spawnT.Count != 0)
-    //        _spawnT.Clear();
-
-    //    var fullList = Utils.FitVectorIntoAnother(qntTrials + qntTraining, size);
-    //    _spawnT = Utils.RandomizeList(fullList);
-
-    //}
-
-
     public void CreateTrialsTransform <T>(List<T> _transform, List<T> stored)
     {
+        stored.Clear();
         var list = Utils.FitVectorIntoAnother(qntTrials + qntTraining, _transform.Count);
         list = Utils.RandomizeList(list);
         foreach (var item in list)
@@ -436,7 +423,25 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void SetGhostsTransform()
     {
+        var halfTrials = qntTrials / 2;
+        var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
 
+        for (int i = 0; i < ghostObjects.transform.childCount; i++)
+        {
+            var obj = ghostObjects.transform.GetChild(i);
+            obj.position = centerTable;
+        //    if(i < qntTraining + halfTrials) // trials where both players manipulate the same object
+        //    {
+        //        obj.position = centerTable;
+        //    }
+        //    else
+        //    {
+        //        var intObj = interactableObjects.transform.GetChild(syncParameters.activeTrial);
+        //        var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
+        //        obj.transform.position = centerPos;
+        //        obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
+        //    }
+        }
     }
 
 
