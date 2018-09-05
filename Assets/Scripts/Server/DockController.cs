@@ -41,13 +41,13 @@ public class DockController : NetworkBehaviour {
         if (mainHandler == null) return;
         syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
+        testParameters = this.gameObject.GetComponent<HandleTestParameters>();
+
         interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
 
-        ghostObjects = ObjectManager.manager.allInteractable;
+        ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
-
-        testParameters = this.gameObject.GetComponent<HandleTestParameters>();
 
         ResetErrorDocking();
     }
@@ -81,8 +81,8 @@ public class DockController : NetworkBehaviour {
 
     void CalculateDocking()
     {
-        Transform movingObject = interactableObjects.transform.GetChild(testParameters.activeTrialOrder[testParameters.trialIndex]);
-        Transform staticObject = ghostObjects.transform.GetChild(testParameters.activeTrialOrder[testParameters.trialIndex]);
+        Transform movingObject = interactableObjects.transform.GetChild(syncParameters.activeTrial);
+        Transform staticObject = ghostObjects.transform.GetChild(syncParameters.activeTrial);
 
         Matrix4x4 movingMatrixTrans = Matrix4x4.TRS(movingObject.position, Quaternion.identity, new Vector3(1.0f, 1.0f, 1.0f));
         Matrix4x4 movingMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), movingObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));

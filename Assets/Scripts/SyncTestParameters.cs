@@ -8,7 +8,7 @@ public class SyncTestParameters : NetworkBehaviour {
     [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
     public int activeCondition;
 
-    [SyncVar]// (hook = "OnTrialChanged")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
+    [SyncVar (hook = "OnTrialChanged")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
     public int activeTrial;
 
     [SyncVar]
@@ -102,6 +102,12 @@ public class SyncTestParameters : NetworkBehaviour {
     {
         if (index > parent.transform.childCount) return;
         parent.transform.GetChild(index).gameObject.SetActive(true);
+    }
+
+    void OnTrialChanged( int trial)
+    {
+        activeTrial = trial;
+        ObjectManager.SetSelected(activeTrial);
     }
 
 }

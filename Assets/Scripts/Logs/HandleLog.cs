@@ -124,6 +124,7 @@ public class HandleLog : NetworkBehaviour
 
     public void ResetContributionTime()
     {
+        if (testParameters.activeInScene.Count <= 0) return;
         foreach(var player in testParameters.activeInScene)
             player.GetComponent<PlayerStuff>().activeTime = 0f;
     }

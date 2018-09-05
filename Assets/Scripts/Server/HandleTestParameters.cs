@@ -41,9 +41,9 @@ public class HandleTestParameters : NetworkBehaviour
 
     public List<int> activeTrialOrder = new List<int>();
 
-    public List<int> spawnPosItem = new List<int>();
-    public List<int> spawnRotItem = new List<int>();
-    public List<int> spawnScaleItem = new List<int>();
+    public List<Vector3> spawnPos = new List<Vector3>();
+    public List<Quaternion> spawnRot = new List<Quaternion>();
+    public List<float> spawnScale = new List<float>();
 
     public int conditionIndex;
     public int trialIndex;
@@ -191,18 +191,18 @@ public class HandleTestParameters : NetworkBehaviour
 
     void UpdateTrial()
     {
-        RandomizeTrialSpawn(); //NEED TO CHECK
+        RandomizeTrialsSpawnTransform();
         SetActiveTrialOrder();
         ResetTrialsCompleted();
         dockController.ResetErrorDocking();
         UpdateTrialColor();
-        handleLog.ResetContributionTime();
-
-        
-        UpdateGhost();
-        UpdateSpawnInfo();
-
-        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+        //handleLog.ResetContributionTime(); NEED TO CHECK WHEN TO RESET THE PLAYERS CONTRIBUTION TIME
+        SetObjectsTransform();
+        SetGhostsTransform();
+        //UpdateGhost();
+        //UpdateSpawnInfo();
+        syncParameters.activeTrial = activeTrialOrder[trialIndex];
+        ObjectManager.SetSelected(syncParameters.activeTrial);
 
     }
 
@@ -259,14 +259,20 @@ public class HandleTestParameters : NetworkBehaviour
 
     void ResetSpawnOrder()
     {
-        spawnPosItem.Clear();
-        spawnRotItem.Clear();
-        spawnScaleItem.Clear();
+        spawnPos.Clear();
+        spawnRot.Clear();
+        spawnScale.Clear();
+    }
+
+    void SetTrialIndex(int index)
+    {
+        trialIndex = index;
+        syncParameters.activeTrial = activeTrialOrder[trialIndex];
     }
 
     void ResetTrialsCompleted()
     {
-        trialIndex = 0;
+        SetTrialIndex(0);
         trialsCompleted.Clear();
         for (int i = 0; i < activeTrialOrder.Count; i++)
             trialsCompleted.Add(false);
@@ -295,7 +301,7 @@ public class HandleTestParameters : NetworkBehaviour
         }
         handleLog.SaveResumed(activeTrialOrder[trialIndex], Time.realtimeSinceStartup, activeInScene);
         handleLog.ResetContributionTime();
-        trialIndex = trialsCompleted.IndexOf(false);
+        SetTrialIndex(trialsCompleted.IndexOf(false));
         UpdateTrialColor();
     }
 
@@ -351,8 +357,8 @@ public class HandleTestParameters : NetworkBehaviour
     void TrialChange(int newIndex)
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
-        UpdateSpawnInfo(activeTrialOrder[newIndex]);
-        trialIndex = newIndex;
+        SetObjectTransform(activeTrialOrder[newIndex]);
+        SetTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
         handleLog.ResetContributionTime();
         UpdateTrialColor();
@@ -378,22 +384,64 @@ public class HandleTestParameters : NetworkBehaviour
         return trainingPlusTrials;
     }
 
-    void RandomizeTrialSpawn()
+    void RandomizeTrialsSpawnTransform()
     {
-        //RandomizeTrialSpawnTransform(syncParameters.spawnPosItem, spawnInfo.pos.Count);
-        //RandomizeTrialSpawnTransform(syncParameters.spawnRotItem, spawnInfo.rot.Count);
-        //RandomizeTrialSpawnTransform(syncParameters.spawnScaleItem, spawnInfo.scale.Count);
+        //RandomizeTrialSpawnTransform(ref spawnPos, spawnInfo.pos.Count);
+        //RandomizeTrialSpawnTransform(ref spawnRot, spawnInfo.rot.Count);
+        //RandomizeTrialSpawnTransform(ref spawnScale, spawnInfo.scale.Count);
+        CreateTrialsTransform<Vector3>(spawnInfo.pos, spawnPos);
+        CreateTrialsTransform<Quaternion>(spawnInfo.rot, spawnRot);
+        CreateTrialsTransform<float>(spawnInfo.scale, spawnScale);
     }
 
-    void RandomizeTrialSpawnTransform(SyncListInt _spawnT, int size)
-    {
-        if (_spawnT.Count != 0)
-            _spawnT.Clear();
+    //void RandomizeTrialSpawnTransform(ref List<int> _spawnT, int size)
+    //{
+    //    if (_spawnT.Count != 0)
+    //        _spawnT.Clear();
 
-        var fullList = Utils.FitVectorIntoAnother(qntTrials + qntTraining, size);
-        fullList = Utils.RandomizeList(fullList);
-        ListToSyncList(ref fullList, ref _spawnT);
+    //    var fullList = Utils.FitVectorIntoAnother(qntTrials + qntTraining, size);
+    //    _spawnT = Utils.RandomizeList(fullList);
+
+    //}
+
+
+    public void CreateTrialsTransform <T>(List<T> _transform, List<T> stored)
+    {
+        var list = Utils.FitVectorIntoAnother(qntTrials + qntTraining, _transform.Count);
+        list = Utils.RandomizeList(list);
+        foreach (var item in list)
+            stored.Add(_transform[item]);
     }
+
+    public void SetObjectsTransform()
+    {
+        for (int i = 0; i < interactableObjects.transform.childCount; i++)
+        {
+            var obj = interactableObjects.transform.GetChild(i);
+            obj.position = spawnPos[i];
+            obj.rotation = spawnRot[i];
+            var uniformScale = spawnScale[i];
+            obj.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
+        }
+    }
+
+    public void SetObjectTransform(int index)
+    {
+        var obj = interactableObjects.transform.GetChild(index);
+        obj.position = spawnPos[index];
+        obj.rotation = spawnRot[index];
+        var uniformScale = spawnScale[index];
+        obj.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
+    }
+
+    public void SetGhostsTransform()
+    {
+
+    }
+
+
+
+
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
     {
@@ -432,48 +480,29 @@ public class HandleTestParameters : NetworkBehaviour
         DisplayTrialOrder();
     }
 
-    public void UpdateSpawnInfo()
-    {
-        for (int i = 0; i < interactableObjects.transform.childCount; i++)
-        {
-            var obj = interactableObjects.transform.GetChild(i);
-            obj.transform.position = spawnInfo.pos[spawnPosItem[i]];
-            obj.transform.rotation = spawnInfo.rot[spawnRotItem[i]];
-            var uniformScale = spawnInfo.scale[spawnScaleItem[i]];
-            obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
-        }
-    }
 
-    public void UpdateSpawnInfo(int index)
-    {
-        var obj = interactableObjects.transform.GetChild(index);
-        obj.transform.position = spawnInfo.pos[spawnPosItem[index]];
-        obj.transform.rotation = spawnInfo.rot[spawnRotItem[index]];
-        var uniformScale = spawnInfo.scale[spawnScaleItem[index]];
-        obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
-    }
 
 
 
     void UpdateGhost()
     {
-        for (int i = 0; i < ghostObjects.transform.childCount; i++)
-        {
-            var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
-            var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
-            if (i < 7)
-            {
+        //for (int i = 0; i < ghostObjects.transform.childCount; i++)
+        //{
+        //    var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
+        //    var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
+        //    if (i < 7)
+        //    {
 
-                obj.transform.position = centerTable;
-            }
-            else
-            {
-                var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
-                var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
-                obj.transform.position = centerPos;
-                obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotItem[i]].eulerAngles); //pega a rotação oposta
-            }
-        }
+        //        obj.transform.position = centerTable;
+        //    }
+        //    else
+        //    {
+        //        var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
+        //        var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
+        //        obj.transform.position = centerPos;
+        //        obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotItem[i]].eulerAngles); //pega a rotação oposta
+        //    }
+        //}
     }
 
 }
