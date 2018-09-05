@@ -5,25 +5,14 @@ using UnityEngine.Networking;
 
 public class SyncTestParameters : NetworkBehaviour {
 
-    public SyncListInt activeTrialOrder = new SyncListInt();
-
-    public List<int> spawnPosItem = new List<int>();
-    public List<int> spawnRotItem = new List<int>();
-    public List<int> spawnScaleItem = new List<int>();
-
     [SyncVar]// (hook = "OnConditionChange")] // hooks dont syncronize in server, so it is not useful here.
-    public int conditionIndex;
-    public int prevConditionIndex;
+    public int activeCondition;
 
-    [SyncVar]// (hook = "OnTrialChanged")]
-    public int trialIndex;
-    public int prevTrialIndex;
+    [SyncVar]// (hook = "OnTrialChanged")]  //NEED TO SETSELECTED WHEN ACTIVETRIAL CHANGES
+    public int activeTrial;
 
     [SyncVar]
     public bool EVALUATIONSTARTED = false;
-
-    [SyncVar]
-    public bool isPaused = false;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
@@ -34,7 +23,7 @@ public class SyncTestParameters : NetworkBehaviour {
     public override void OnStartLocalPlayer()
     {
         CmdSyncAll(); // sync all test parameters when connected
-        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+        ObjectManager.SetSelected(activeTrial);
     }
 
     [Command]
@@ -80,109 +69,28 @@ public class SyncTestParameters : NetworkBehaviour {
         if (scale != Vector3.zero) g.transform.localScale = scale;
     }
 
-    public override void OnStartServer()
+    private void Start()
     {
-        
-
         interactableObjects = ObjectManager.manager.allInteractable;
         if (interactableObjects == null) return;
 
         ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
-
-        spawnInfo = this.gameObject.GetComponent<SpawnInformation>();
-
-        prevConditionIndex = conditionIndex;
-        prevTrialIndex = trialIndex;
-
-        UpdateGhost();
-        UpdateSpawnInfo();
-
-        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
-
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         //if (!isClient) return;
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
 
         if (!EVALUATIONSTARTED) return; // dont do an
 
+        ActivateObject(activeTrial, interactableObjects);
+        ActivateObject(activeTrial, ghostObjects);
 
-        ActivateObject(trialIndex, interactableObjects);
-        ActivateObject(trialIndex, ghostObjects);
 
-        if (prevConditionIndex != conditionIndex)
-        {
-            UpdateSpawnInfo();
-            UpdateGhost();
-            prevConditionIndex = conditionIndex;
-        }
-
-        if (prevTrialIndex != trialIndex)
-        {
-            UpdateGhost();
-            ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
-            prevTrialIndex = trialIndex;
-        }
     }
-
-    public void UpdateSpawnInfo()
-    {
-        for (int i = 0; i < interactableObjects.transform.childCount; i++)
-        {
-            var obj = interactableObjects.transform.GetChild(i);
-            obj.transform.position = spawnInfo.pos[spawnPosItem[i]];
-            obj.transform.rotation = spawnInfo.rot[spawnRotItem[i]];
-            var uniformScale = spawnInfo.scale[spawnScaleItem[i]];
-            obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
-        }
-    }
-
-    public void UpdateSpawnInfo(int index)
-    {
-        var obj = interactableObjects.transform.GetChild(index);
-        obj.transform.position = spawnInfo.pos[spawnPosItem[index]];
-        obj.transform.rotation = spawnInfo.rot[spawnRotItem[index]];
-        var uniformScale = spawnInfo.scale[spawnScaleItem[index]];
-        obj.transform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
-    }
-
-    [ClientRpc]
-    public void RpcUpdateSpawnInfo()
-    {
-        UpdateSpawnInfo();
-    }
-
-    void UpdateGhost()
-    {
-        for (int i = 0; i < ghostObjects.transform.childCount; i++)
-        {
-            var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
-            var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
-            if (i < 7)
-            {
-
-                obj.transform.position = centerTable;
-            }
-            else
-            {
-                var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
-                var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
-                obj.transform.position = centerPos;
-                obj.transform.rotation = Quaternion.Euler(-spawnInfo.rot[spawnRotItem[i]].eulerAngles); //pega a rotação oposta
-            }
-        }
-    }
-
-    [ClientRpc]
-    public void RpcUpdateGhost()
-    {
-        UpdateGhost();
-    }
-
 
     void DeactivateAllObjects(GameObject parent)
     {
@@ -193,7 +101,7 @@ public class SyncTestParameters : NetworkBehaviour {
     void ActivateObject(int index, GameObject parent)
     {
         if (index > parent.transform.childCount) return;
-        parent.transform.GetChild(activeTrialOrder[index]).gameObject.SetActive(true);
+        parent.transform.GetChild(index).gameObject.SetActive(true);
     }
 
 }

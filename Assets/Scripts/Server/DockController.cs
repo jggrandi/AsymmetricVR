@@ -81,8 +81,8 @@ public class DockController : NetworkBehaviour {
 
     void CalculateDocking()
     {
-        Transform movingObject = interactableObjects.transform.GetChild(syncParameters.activeTrialOrder[syncParameters.trialIndex]);
-        Transform staticObject = ghostObjects.transform.GetChild(syncParameters.activeTrialOrder[syncParameters.trialIndex]);
+        Transform movingObject = interactableObjects.transform.GetChild(testParameters.activeTrialOrder[testParameters.trialIndex]);
+        Transform staticObject = ghostObjects.transform.GetChild(testParameters.activeTrialOrder[testParameters.trialIndex]);
 
         Matrix4x4 movingMatrixTrans = Matrix4x4.TRS(movingObject.position, Quaternion.identity, new Vector3(1.0f, 1.0f, 1.0f));
         Matrix4x4 movingMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), movingObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
@@ -92,16 +92,16 @@ public class DockController : NetworkBehaviour {
         Matrix4x4 staticMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), staticObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
         float staticScale = staticObject.localScale.x;
 
-        errorTrans[syncParameters.trialIndex] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
-        errorRot[syncParameters.trialIndex] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
-        errorRotAngle[syncParameters.trialIndex] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
-        errorScale[syncParameters.trialIndex] = Mathf.Abs(movingScale - staticScale);
+        errorTrans[testParameters.trialIndex] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
+        errorRot[testParameters.trialIndex] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
+        errorRotAngle[testParameters.trialIndex] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
+        errorScale[testParameters.trialIndex] = Mathf.Abs(movingScale - staticScale);
 
     }
 
     bool EvaluateCurrentDocking()
     {
-        var tIndex = syncParameters.trialIndex;
+        var tIndex = testParameters.trialIndex;
         if (errorTrans[tIndex] < toleranceTrans && errorRotAngle[tIndex] < toleranceRot && errorScale[tIndex] < toleranceScale)
             return true;
         return false;

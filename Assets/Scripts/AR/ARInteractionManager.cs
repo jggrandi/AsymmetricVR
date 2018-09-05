@@ -64,9 +64,10 @@ namespace Lean.Touch {
             selected = ObjectManager.GetSelected();
             if (selected == null) return; // there is no object to interact with
 
-            playerStuff.CmdSetIsGhost(false);
-            if (syncParameters.trialIndex > 6 && playerStuff.id == 1)
-                playerStuff.CmdSetIsGhost(true);
+            // SERVER SHOULD TELL PLAYER TO CONTROL GHOST
+            //playerStuff.CmdSetIsGhost(false);
+            //if (syncParameters.trialIndex > 6 && playerStuff.id == 1)
+            //    playerStuff.CmdSetIsGhost(true);
 
             Matrix4x4 camMatrix = Camera.main.worldToCameraMatrix;
 
