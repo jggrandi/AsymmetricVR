@@ -346,9 +346,9 @@ public class HandleTestParameters : NetworkBehaviour
 
     void RandomizeTrialSpawn()
     {
-        RandomizeTrialSpawnTransform(syncParameters.spawnPosItem, spawnInfo.pos.Count);
-        RandomizeTrialSpawnTransform(syncParameters.spawnRotItem, spawnInfo.rot.Count);
-        RandomizeTrialSpawnTransform(syncParameters.spawnScaleItem, spawnInfo.scale.Count);
+        //RandomizeTrialSpawnTransform(syncParameters.spawnPosItem, spawnInfo.pos.Count);
+        //RandomizeTrialSpawnTransform(syncParameters.spawnRotItem, spawnInfo.rot.Count);
+        //RandomizeTrialSpawnTransform(syncParameters.spawnScaleItem, spawnInfo.scale.Count);
     }
 
     void RandomizeTrialSpawnTransform(SyncListInt _spawnT, int size)

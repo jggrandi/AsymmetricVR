@@ -95,15 +95,17 @@ public class SyncTestParameters : NetworkBehaviour {
         prevConditionIndex = conditionIndex;
         prevTrialIndex = trialIndex;
 
-        UpdateGhost();
-        UpdateSpawnInfo();
+        //UpdateGhost();
+        //UpdateSpawnInfo();
 
-        ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+        //ObjectManager.SetSelected(activeTrialOrder[trialIndex]);
+        ObjectManager.SetSelected(0);
+
 
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         //if (!isClient) return;
         DeactivateAllObjects(interactableObjects);
         DeactivateAllObjects(ghostObjects);
