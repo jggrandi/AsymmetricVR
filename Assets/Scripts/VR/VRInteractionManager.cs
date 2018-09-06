@@ -13,11 +13,7 @@ public class VRInteractionManager : NetworkBehaviour {
     VRTransformSync transformSync;
 
     Vector3 prevTranslation = new Vector3();
-    Quaternion prevRotation = new Quaternion();
-    float prevScale = 0f;
 
-
-    SyncTestParameters syncParameters;
     PlayerStuff playerStuff;
 
     // Use this for initialization
@@ -26,9 +22,6 @@ public class VRInteractionManager : NetworkBehaviour {
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
         transformSync = this.gameObject.GetComponent<VRTransformSync>();
         playerStuff = this.gameObject.GetComponent<PlayerStuff>();
-
-        var mainHandler = GameObject.Find("MainHandler");
-        syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
     }
 
@@ -112,8 +105,6 @@ public class VRInteractionManager : NetworkBehaviour {
         }
 
         prevTranslation = newTranslation;
-        prevRotation = newRotation;
-        prevScale = newScale;
 
     }
 

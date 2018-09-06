@@ -26,7 +26,6 @@ public class HandleTestParameters : NetworkBehaviour
 
     GameObject mainHandler;
     SyncTestParameters syncParameters;
-    NetworkManager netMan;
     DockController dockController;
     SpawnInformation spawnInfo;
     HandleLog handleLog;
@@ -46,11 +45,10 @@ public class HandleTestParameters : NetworkBehaviour
 
     public int conditionIndex;
     public int trialIndex;
+    public int ghostOrder;
 
     public override void OnStartServer()
     {
-        Debug.Log("OnStartServer");
-        netMan = NetworkManager.singleton;
 
         mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
@@ -101,8 +99,6 @@ public class HandleTestParameters : NetworkBehaviour
         DisplayPlayersInUI(activeInScene); // handle the display of the player's name on the UI
     }
 
-
-
     public void RetrieveAllPlayersConnected()
     {
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
@@ -125,6 +121,9 @@ public class HandleTestParameters : NetworkBehaviour
         groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
         int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
+        int[] ghostPermutations = Utils.selectTaskSequence(groupID, 2);
+        ghostOrder = ghostPermutations[0]; 
+
         conditionsOrder.Clear();
 
         for (int i = 0; i < order.Length; i++)
@@ -160,6 +159,7 @@ public class HandleTestParameters : NetworkBehaviour
         UpdateTrialColor();
         ResetContributionTime();
         SetObjectsTransform();
+        SetGhostsTransform();
         SetGhostsTransform();
         SetCurrentTrialIndex(trialIndex);
     }
@@ -251,8 +251,20 @@ public class HandleTestParameters : NetworkBehaviour
         trialIndex = index;
         syncParameters.activeTrial = activeTrialOrder[trialIndex];
         ObjectManager.SetSelected(syncParameters.activeTrial); // set only for the server. the sync var hook will set for clients
-        if (trialIndex > qntTraining + (qntTrials / 2))
-            SetGhostManipulation(true);
+        if (ghostOrder == 0)
+        {
+            if (trialIndex >= qntTraining && trialIndex < qntTraining + (qntTrials / 2))
+                SetGhostManipulation(false);
+            else
+                SetGhostManipulation(true);
+        }
+        else if (ghostOrder == 1)
+        {
+            if (trialIndex >= qntTraining  && trialIndex < qntTraining + (qntTrials / 2))
+                SetGhostManipulation(true);
+            else
+                SetGhostManipulation(false);
+        }
     }
 
     void SetGhostManipulation(bool _isghost)
@@ -261,10 +273,8 @@ public class HandleTestParameters : NetworkBehaviour
         g = activeInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
         if (g == null) return;
 
-        if(_isghost)
-            g.GetComponent<PlayerStuff>().isGhost = true; 
-        else
-            g.GetComponent<PlayerStuff>().isGhost = false;
+        g.GetComponent<PlayerStuff>().isGhost = _isghost; 
+
         RpcSyncGhostManipulation(_isghost); //sync clients.
     }
 
@@ -370,6 +380,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
         SetObjectTransform(activeTrialOrder[newIndex]);
+        SetGhostsTransform();
         SetCurrentTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
         ResetContributionTime();
@@ -446,25 +457,45 @@ public class HandleTestParameters : NetworkBehaviour
         var halfTrials = qntTrials / 2;
         var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
 
-        for (int i = 0; i < ghostObjects.transform.childCount; i++)
+        for(int i = 0; i < qntTraining; i++)
         {
             var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
             obj.position = centerTable;
-            if (i < qntTraining + halfTrials) // trials where both players manipulate the same object
-            {
-                obj.position = centerTable;
-                obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
-            }
-            else
-            {
-                var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
-                var centerPos = new Vector3(-(intObj.transform.position.x - centerTable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centerTable.z) - 0.2f);
-                obj.transform.position = centerPos;
-                obj.transform.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
-            }
+            obj.rotation = Quaternion.identity;
+        }
+
+        if (ghostOrder == 0)
+        {
+            for (int i = qntTraining; i < halfTrials+qntTraining; i++)
+                StaticGhostPositioning(i, centerTable);
+            for (int i = qntTraining+halfTrials; i < ghostObjects.transform.childCount; i++)
+                MovingGhostPositioning(i, centerTable);
+        }
+        else if(ghostOrder == 1)
+        {
+            for (int i = qntTraining; i < halfTrials+qntTraining; i++)
+                MovingGhostPositioning(i, centerTable);
+            for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
+                StaticGhostPositioning(i, centerTable);
         }
     }
 
+    public void StaticGhostPositioning(int i, Vector3 centertable)
+    {
+        var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
+        obj.position = centertable;
+        obj.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles);
+    }
+
+    public void MovingGhostPositioning(int i, Vector3 centertable)
+    {
+        var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
+        var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
+        var centerPos = new Vector3(-(intObj.transform.position.x - centertable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centertable.z) - 0.2f);
+        obj.position = centerPos;
+        obj.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
+
+    }
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
     {

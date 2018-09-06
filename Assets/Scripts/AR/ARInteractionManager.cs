@@ -27,7 +27,6 @@ namespace Lean.Touch {
         //int currentOperation = 0; /* move rotate resize move_cel */
 
         ObjSelected selected;
-        SyncTestParameters syncParameters;
         PlayerStuff playerStuff;
 
         void Start()
@@ -42,8 +41,6 @@ namespace Lean.Touch {
             Utils.UpdateTouchSensibilty();
 
             playerStuff = this.gameObject.GetComponent<PlayerStuff>();
-            var mainHandler = GameObject.Find("MainHandler");
-            syncParameters = mainHandler.GetComponent<SyncTestParameters>();
 
         }
 
@@ -209,7 +206,7 @@ namespace Lean.Touch {
             
             //Vector3 avg = avgCenterOfObjects(gameObject.GetComponent<Lean.Touch.NetHandleSelectionTouch>().objSelected);
             Vector3 axis, axisTwist;
-			float angle = LeanGesture.GetScreenDelta(fingers).magnitude * 0.3f;
+			//float angle = LeanGesture.GetScreenDelta(fingers).magnitude * 0.3f;
             
             float angleTwist = LeanGesture.GetTwistDegrees(fingers) * 0.8f;
             axisTwist = Camera.main.transform.forward.normalized;
