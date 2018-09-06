@@ -265,6 +265,10 @@ public class HandleTestParameters : NetworkBehaviour
             else
                 SetGhostManipulation(false);
         }
+
+        if (trialIndex == 1) // if the training piece index is 1, player 1 train manipulating the ghost piece.
+            SetGhostManipulation(true);
+
     }
 
     void SetGhostManipulation(bool _isghost)
@@ -373,6 +377,8 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (newIndex == trialIndex) return; // dont allow to select the same trial that is active
         if (conditionsCompleted[conditionIndex] == true) return; //dont allow to select trial if the condition was already finished
+        SetObjectTransform(trialIndex); // the trial was not completed, so it is necessary to reset the position of this object
+        SetGhostsTransform(); // and its ghost (in this case the function resets all ghost positions)
         TrialChange(newIndex); 
     }
 
@@ -457,7 +463,7 @@ public class HandleTestParameters : NetworkBehaviour
         var halfTrials = qntTrials / 2;
         var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
 
-        for(int i = 0; i < qntTraining; i++)
+        for (int i = 0; i < qntTraining; i++)
         {
             var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
             obj.position = centerTable;
@@ -466,18 +472,22 @@ public class HandleTestParameters : NetworkBehaviour
 
         if (ghostOrder == 0)
         {
-            for (int i = qntTraining; i < halfTrials+qntTraining; i++)
+            for (int i = qntTraining; i < halfTrials + qntTraining; i++)
                 StaticGhostPositioning(i, centerTable);
-            for (int i = qntTraining+halfTrials; i < ghostObjects.transform.childCount; i++)
+            for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
                 MovingGhostPositioning(i, centerTable);
         }
-        else if(ghostOrder == 1)
+        else if (ghostOrder == 1)
         {
-            for (int i = qntTraining; i < halfTrials+qntTraining; i++)
+            for (int i = qntTraining; i < halfTrials + qntTraining; i++)
                 MovingGhostPositioning(i, centerTable);
             for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
                 StaticGhostPositioning(i, centerTable);
         }
+
+        
+        MovingGhostPositioning(1, centerTable);
+
     }
 
     public void StaticGhostPositioning(int i, Vector3 centertable)
@@ -534,13 +544,11 @@ public class HandleTestParameters : NetworkBehaviour
         DisplayTrialOrder();
     }
 
-
     public void ResetContributionTime()
     {
         if (activeInScene.Count <= 0) return;
         foreach (var player in activeInScene)
             player.GetComponent<PlayerStuff>().activeTime = 0f;
     }
-
 
 }
