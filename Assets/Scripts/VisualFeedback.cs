@@ -92,28 +92,29 @@ public class VisualFeedback : NetworkBehaviour {
                     controllersCenter = rightController.transform.position;
             }
 
-            if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
-            {
-                if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
-                {
-                    GameObject obj = null;
-                    if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
-                    else obj = ObjectManager.Get(indexObjSelected);
 
-                    AddLine(controllersCenter, obj.transform.position, color); // line from the center of the controllers to the object
+            if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
+            {
+                GameObject obj = null;
+                if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
+                else obj = ObjectManager.Get(indexObjSelected);
+
+                AddLine(controllersCenter, obj.transform.position, color); // line from the center of the controllers to the object
+
+                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
+                {
                     icons.position = controllersCenter * 0.7f + obj.transform.position * 0.3f;
                     icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
                     if (vrTransform.isTranslating) icons.GetChild(0).gameObject.SetActive(true);
                     if (vrTransform.isRotating) icons.GetChild(1).gameObject.SetActive(true);
                     if (vrTransform.isScaling) icons.GetChild(2).gameObject.SetActive(true);
                 }
+                else
+                {
+                    UpdateIconsPosition(icons, controllersCenter);
+                    ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
+                }
             }
-            else
-            {
-                UpdateIconsPosition(icons, controllersCenter);
-                ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
-            }
-
         }
     }
 
@@ -144,13 +145,13 @@ public class VisualFeedback : NetworkBehaviour {
             Color color = greyColor; // other players' ray are grey
             if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
-                //rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
+                rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
                 color = blueColor; // localplayer's ray is blue
             }
 
             int operation = player.GetComponent<ARInteractionManager>().currentOperation;
 
-            if (operation != (int)Utils.Transformations.None && !player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player //only show feedback if user is interacting
+            if (operation != (int)Utils.Transformations.None)
             {
                 var OperationObj = icons.transform.GetChild(operation - 1);
                 OperationObj.gameObject.SetActive(true);
