@@ -494,7 +494,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
         obj.position = centertable;
-        obj.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles);
+        obj.rotation = CreateGhostRotation(i);
     }
 
     public void MovingGhostPositioning(int i, Vector3 centertable)
@@ -503,8 +503,15 @@ public class HandleTestParameters : NetworkBehaviour
         var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
         var centerPos = new Vector3(-(intObj.transform.position.x - centertable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centertable.z) - 0.2f);
         obj.position = centerPos;
-        obj.rotation = Quaternion.Euler(-spawnRot[i].eulerAngles); //pega a rotação oposta
+        obj.rotation = CreateGhostRotation(i);
+    }
 
+    Quaternion CreateGhostRotation(int i)
+    {
+        float angle = 0f;
+        Vector3 axis = new Vector3();
+        spawnRot[i].ToAngleAxis(out angle, out axis);
+        return Quaternion.AngleAxis(angle, -axis);
     }
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)

@@ -10,10 +10,16 @@ public class DockController : NetworkBehaviour {
     //const float toleranceRot = 1.0f;
     //const float toleranceScale = 0.003f;
 
+    //midhard
+    const float toleranceTrans = 0.01f; // 1cm
+    const float toleranceRot = 3.0f; // 3 degrees
+    const float toleranceScale = 0.01f; // 1cm
+
+
     //medium
-    const float toleranceTrans = 0.05f;
-    const float toleranceRot = 5.0f;
-    const float toleranceScale = 0.03f;
+    //const float toleranceTrans = 0.05f;
+    //const float toleranceRot = 5.0f;
+    //const float toleranceScale = 0.03f;
 
     //const float toleranceTrans = 4f;
     //const float toleranceRot = 120.0f;
