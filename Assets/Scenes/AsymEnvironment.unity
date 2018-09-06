@@ -7150,6 +7150,7 @@ MonoBehaviour:
   spawnScale: []
   conditionIndex: 0
   trialIndex: 0
+  ghostOrder: 0
 --- !u!114 &1111413131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11296,7 +11297,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1813000031
 Transform:
   m_ObjectHideFlags: 0
