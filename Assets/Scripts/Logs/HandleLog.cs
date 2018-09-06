@@ -37,8 +37,6 @@ public class HandleLog : NetworkBehaviour
 
         testParameters = this.gameObject.GetComponent<HandleTestParameters>();
         dockParameters = this.gameObject.GetComponent<DockController>();
-
- 
     }
 	
 	// Update is called once per frame
@@ -51,10 +49,9 @@ public class HandleLog : NetworkBehaviour
 
         if (countFrames % 5 == 0)
         {
-            var objId = testParameters.trialIndex;
+            var objId = syncParameters.activeTrial;
             log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
         }
-
     }
 
     public void StartLogRecording()
@@ -65,21 +62,21 @@ public class HandleLog : NetworkBehaviour
         isRecording = true;
         isPaused = false;
         SetPauseButtonColor();
-        startLogRecording.GetComponent<Image>().color = Color.grey;
+        SetRecordingButtonColor();
+        
     }
 
     public void StopLogRecording()
     {
-        if (isRecording == false) return;
+        if (!isRecording) return;
         syncParameters.EVALUATIONSTARTED = false;
-        isRecording = false;
         previousTime = 0f;
+        isRecording = false;
         isPaused = false;
         SetPauseButtonColor();
+        SetRecordingButtonColor();
         log.Close();
-        startLogRecording.GetComponent<Image>().color = Color.white;
     }
-
 
     public void PauseLogRecording()
     {
@@ -95,6 +92,14 @@ public class HandleLog : NetworkBehaviour
             timeWhenStartPause = Time.realtimeSinceStartup;
             SetPauseButtonColor();
         }
+    }
+
+    public void SetRecordingButtonColor()
+    {
+        if(isRecording)
+            startLogRecording.GetComponent<Image>().color = Color.grey;
+        else
+            startLogRecording.GetComponent<Image>().color = Color.white;
     }
 
     public void SetPauseButtonColor()

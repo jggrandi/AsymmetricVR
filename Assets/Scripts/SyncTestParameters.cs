@@ -12,6 +12,9 @@ public class SyncTestParameters : NetworkBehaviour {
     [SyncVar]
     public bool EVALUATIONSTARTED = false;
 
+    [SyncVar]
+    public bool TESTFINISHED = false;
+
     GameObject interactableObjects;
     GameObject ghostObjects;
 

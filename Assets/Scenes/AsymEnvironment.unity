@@ -10690,6 +10690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activeTrial: 0
   EVALUATIONSTARTED: 0
+  TESTFINISHED: 0
 --- !u!1 &1625928989
 GameObject:
   m_ObjectHideFlags: 0
@@ -10947,8 +10948,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1111413133}
-        m_MethodName: PauseLogRecording
+      - m_Target: {fileID: 1111413130}
+        m_MethodName: OnClickPause
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -10,7 +10,6 @@ public class HandleTestParameters : NetworkBehaviour
     public const int qntTraining = 3;
     public const int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
     public int groupID = 0;
-    //public int conditionIndex = 0;
 
     public List<int> conditionsOrder = new List<int>();
     
@@ -143,6 +142,7 @@ public class HandleTestParameters : NetworkBehaviour
         SetGhostManipulation(false);
         UpdateTrials();
         syncParameters.EVALUATIONSTARTED = false;
+        syncParameters.TESTFINISHED = false;
     }
 
     public void OnClickUpdate()
@@ -251,7 +251,6 @@ public class HandleTestParameters : NetworkBehaviour
         trialIndex = index;
         syncParameters.activeTrial = activeTrialOrder[trialIndex];
         ObjectManager.SetSelected(syncParameters.activeTrial); // set only for the server. the sync var hook will set for clients
-        Debug.Log(trialIndex);
         if (trialIndex > qntTraining + (qntTrials / 2))
             SetGhostManipulation(true);
     }
@@ -301,7 +300,7 @@ public class HandleTestParameters : NetworkBehaviour
     public void TrialCompleted()
     {
         trialsCompleted[trialIndex] = true;
-        handleLog.SaveResumed(activeTrialOrder[trialIndex], Time.realtimeSinceStartup, activeInScene);
+        handleLog.SaveResumed(syncParameters.activeTrial, Time.realtimeSinceStartup, activeInScene);
         ResetContributionTime();
 
         if (!trialsCompleted.Contains(false))
@@ -338,6 +337,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         GreyConditionCompleted();
         GreyTrialCompleted();
+        syncParameters.TESTFINISHED = true;
         handleLog.StopLogRecording();
     }
 
@@ -361,7 +361,8 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void OnClickTrial(int newIndex)
     {
-        if (newIndex == trialIndex) return;
+        if (newIndex == trialIndex) return; // dont allow to select the same trial that is active
+        if (conditionsCompleted[conditionIndex] == true) return; //dont allow to select trial if the condition was already finished
         TrialChange(newIndex); 
     }
 
@@ -376,8 +377,15 @@ public class HandleTestParameters : NetworkBehaviour
         syncParameters.SYNC();
     }
 
+    public void OnClickPause()
+    {
+        if (syncParameters.TESTFINISHED) return;
+        handleLog.StopLogRecording();
+    }
+
     public void OnClickStartRecording()
     {
+        if (syncParameters.TESTFINISHED) return;
         handleLog.StartLogRecording();
         syncParameters.SYNC();
     }

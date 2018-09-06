@@ -15,6 +15,9 @@ public class DockController : NetworkBehaviour {
     const float toleranceRot = 5.0f;
     const float toleranceScale = 0.03f;
 
+    //const float toleranceTrans = 4f;
+    //const float toleranceRot = 120.0f;
+    //const float toleranceScale = 1f;
 
     //const float toleranceTrans = 12f;
     //const float toleranceRot = 190.0f;
@@ -25,7 +28,7 @@ public class DockController : NetworkBehaviour {
     
     GameObject interactableObjects; // interactable and ghosts must have the same number of elements
     GameObject ghostObjects;
-    GameObject spawnInfo;
+
     HandleTestParameters testParameters;
 
     public List<float> errorTrans = new List<float>();
@@ -68,6 +71,7 @@ public class DockController : NetworkBehaviour {
     {
         errorTrans.Clear();
         errorRot.Clear();
+        errorRotAngle.Clear();
         errorScale.Clear();
 
         for (int i = 0; i < HandleTestParameters.qntTrials + HandleTestParameters.qntTraining; i++)
@@ -92,16 +96,16 @@ public class DockController : NetworkBehaviour {
         Matrix4x4 staticMatrixRot = Matrix4x4.TRS(new Vector3(0, 0, 0), staticObject.rotation, new Vector3(1.0f, 1.0f, 1.0f));
         float staticScale = staticObject.localScale.x;
 
-        errorTrans[testParameters.trialIndex] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
-        errorRot[testParameters.trialIndex] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
-        errorRotAngle[testParameters.trialIndex] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
-        errorScale[testParameters.trialIndex] = Mathf.Abs(movingScale - staticScale);
+        errorTrans[syncParameters.activeTrial] = Utils.distMatrices(movingMatrixTrans, staticMatrixTrans);
+        errorRot[syncParameters.activeTrial] = Utils.distMatrices(movingMatrixRot, staticMatrixRot);
+        errorRotAngle[syncParameters.activeTrial] = Quaternion.Angle(movingObject.rotation, staticObject.rotation);
+        errorScale[syncParameters.activeTrial] = Mathf.Abs(movingScale - staticScale);
 
     }
 
     bool EvaluateCurrentDocking()
     {
-        var tIndex = testParameters.trialIndex;
+        var tIndex = syncParameters.activeTrial;
         if (errorTrans[tIndex] < toleranceTrans && errorRotAngle[tIndex] < toleranceRot && errorScale[tIndex] < toleranceScale)
             return true;
         return false;
