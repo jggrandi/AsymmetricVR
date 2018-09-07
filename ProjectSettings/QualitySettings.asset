@@ -177,7 +177,7 @@ QualitySettings:
   m_PerPlatformDefaultQuality:
     Android: 4
     BlackBerry: 0
-    Standalone: 4
+    Standalone: 3
     WP8: 0
     Web: 0
     WebGL: 0

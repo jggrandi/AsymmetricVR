@@ -24,18 +24,18 @@ public class Log
         foreach (var p in players)
             playerOrder.Add(p.GetComponent<PlayerStuff>().id);
 
-        string header = "Time;ObjID;TError;RError;RAError;SError";
+        string header = "Time;ObjID;DiffObj;TError;RError;RAError;SError";
         foreach (var p in players)
         {
             if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.VR)
-                header += ";PID;Modal;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
+                header += ";PID;Modal;Ghost;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
             else if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.AR)
-                header += ";PID;Modal;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
+                header += ";PID;Modal;Ghost;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
         }
 
         logFull.WriteLine(header);
 
-        header = "ObjID;Time";
+        header = "ObjID;Time;DiffObj";
         foreach (var p in players)
             header += ";PID;Modal;PieceTime";
 
@@ -58,7 +58,9 @@ public class Log
     public void SaveFull(int objId, float tError, float rError, float raError, float sError, List<GameObject> players)
     {
         String line = "";
-        line += Time.realtimeSinceStartup + ";" + objId + ";" + tError + ";" + rError + ";" + raError + ";" + sError;
+        String lineBuff = "";
+
+        var differentObj = false;
 
         foreach (var c in playerOrder)
         {
@@ -66,6 +68,10 @@ public class Log
             if (playerFound != null)
             {
                 var pStuff = playerFound.GetComponent<PlayerStuff>();
+
+                if (pStuff.isGhost)
+                    differentObj = true;
+
                 var pTransformStep = playerFound.GetComponent<HandleNetworkTransformations>();
                 Vector3 pPos = new Vector3();
                 Quaternion pRot = new Quaternion();
@@ -90,19 +96,23 @@ public class Log
                     arOperation = pOperation.currentOperation;
                 }
 
-                line += ";" + pStuff.id + ";" + pStuff.type;
-                line += ";" + pPos.x + ";" + pPos.y + ";" + pPos.z + ";" + pRot.x + ";" + pRot.y + ";" + pRot.z + ";" + pRot.w;
-                line += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
+                lineBuff += ";" + pStuff.id + ";" + pStuff.type + ";" + pStuff.isGhost;
+                lineBuff += ";" + pPos.x + ";" + pPos.y + ";" + pPos.z + ";" + pRot.x + ";" + pRot.y + ";" + pRot.z + ";" + pRot.w;
+                lineBuff += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
                 if (pStuff.type == Utils.PlayerType.VR)
-                    line += ";" + vrBimanual + ";" + vrLockCombo;
+                    lineBuff += ";" + vrBimanual + ";" + vrLockCombo;
                 else if (pStuff.type == Utils.PlayerType.AR)
-                    line += ";" + arOperation + ";";
+                    lineBuff += ";" + arOperation + ";";
             }
             else
             {
-                line += ";;;;;;;;;;;;;;;;;;;";
+                lineBuff += ";;;;;;;;;;;;;;;;;;;;";
             }
         }
+
+        line += Time.realtimeSinceStartup + ";" + objId + ";" + differentObj + ";" + tError + ";" + rError + ";" + raError + ";" + sError;
+        line += lineBuff;
+
 
         logFull.WriteLine(line);
         logFull.Flush();
@@ -114,11 +124,18 @@ public class Log
         String line = "";
         line += objId + ";" + time;
 
+        var differentObj = false;
+        String buffLines = "";
         foreach (var p in players)
         {
             var pStuff = p.GetComponent<PlayerStuff>();
-            line +=  ";" + pStuff.id + ";" + pStuff.type + ";" + pStuff.activeTime;
+            if (pStuff.isGhost)
+                differentObj = true;
+            buffLines += ";" + pStuff.id + ";" + pStuff.type + ";" + pStuff.activeTime;
         }
+
+        line += ";" + differentObj;
+        line += buffLines;
 
         logResumed.WriteLine(line);
         logResumed.Flush();

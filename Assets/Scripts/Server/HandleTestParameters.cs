@@ -375,7 +375,7 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void OnClickTrial(int newIndex)
     {
-        if (newIndex == trialIndex) return; // dont allow to select the same trial that is active
+        //if (newIndex == trialIndex) return; // dont allow to select the same trial that is active
         if (conditionsCompleted[conditionIndex] == true) return; //dont allow to select trial if the condition was already finished
         SetObjectTransform(trialIndex); // the trial was not completed, so it is necessary to reset the position of this object
         SetGhostsTransform(); // and its ghost (in this case the function resets all ghost positions)
