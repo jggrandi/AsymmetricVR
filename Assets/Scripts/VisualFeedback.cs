@@ -103,7 +103,7 @@ public class VisualFeedback : NetworkBehaviour {
 
                 if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
                 {
-                    icons.position = controllersCenter * 0.7f + obj.transform.position * 0.3f;
+                    icons.position = controllersCenter * 0.3f + obj.transform.position * 0.7f;
                     icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
                     if (vrTransform.isTranslating) icons.GetChild(0).gameObject.SetActive(true);
                     if (vrTransform.isRotating) icons.GetChild(1).gameObject.SetActive(true);
@@ -161,7 +161,7 @@ public class VisualFeedback : NetworkBehaviour {
                 else obj = ObjectManager.Get(indexObjSelected);
 
                 AddLine(rayAdjust, obj.transform.position, color); // add line 
-                OperationObj.position = rayAdjust * 0.7f + obj.transform.position * 0.3f;
+                OperationObj.position = rayAdjust * 0.3f + obj.transform.position * 0.7f;
 
                 OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
                 OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);
