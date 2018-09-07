@@ -14,7 +14,7 @@ public class SpawnInformation : NetworkBehaviour
 
     public GameObject table;
 
-    float baseAngle = 30.0f;
+    float baseAngle = 45.0f;
 
     private void Awake()
     {
@@ -44,8 +44,6 @@ public class SpawnInformation : NetworkBehaviour
     {
         rot.Add(Quaternion.AngleAxis(baseAngle, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
         rot.Add(Quaternion.AngleAxis(baseAngle*2, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
-        rot.Add(Quaternion.AngleAxis(baseAngle*3, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
-        rot.Add(Quaternion.AngleAxis(baseAngle*4, new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f))));
     }
 
     void CreateScales() {

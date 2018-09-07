@@ -160,7 +160,6 @@ public class HandleTestParameters : NetworkBehaviour
         ResetContributionTime();
         SetObjectsTransform();
         SetGhostsTransform();
-        SetGhostsTransform();
         SetCurrentTrialIndex(trialIndex);
     }
 
@@ -377,8 +376,6 @@ public class HandleTestParameters : NetworkBehaviour
     {
         //if (newIndex == trialIndex) return; // dont allow to select the same trial that is active
         if (conditionsCompleted[conditionIndex] == true) return; //dont allow to select trial if the condition was already finished
-        SetObjectTransform(trialIndex); // the trial was not completed, so it is necessary to reset the position of this object
-        SetGhostsTransform(); // and its ghost (in this case the function resets all ghost positions)
         TrialChange(newIndex); 
     }
 
@@ -386,7 +383,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (trialsCompleted[newIndex] == true) trialsCompleted[newIndex] = false;
         SetObjectTransform(activeTrialOrder[newIndex]);
-        SetGhostsTransform();
+        SetGhostTransform(activeTrialOrder[newIndex]);
         SetCurrentTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
         ResetContributionTime();
@@ -487,6 +484,40 @@ public class HandleTestParameters : NetworkBehaviour
 
         
         MovingGhostPositioning(1, centerTable);
+
+    }
+
+    public void SetGhostTransform(int index)
+    {
+        var halfTrials = qntTrials / 2;
+        var centerTable = new Vector3(spawnInfo.table.transform.position.x, 1.0f, spawnInfo.table.transform.position.z);
+
+        var obj = ghostObjects.transform.GetChild(activeTrialOrder[index]);
+        if (index < qntTraining)
+        {
+            obj.position = centerTable;
+            obj.rotation = Quaternion.identity;
+        }
+        else
+        {
+            if (ghostOrder == 0)
+            {
+                if(index < halfTrials)
+                    StaticGhostPositioning(index, centerTable);
+                else
+                    MovingGhostPositioning(index, centerTable);
+            }
+            else if (ghostOrder == 1)
+            {
+                if (index < halfTrials)
+                    MovingGhostPositioning(index, centerTable);
+                else
+                    StaticGhostPositioning(index, centerTable);
+            }
+        }
+
+        if(index == 1)
+            MovingGhostPositioning(index, centerTable);
 
     }
 
