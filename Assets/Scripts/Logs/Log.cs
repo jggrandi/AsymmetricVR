@@ -28,7 +28,7 @@ public class Log
         foreach (var p in players)
         {
             if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.VR)
-                header += ";PID;Modal;Ghost;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Bimanual;LockCombo";
+                header += ";PID;Modal;Ghost;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;Hand;LockCombo";
             else if (p.GetComponent<PlayerStuff>().type == Utils.PlayerType.AR)
                 header += ";PID;Modal;Ghost;CamPosX;CamPosY;CamPosZ;CamRotX;CamRotY;CamRotZ;CamRotW;TX;TY;TZ;RX;RY;RZ;RW;Scale;CurrentOperation;NOthing"; // last element to match the number of columns
         }
