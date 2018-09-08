@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
-public class VRTransformSync : NetworkBehaviour
+public class VRTransformSync : MonoBehaviour
 {
 
     public Vector3 headPos;
@@ -25,8 +24,6 @@ public class VRTransformSync : NetworkBehaviour
     {
         if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
 
-        if (!isLocalPlayer) return;
-
         player = Player.instance;
 
         if (player == null)
@@ -41,7 +38,6 @@ public class VRTransformSync : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isLocalPlayer) return;
         if (player == null) player = Player.instance;
 
         headPos = player.hmdTransform.position;
@@ -54,111 +50,6 @@ public class VRTransformSync : NetworkBehaviour
         rightHPos = player.rightHand.transform.position;
         rightHRot = player.rightHand.transform.rotation;
 
-        CmdHeadPos(headPos);
-        CmdHeadRot(headRot);
-        CmdLeftHPos(leftHPos);
-        CmdLeftHRot(leftHRot);
-        CmdRightHPos(rightHPos);
-        CmdRightHRot(rightHRot);
-        CmdIsTransforms(isTranslating, isRotating, isScaling);
-
-    }
-
-
-    [Command]
-    void CmdIsTransforms(bool _istranslating, bool _isrotating, bool _isscaling)
-    {
-        isTranslating = _istranslating;
-        isRotating = _isrotating;
-        isScaling = _isscaling;
-        RpcIsTransforms(_istranslating, _isrotating, _isscaling);
-    }
-
-    [ClientRpc]
-    void RpcIsTransforms(bool _istranslating, bool _isrotating, bool _isscaling)
-    {
-        isTranslating = _istranslating;
-        isRotating = _isrotating;
-        isScaling = _isscaling;
-    }
-
-    [Command]
-    void CmdHeadPos(Vector3 pos)
-    {
-        headPos = pos;
-        RpcHeadPos(pos);
-    }
-
-    [ClientRpc]
-    void RpcHeadPos(Vector3 pos)
-    {
-        headPos = pos;
-    }
-
-    [Command]
-    void CmdHeadRot(Quaternion rot)
-    {
-        headRot = rot;
-        RpcHeadRot(rot);
-    }
-
-    [ClientRpc]
-    void RpcHeadRot(Quaternion rot)
-    {
-        headRot = rot;
-    }
-///
-    [Command]
-    void CmdLeftHPos(Vector3 pos)
-    {
-        leftHPos = pos;
-        RpcLeftHPos(pos);
-    }
-
-    [ClientRpc]
-    void RpcLeftHPos(Vector3 pos)
-    {
-        leftHPos = pos;
-    }
-
-    [Command]
-    void CmdLeftHRot(Quaternion rot)
-    {
-        leftHRot = rot;
-        RpcLeftHRot(rot);
-    }
-
-    [ClientRpc]
-    void RpcLeftHRot(Quaternion rot)
-    {
-        leftHRot = rot;
-    }
-    ///
-
-    [Command]
-    void CmdRightHPos(Vector3 pos)
-    {
-        rightHPos = pos;
-        RpcRightHPos(pos);
-    }
-
-    [ClientRpc]
-    void RpcRightHPos(Vector3 pos)
-    {
-        rightHPos = pos;
-    }
-
-    [Command]
-    void CmdRightHRot(Quaternion rot)
-    {
-        rightHRot = rot;
-        RpcRightHRot(rot);
-    }
-
-    [ClientRpc]
-    void RpcRightHRot(Quaternion rot)
-    {
-        rightHRot = rot;
     }
 
 }

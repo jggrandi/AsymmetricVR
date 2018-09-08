@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using Valve.VR.InteractionSystem;
 
 
@@ -12,7 +11,7 @@ public class ObjSelected
     //public List<Hand> hands;
 }
 
-public class ObjectManager : NetworkBehaviour
+public class ObjectManager : MonoBehaviour
 {
     //[SyncVar]
     //public int objSelectedShared = 1; // the user selections visible by other players
@@ -117,82 +116,4 @@ public class ObjectManager : NetworkBehaviour
             return manager.objSelected;
         return null;
     }
-
-
-    // THE COMMENTED FUNCTIONS ARE FOR MULTIPLE OBJECT SELECTION (THEY ARE STORED IN A LIST)
-
-    //public static ObjSelected FindObject(GameObject obj)
-    //{
-    //    foreach (ObjSelected selected in manager.objsSelected)
-    //    {
-    //        if (GameObject.ReferenceEquals(selected.obj, obj))
-    //            return selected;
-    //    }
-    //    return null;
-    //}
-
-
-    //public static void AddToSelectedList(GameObject obj, Hand h)
-    //{
-    //    var index = DetermineIndexSelected(obj);
-    //    ObjSelected objS = new ObjSelected();
-    //    objS.index = index;
-    //    objS.obj = obj;
-    //    objS.hands = new List<Hand>();
-    //    objS.hands.Add(h);
-    //    manager.objsSelected.Add(objS);
-    //}
-
-
-    //public static void SetSelected(GameObject obj, Hand h)
-    //{
-    //    var found = FindObject(obj);
-    //    if (found == null) // if it is not selected, add to list
-    //    {
-    //        AddToSelectedList(obj,h); // add the object and the hand whitch is selecting it
-    //    }
-    //    else // it is already selected, we need to verify if the hand that is selecting is other hand
-    //    {
-    //        if(!found.hands.Contains(h)) // if is not the same hand, add this hand to the obj
-    //            found.hands.Add(h);  
-    //    }
-    //}
-
-    //public static void RemoveObjFromSelectedList(ObjSelected obj)
-    //{
-    //    if (manager.objsSelected.Contains(obj))
-    //        manager.objsSelected.Remove(obj);
-    //}
-
-    //public static List<ObjSelected> GetAllSelected()
-    //{
-    //    if (manager.objsSelected != null)
-    //        return manager.objsSelected;
-    //    return null;
-    //}
-
-    //public static ObjSelected GetSelected(int index)
-    //{
-    //    if (index < manager.objsSelected.Count && index >= 0)
-    //        return manager.objsSelected[index];
-    //    return null;
-    //}
-
-    //public static void DetachObjectFromHand(GameObject obj, Hand h)
-    //{
-    //    var found = FindObject(obj);
-    //    if (found == null) return; // if it is not selected, nothing to do, return
-
-    //    if (found.hands.Contains(h)) // if the object is being selected by this hand
-    //        found.hands.Remove(h);
-
-    //    if (found.hands.Count == 0) // there is no hand selecting the object, remove object from the selected list
-    //        RemoveObjFromSelectedList(found);
-    //}
-
-
-
-
-
-
 }

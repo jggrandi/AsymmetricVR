@@ -1,64 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class SyncTestParameters : NetworkBehaviour {
+public class SyncTestParameters : MonoBehaviour {
 
 
-    [SyncVar (hook = "UpdateSelected")]// hooks dont syncronize in server
+
     public int activeTrial;
 
-    [SyncVar]
     public bool EVALUATIONSTARTED = false;
-
-    [SyncVar]
     public bool TESTFINISHED = false;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
-
-    public void SYNC()
-    {
-        if (interactableObjects == null) interactableObjects = ObjectManager.manager.allInteractable;
-        bool isghost = false;
-        for (int i = 0; i < interactableObjects.transform.childCount; i++)
-            SyncObj(i, isghost);
-
-        isghost = true;
-        if (ghostObjects == null) ghostObjects = ObjectManager.manager.allGhosts;
-        for (int i = 0; i < ghostObjects.transform.childCount; i++)
-            SyncObj(i, isghost);
-    }
-
-    public void SyncObj(int index,bool isghost, bool pos = true, bool rot = true, bool scale = true)
-    {
-        Vector3 p = Vector3.zero;
-        Quaternion r = new Quaternion(0, 0, 0, 0);
-        Vector3 s = Vector3.zero;
-
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
-
-        if (pos) p = g.transform.position;
-        if (rot) r = g.transform.rotation;
-        if (scale) s = g.transform.localScale;
-        RpcSyncObj(index,isghost, p, r, s);
-    }
-
-    [ClientRpc]
-    public void RpcSyncObj(int index, bool isghost, Vector3 pos, Quaternion rot, Vector3 scale)
-    {
-
-        GameObject g = null;
-        if (isghost) g = ObjectManager.GetGhost(index);
-        else g = ObjectManager.Get(index);
-
-        if (pos != Vector3.zero) g.transform.position = pos;
-        if (rot != new Quaternion(0, 0, 0, 0)) g.transform.rotation = rot;
-        if (scale != Vector3.zero) g.transform.localScale = scale;
-    }
 
     private void Start()
     {
@@ -79,6 +33,7 @@ public class SyncTestParameters : NetworkBehaviour {
 
         if (!EVALUATIONSTARTED) return; // dont do an
 
+        UpdateSelected(activeTrial);
         ActivateObject(activeTrial, interactableObjects);
         ActivateObject(activeTrial, ghostObjects);
     }

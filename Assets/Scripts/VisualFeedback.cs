@@ -1,18 +1,15 @@
-﻿using Lean.Touch;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
+
 
 //[NetworkSettings(channel = 1, sendInterval = 0.001f)]
-public class VisualFeedback : NetworkBehaviour {
+public class VisualFeedback : MonoBehaviour {
 
-    Color greyColor = new Color(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+
     Color blueColor = new Color(0 / 255.0f, 118 / 255.0f, 255 / 255.0f);
     public GameObject lines;
-    NetworkManager netMan;
-    Utils.PlayerType playerType;
-
+    private Utils.PlayerType playerType;
     int linesUsed = 0;
 
     int indexObjSelected;
@@ -20,155 +17,76 @@ public class VisualFeedback : NetworkBehaviour {
     void Start () {
         lines = GameObject.Find("Lines");
 
-        netMan = NetworkManager.singleton;
-        playerType = netMan.GetComponent<MyNetworkManager>().playerType;
-
         ClearLines();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //if(!isServer && isClient)
-        //    CmdSyncSelected();
         var obj = ObjectManager.GetSelected();
         if (obj == null) return;
         indexObjSelected = obj.index;
         linesUsed = 0;
         AddFeedbackVR();
-        AddFeedbackAR();
+
         ClearLines();
 
     }
 
     void AddFeedbackVR()
     {
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerVR"))
+
+        var head = this.transform.GetChild(0); // if the order changes in the prefab, it is necessary to update these indexes
+        var leftController = this.transform.GetChild(1);
+        var rightController = this.transform.GetChild(2);
+        var icons = this.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
+
+        DisableIcons(icons); // disable all icons. Only show when an action is performed.
+
+        //var vrTransform = this.GetComponent<VRTransformSync>();
+
+        //head.transform.position = Vector3.Lerp(head.transform.position, vrTransform.headPos, 0.4f); // set the virtual avatar pos and rot
+        //head.transform.rotation = vrTransform.headRot;
+        //leftController.transform.position = Vector3.Lerp(leftController.transform.position, vrTransform.leftHPos, 0.4f);
+        //leftController.transform.rotation = vrTransform.leftHRot;
+        //rightController.transform.position = Vector3.Lerp(rightController.transform.position, vrTransform.rightHPos, 0.4f);
+        //rightController.transform.rotation = vrTransform.rightHRot;
+
+        //var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
+        if (indexObjSelected == -1) return;
+
+        var buttonSync = this.GetComponent<ButtonSync>();
+        if (buttonSync == null) return;
+
+        Color color = blueColor; 
+
+        var controllersCenter = Vector3.zero;
+        if (buttonSync.whichHand == Utils.Hand.Bimanual) // the rays drawn are different from one hand.
         {
-            var head = player.transform.GetChild(0); // if the order changes in the prefab, it is necessary to update these indexes
-            var leftController = player.transform.GetChild(1);
-            var rightController = player.transform.GetChild(2);
-            var icons = player.transform.GetChild(3); // it is the fourth because the other 3 are the head and the controllers 
-
-            DisableIcons(icons); // disable all icons. Only show when an action is performed.
-
-            var vrTransform = player.GetComponent<VRTransformSync>();
-
-            head.transform.position = Vector3.Lerp(head.transform.position, vrTransform.headPos, 0.4f); // set the virtual avatar pos and rot
-            head.transform.rotation = vrTransform.headRot;
-            leftController.transform.position = Vector3.Lerp(leftController.transform.position, vrTransform.leftHPos, 0.4f);
-            leftController.transform.rotation = vrTransform.leftHRot;
-            rightController.transform.position = Vector3.Lerp(rightController.transform.position, vrTransform.rightHPos, 0.4f);
-            rightController.transform.rotation = vrTransform.rightHRot;
-
-            if (playerType == Utils.PlayerType.AR) // dont need to show the VR avatar in AR
-            {
-                head.gameObject.SetActive(false);
-                leftController.gameObject.SetActive(false);
-                rightController.gameObject.SetActive(false);
-            }
-            //var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
-            if (indexObjSelected == -1) continue;
-
-            var buttonSync = player.GetComponent<ButtonSync>();
-            if (buttonSync == null) return;
-
-            Color color = greyColor; // other players' ray are grey
-            if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
-                color = blueColor; // localplayer's ray is blue
-
-            var controllersCenter = Vector3.zero;
-            if (buttonSync.whichHand == Utils.Hand.Bimanual) // the rays drawn are different from one hand.
-            {
-                AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
-                controllersCenter = (leftController.transform.position - rightController.transform.position);
-                controllersCenter = controllersCenter.normalized * (controllersCenter.magnitude / -2f) + leftController.transform.position;
-            }
-            else
-            {
-                if (buttonSync.AnyButtonPressedLeft())
-                    controllersCenter = leftController.transform.position;
-                else if (buttonSync.AnyButtonPressedRight())
-                    controllersCenter = rightController.transform.position;
-            }
-
-
-            if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
-            {
-                GameObject obj = null;
-                if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
-                else obj = ObjectManager.Get(indexObjSelected);
-
-                AddLine(controllersCenter, obj.transform.position, color); // line from the center of the controllers to the object
-
-                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer) // other player
-                {
-                    icons.position = controllersCenter * 0.3f + obj.transform.position * 0.7f;
-                    icons.rotation = Quaternion.LookRotation(new Vector3(0, 1, 0), (Camera.main.transform.position - icons.position).normalized);
-                    if (vrTransform.isTranslating) icons.GetChild(0).gameObject.SetActive(true);
-                    if (vrTransform.isRotating) icons.GetChild(1).gameObject.SetActive(true);
-                    if (vrTransform.isScaling) icons.GetChild(2).gameObject.SetActive(true);
-                }
-                else
-                {
-                    UpdateIconsPosition(icons, controllersCenter);
-                    ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
-                }
-            }
+            AddLine(leftController.transform.position, rightController.transform.position, color); // line between controllers
+            controllersCenter = (leftController.transform.position - rightController.transform.position);
+            controllersCenter = controllersCenter.normalized * (controllersCenter.magnitude / -2f) + leftController.transform.position;
         }
-    }
-
-    void AddFeedbackAR()
-    {
-        foreach (var player in GameObject.FindGameObjectsWithTag("PlayerAR"))
+        else
         {
-            var tablet = player.transform.GetChild(0);
-            var icons = player.transform.GetChild(1);
+            if (buttonSync.AnyButtonPressedLeft())
+                controllersCenter = leftController.transform.position;
+            else if (buttonSync.AnyButtonPressedRight())
+                controllersCenter = rightController.transform.position;
+        }
 
-            //var selected = player.GetComponent<VisualFeedback>().;
 
-            if (indexObjSelected == -1) continue;
+        if (buttonSync.whichHand == Utils.Hand.Bimanual || buttonSync.AnyButtonPressedLeft() || buttonSync.AnyButtonPressedRight()) //only show the line if user is interacting
+        {
+            GameObject obj = ObjectManager.Get(indexObjSelected);
 
-            DisableIcons(icons);
-            var arTransform = player.GetComponent<ARTransformSync>();
+            AddLine(controllersCenter, obj.transform.position, color); // line from the center of the controllers to the object
 
-            tablet.transform.position = Vector3.Lerp(tablet.transform.position, arTransform.position, 0.1f);
-            tablet.transform.rotation = Quaternion.Slerp(tablet.transform.rotation, arTransform.rotation, 0.1f);
-            //tablet.transform.position = arTransform.position; // set the virtual tablet pos and rot
-            //tablet.transform.rotation = arTransform.rotation;
-
-            if (playerType == Utils.PlayerType.AR) // dont need to show the AR avatar in AR
-                tablet.gameObject.SetActive(false);
-
-            var rayAdjust = tablet.transform.position;
-
-            Color color = greyColor; // other players' ray are grey
-            if (player.GetComponent<NetworkIdentity>().isLocalPlayer)
-            {
-                rayAdjust = tablet.transform.position - tablet.transform.up.normalized * 0.4f + new Vector3(0.031f, 0.021f, 0.01f);
-                color = blueColor; // localplayer's ray is blue
-            }
-
-            int operation = player.GetComponent<ARInteractionManager>().currentOperation;
-
-            if (operation != (int)Utils.Transformations.None)
-            {
-                var OperationObj = icons.transform.GetChild(operation - 1);
-                OperationObj.gameObject.SetActive(true);
-
-                GameObject obj = null;
-                if (player.GetComponent<PlayerStuff>().isGhost) obj = ObjectManager.GetGhost(indexObjSelected);
-                else obj = ObjectManager.Get(indexObjSelected);
-
-                AddLine(rayAdjust, obj.transform.position, color); // add line 
-                OperationObj.position = rayAdjust * 0.3f + obj.transform.position * 0.7f;
-
-                OperationObj.rotation = Quaternion.LookRotation((Camera.main.transform.position - OperationObj.position).normalized, new Vector3(0, 1, 0));
-                OperationObj.localRotation = OperationObj.localRotation * Quaternion.Euler(90, 0, 0);
-            }
-
+            UpdateIconsPosition(icons, controllersCenter);
+            ShowIcons(buttonSync, icons); // add icons on the ray that hits the object
 
         }
+        
     }
 
     void UpdateIconsPosition(Transform icons, Vector3 pos)

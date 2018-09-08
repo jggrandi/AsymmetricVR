@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
 
-public class ButtonSync : NetworkBehaviour {
+public class ButtonSync : MonoBehaviour {
 
 
     public bool lTrigger = false;
@@ -33,8 +32,6 @@ public class ButtonSync : NetworkBehaviour {
 
     // Use this for initialization
     void Start() {
-        if (string.Compare(SceneManager.GetActiveScene().name, "SetupTest") == 0) return;
-        if (!isLocalPlayer) return;
 
         player = Player.instance;
         if (player == null)
@@ -55,7 +52,6 @@ public class ButtonSync : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!isLocalPlayer) return;
 
         if (leftHand == null) leftHand = player.leftHand; 
         if (rightHand == null) rightHand = player.rightHand;
@@ -117,8 +113,7 @@ public class ButtonSync : NetworkBehaviour {
             //if (rGrip) lockCombination += 5;
             //}
         }
-        CmdSyncButtons(lTrigger, rTrigger, lA, rA, lApp, rApp, lGrip, rGrip, lJoystick, rJoystick ); 
-        CmdUpdateActions(whichHand, lockCombination);
+
     }
 
     public bool AnyButtonPressedLeft()
@@ -135,52 +130,4 @@ public class ButtonSync : NetworkBehaviour {
         return false;
     }
 
-
-    [Command]
-    void CmdSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)
-    {
-        lTrigger = ltrigger;
-        rTrigger = rtrigger;
-        lA = la;
-        rA = ra;
-        lApp = lapp;
-        rApp = rapp;
-        lGrip = lgrip;
-        rGrip = rgrip;
-        lJoystick = ljoystick;
-        rJoystick = rjoystick;
-
-        RpcSyncButtons(ltrigger, rtrigger, la, ra, lapp, rapp, lgrip, rgrip, ljoystick, rjoystick);
-    }
-
-    [ClientRpc]
-    void RpcSyncButtons(bool ltrigger, bool rtrigger, bool la, bool ra, bool lapp, bool rapp, bool lgrip, bool rgrip, Vector2 ljoystick, Vector2 rjoystick)
-    {
-        lTrigger = ltrigger;
-        rTrigger = rtrigger;
-        lA = la;
-        rA = ra;
-        lApp = lapp;
-        rApp = rapp;
-        lGrip = lgrip;
-        rGrip = rgrip;
-        lJoystick = ljoystick;
-        rJoystick = rjoystick;
-
-    }
-
-    [Command]
-    void CmdUpdateActions(Utils.Hand biman, int lockcomb)
-    {
-        whichHand = biman;
-        lockCombination = lockcomb;
-        RpcUpdateActions(biman, lockcomb);
-    }
-
-    [ClientRpc]
-    void RpcUpdateActions(Utils.Hand biman, int lockcomb)
-    {
-        whichHand = biman;
-        lockCombination = lockcomb;
-    }
 }

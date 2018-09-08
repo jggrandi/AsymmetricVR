@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class DockController : NetworkBehaviour {
+
+public class DockController : MonoBehaviour {
 
     ////hard
     //const float toleranceTrans = 0.005f;
@@ -44,7 +44,6 @@ public class DockController : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
-        if (!isServer) return;
 
         GameObject mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
@@ -63,8 +62,6 @@ public class DockController : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!isServer) return;
-        
         if (!syncParameters.EVALUATIONSTARTED) return;
 
         CalculateDocking();

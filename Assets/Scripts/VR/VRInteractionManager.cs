@@ -1,44 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using Valve.VR.InteractionSystem;
 
-public class VRInteractionManager : NetworkBehaviour {
+public class VRInteractionManager : MonoBehaviour {
 
     Vector3[] oldPointsForRotation = new Vector3[2];
     float oldScaleMag = 0f;
 
     ButtonSync buttonSync;
-    VRTransformSync transformSync;
 
-    Vector3 prevTranslation = new Vector3();
+    public Vector3 tStep = new Vector3();
+    public Quaternion rStep = new Quaternion();
+    public float sStep = 1f;
 
     PlayerStuff playerStuff;
 
+    public const float minScale = 0.03f;
+    public const float maxScale = 0.4f;
+
     // Use this for initialization
     void Start () {
-        if (!isLocalPlayer) return;
         buttonSync = this.gameObject.GetComponent<ButtonSync>();
-        transformSync = this.gameObject.GetComponent<VRTransformSync>();
         playerStuff = this.gameObject.GetComponent<PlayerStuff>();
-
     }
 
 
     // Update is called once per frame
     void Update () {
-        if (!isLocalPlayer) return;
+
         if(buttonSync == null) this.gameObject.GetComponent<ButtonSync>();
 
         var selected = ObjectManager.GetSelected();
         if (selected == null) return; // there is no object to interact with
-
-        // SERVER SHOULD TELL PLAYER TO CONTROL GHOST
-        //playerStuff.CmdSetIsGhost(false);
-        //if (syncParameters.trialIndex > 6 && playerStuff.id == 1)
-        //    playerStuff.CmdSetIsGhost(true);
-        
 
         List<Hand> interactingHands = new List<Hand>();
 
@@ -71,40 +65,24 @@ public class VRInteractionManager : NetworkBehaviour {
             oldScaleMag /= 2;
         }
 
-        transformSync.isTranslating = false;
-        transformSync.isRotating = false;
-        transformSync.isScaling = false;
 
         if (interactingHands.Count == 0)
             return;
 
-        var newTranslation = CalcTranslation(selected, interactingHands);
-        var newRotation = CalcRotation(selected, interactingHands);
-        var newScale = CalcScale(selected, interactingHands);
+        tStep = CalcTranslation(selected, interactingHands);
+        rStep = CalcRotation(selected, interactingHands);
+        sStep = CalcScale(selected, interactingHands);
 
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 1 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 9)
-        {
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRTranslate(selected.index, newTranslation, playerStuff.isGhost); // add position changes to the object
-            if (Vector3.Distance(newTranslation,prevTranslation) > 0.0001f)
-                transformSync.isTranslating = true;
-
-        }
+            selected.gameobject.transform.position += tStep;
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 3 || buttonSync.lockCombination == 4 || buttonSync.lockCombination == 8  || buttonSync.lockCombination == 9)
-        {
-            //Debug.Log(newRotation);
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRRotate(selected.index, newRotation, playerStuff.isGhost); // add all rotations to the object
-            if (newRotation != Quaternion.identity)
-                transformSync.isRotating = true;
-
-        }
+            selected.gameobject.transform.rotation =  rStep * selected.gameobject.transform.rotation;
         if (buttonSync.lTrigger || buttonSync.rTrigger || buttonSync.lockCombination == 5 || buttonSync.lockCombination == 6 || buttonSync.lockCombination == 8 ||  buttonSync.lockCombination == 9)
         {
-            this.gameObject.GetComponent<HandleNetworkTransformations>().VRScale(selected.index, newScale, playerStuff.isGhost); // add scale to the object
-            if (Mathf.Abs(newScale) > 0.0001f)
-                transformSync.isScaling = true;
+            var finalScale = selected.gameobject.transform.localScale.x + sStep;
+            finalScale = Mathf.Min(Mathf.Max(finalScale, minScale), maxScale); //limit the scale min and max
+            selected.gameobject.transform.localScale = new Vector3(finalScale, finalScale, finalScale);
         }
-
-        prevTranslation = newTranslation;
 
     }
 

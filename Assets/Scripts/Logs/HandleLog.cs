@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class HandleLog : NetworkBehaviour
+public class HandleLog : MonoBehaviour
 {
     Log log;
     int countFrames = 0;
@@ -24,7 +23,6 @@ public class HandleLog : NetworkBehaviour
     GameObject pauseRecord;
 
     void Start () {
-        if (!isServer) return;
         mainHandler = GameObject.Find("MainHandler");
         if (mainHandler == null) return;
         syncParameters = mainHandler.GetComponent<SyncTestParameters>();
@@ -41,7 +39,6 @@ public class HandleLog : NetworkBehaviour
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        if (!isServer) return;
         if (!isRecording) return;
         if (isPaused) return;
 
@@ -50,14 +47,14 @@ public class HandleLog : NetworkBehaviour
         if (countFrames % 5 == 0)
         {
             var objId = syncParameters.activeTrial;
-            log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.playersActiveInScene);
+            log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.playerInScene);
         }
     }
 
     public void StartLogRecording()
     {
         if (isRecording) return;
-        log = new Log(testParameters.groupID, testParameters.conditionsOrder[testParameters.conditionIndex], testParameters.playersActiveInScene);
+        log = new Log(testParameters.userID, testParameters.conditionsOrder[testParameters.conditionIndex]);
         syncParameters.EVALUATIONSTARTED = true;
         isRecording = true;
         isPaused = false;
@@ -118,42 +115,29 @@ public class HandleLog : NetworkBehaviour
         }
     }
 
-    public void SaveResumed(int objId, float time, List<GameObject> players)
+    public void SaveResumed(int objId, float time, GameObject players)
     {
         if (!isRecording) return;
         if (isPaused) return;
         var timeWithoutPause = time - timePaused;
         var objTime = timeWithoutPause - previousTime;
 
-        log.SaveResumed(objId, objTime, players);
+        log.SaveResumed(objId, objTime, testParameters.playerInScene);
         previousTime = timeWithoutPause;
         timePaused = 0f;
     }
 
     public void RecordActiveTime()
     {
-        foreach (var player in testParameters.playersActiveInScene)
-        {
-            var pStuff = player.GetComponent<PlayerStuff>();
-            if(pStuff.type == Utils.PlayerType.AR)
-            {
-                var arInteraction = player.GetComponent<Lean.Touch.ARInteractionManager>();
-                if(arInteraction.currentOperation > 0)
-                    pStuff.activeTime += Time.deltaTime;
-            }
-            else if (pStuff.type == Utils.PlayerType.VR)
-            {
-                var bSync = player.GetComponent<ButtonSync>();
-                if (bSync.AnyButtonPressedLeft() || bSync.AnyButtonPressedRight())
-                    pStuff.activeTime += Time.deltaTime;
-            }
-        }
+        var pStuff = testParameters.playerInScene.GetComponent<PlayerStuff>();
+        var bSync = testParameters.playerInScene.GetComponent<ButtonSync>();
+        if (bSync.AnyButtonPressedLeft() || bSync.AnyButtonPressedRight())
+            pStuff.activeTime += Time.deltaTime;
     }
 
     void OnApplicationQuit()
     {
         //TODO: NEED TO VERIFY IF LOG WAS CREATED BEFORE CLOSING
         log.Close();
-
     }
 }

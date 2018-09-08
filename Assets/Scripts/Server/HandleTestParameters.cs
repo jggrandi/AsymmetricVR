@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class HandleTestParameters : NetworkBehaviour
+public class HandleTestParameters : MonoBehaviour
 {
-    public const int conditionsToPermute = 3;
+    public const int conditionsToPermute = 2;
     public const int qntTraining = 3;
     public const int qntTrials = 8; // it is the defauld, interactableObjects.transform.childCount in start can change this value
-    public int groupID = 0;
+    public int userID = 0;
 
     public List<int> conditionsOrder = new List<int>();
     
@@ -30,12 +29,12 @@ public class HandleTestParameters : NetworkBehaviour
     SpawnInformation spawnInfo;
     HandleLog handleLog;
 
-    public List<GameObject> playersActiveInScene;
+    public GameObject playerInScene;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
 
-    string[] conditionName = { "VR-VR", "AR-AR", "VR-AR" };
+    string[] conditionName = { "Grab", "Distant"};
 
     public List<int> activeTrialOrder = new List<int>();
 
@@ -47,7 +46,7 @@ public class HandleTestParameters : NetworkBehaviour
     public int trialIndex;
     public int ghostOrder;
 
-    public override void OnStartServer()
+    public void Start()
     {
 
         mainHandler = GameObject.Find("MainHandler");
@@ -57,9 +56,6 @@ public class HandleTestParameters : NetworkBehaviour
         spawnInfo = this.gameObject.GetComponent<SpawnInformation>();
         dockController = this.gameObject.GetComponent<DockController>();
         handleLog = this.gameObject.GetComponent<HandleLog>();
-
-        panelConnected = GameObject.Find("ClientsConnected");
-        if (panelConnected == null) return;
 
         panelModality = GameObject.Find("PanelModality");
         if (panelModality == null) return;
@@ -75,8 +71,6 @@ public class HandleTestParameters : NetworkBehaviour
         ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
 
-        playersActiveInScene = new List<GameObject>();
-
         UpdateParameters();
 
     }
@@ -85,44 +79,14 @@ public class HandleTestParameters : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isServer) return;
-
-        RetrieveAllPlayersConnected();
-
-        if (playersActiveInScene.Count == 0) //if there is no players connected , remove the text of all UI 
-        {
-            for (int i = 0; i < panelConnected.transform.childCount; i++)
-                RemovePlayerOnDisplay(i);
-            return; // dont need to do other things
-        }
-
-        DisplayPlayersInUI(playersActiveInScene); // handle the display of the player's name on the UI
-
-    }
-
-    public void RetrieveAllPlayersConnected()
-    {
-        var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
-        var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
-        playersActiveInScene.Clear();
-        if (arObjs.Length > 0)
-        {
-            for (int i = 0; i < arObjs.Length; i++) // add all ar players connected
-                playersActiveInScene.Add(arObjs[i]);
-        }
-        if (vrObjs.Length > 0)
-        {
-            for (int i = 0; i < vrObjs.Length; i++) //add all vr players connected
-                playersActiveInScene.Add(vrObjs[i]);
-        }
     }
 
     public void UpdateParameters()
     {
-        groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
+        userID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
-        int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        int[] ghostPermutations = Utils.selectTaskSequence(groupID, 2); // alternate the order or manipulation of ghost pieces. it canoccour in the begining (0) or in the end (1) .. depends on the group id
+        int[] order = Utils.selectTaskSequence(userID, conditionsToPermute);
+        int[] ghostPermutations = Utils.selectTaskSequence(userID, 2); // alternate the order or manipulation of ghost pieces. it canoccour in the begining (0) or in the end (1) .. depends on the group id
         ghostOrder = ghostPermutations[0]; 
 
         conditionsOrder.Clear();
@@ -139,7 +103,6 @@ public class HandleTestParameters : NetworkBehaviour
         ReorderConditionNames();
         UpdateConditionColor();
         handleLog.StopLogRecording();
-        SetGhostManipulation(false);
         UpdateTrials();
         syncParameters.EVALUATIONSTARTED = false;
         syncParameters.TESTFINISHED = false;
@@ -148,7 +111,6 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickUpdate()
     {
         UpdateParameters();
-        syncParameters.SYNC();
     }
 
     void UpdateTrials()
@@ -251,49 +213,6 @@ public class HandleTestParameters : NetworkBehaviour
         trialIndex = index;
         syncParameters.activeTrial = activeTrialOrder[trialIndex];
         ObjectManager.SetSelected(syncParameters.activeTrial); // set only for the server. the sync var hook will set for clients
-        if (ghostOrder == 0)
-        {
-            if (trialIndex >= qntTraining && trialIndex < qntTraining + (qntTrials / 2))
-                SetGhostManipulation(false);
-            else
-                SetGhostManipulation(true);
-        }
-        else if (ghostOrder == 1)
-        {
-            if (trialIndex >= qntTraining  && trialIndex < qntTraining + (qntTrials / 2))
-                SetGhostManipulation(true);
-            else
-                SetGhostManipulation(false);
-        }
-
-        if (trialIndex == 0)
-            SetGhostManipulation(false);
-        if (trialIndex == 1) // if the training piece index is 1, player 1 train manipulating the ghost piece.
-            SetGhostManipulation(true);
-        if (trialIndex == 2)
-            SetGhostManipulation(false);
-    }
-
-    void SetGhostManipulation(bool _isghost)
-    {
-        GameObject g;
-        g = playersActiveInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
-        if (g == null) return;
-
-        g.GetComponent<PlayerStuff>().isGhost = _isghost; 
-
-        RpcSyncGhostManipulation(_isghost); //sync clients.
-    }
-
-    [ClientRpc]
-    void RpcSyncGhostManipulation(bool isghost)
-    {
-        GameObject g;
-        RetrieveAllPlayersConnected();
-        g = playersActiveInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
-        if (g == null) return;
-
-        g.GetComponent<PlayerStuff>().isGhost = isghost;
     }
 
     void ResetTrialsCompleted()
@@ -317,7 +236,7 @@ public class HandleTestParameters : NetworkBehaviour
     public void TrialCompleted()
     {
         trialsCompleted[trialIndex] = true;
-        handleLog.SaveResumed(syncParameters.activeTrial, Time.realtimeSinceStartup, playersActiveInScene);
+        handleLog.SaveResumed(syncParameters.activeTrial, Time.realtimeSinceStartup, playerInScene);
         ResetContributionTime();
 
         if (!trialsCompleted.Contains(false))
@@ -346,8 +265,6 @@ public class HandleTestParameters : NetworkBehaviour
         
         UpdateConditionColor();
         UpdateTrials();
-        SetGhostManipulation(false);
-        syncParameters.SYNC();
     }
 
     public void TestFinished()
@@ -372,8 +289,6 @@ public class HandleTestParameters : NetworkBehaviour
         conditionIndex = newIndex;
         UpdateConditionColor();
         UpdateTrials();
-        SetGhostManipulation(false);
-        syncParameters.SYNC();
     }
 
     public void OnClickTrial(int newIndex)
@@ -392,7 +307,6 @@ public class HandleTestParameters : NetworkBehaviour
         handleLog.previousTime = Time.realtimeSinceStartup;
         ResetContributionTime();
         UpdateTrialColor();
-        syncParameters.SYNC();
     }
 
     public void OnClickPause()
@@ -405,7 +319,6 @@ public class HandleTestParameters : NetworkBehaviour
     {
         if (syncParameters.TESTFINISHED) return;
         handleLog.StartLogRecording();
-        syncParameters.SYNC();
     }
 
     void DisplayTrialOrder()
@@ -568,23 +481,6 @@ public class HandleTestParameters : NetworkBehaviour
         return newQuat * spawnRot[i];
     }
 
-    public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
-    {
-        syncList.Clear();
-        for (int i = 0; i < list.Count; i++)
-        {
-            syncList.Add(list[i]);
-        }
-    }
-
-    public void SyncListToList(ref SyncListInt syncList, ref List<int> list)
-    {
-        list.Clear();
-        for (int i = 0; i < syncList.Count; i++)
-        {
-            list.Add(syncList[i]);
-        }
-    }
 
     void SetActiveTrialOrder()
     {
@@ -607,9 +503,8 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void ResetContributionTime()
     {
-        if (playersActiveInScene.Count <= 0) return;
-        foreach (var player in playersActiveInScene)
-            player.GetComponent<PlayerStuff>().activeTime = 0f;
+        if (playerInScene == null) return;
+        playerInScene.GetComponent<PlayerStuff>().activeTime = 0f;
     }
 
 }
