@@ -50,17 +50,18 @@ public class HandleLog : NetworkBehaviour
         if (countFrames % 5 == 0)
         {
             var objId = syncParameters.activeTrial;
-            log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.activeInScene);
+            log.SaveFull(objId, dockParameters.errorTrans[objId], dockParameters.errorRot[objId], dockParameters.errorRotAngle[objId], dockParameters.errorScale[objId], testParameters.playersActiveInScene);
         }
     }
 
     public void StartLogRecording()
     {
         if (isRecording) return;
-        log = new Log(testParameters.groupID, testParameters.conditionsOrder[testParameters.conditionIndex], testParameters.activeInScene);
+        log = new Log(testParameters.groupID, testParameters.conditionsOrder[testParameters.conditionIndex], testParameters.playersActiveInScene);
         syncParameters.EVALUATIONSTARTED = true;
         isRecording = true;
         isPaused = false;
+        timePaused = 0f;
         SetPauseButtonColor();
         SetRecordingButtonColor();
         
@@ -73,6 +74,7 @@ public class HandleLog : NetworkBehaviour
         previousTime = 0f;
         isRecording = false;
         isPaused = false;
+        timePaused = 0f;
         SetPauseButtonColor();
         SetRecordingButtonColor();
         log.Close();
@@ -125,11 +127,12 @@ public class HandleLog : NetworkBehaviour
 
         log.SaveResumed(objId, objTime, players);
         previousTime = timeWithoutPause;
+        timePaused = 0f;
     }
 
     public void RecordActiveTime()
     {
-        foreach (var player in testParameters.activeInScene)
+        foreach (var player in testParameters.playersActiveInScene)
         {
             var pStuff = player.GetComponent<PlayerStuff>();
             if(pStuff.type == Utils.PlayerType.AR)

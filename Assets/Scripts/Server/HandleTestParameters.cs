@@ -30,7 +30,7 @@ public class HandleTestParameters : NetworkBehaviour
     SpawnInformation spawnInfo;
     HandleLog handleLog;
 
-    public List<GameObject> activeInScene;
+    public List<GameObject> playersActiveInScene;
 
     GameObject interactableObjects;
     GameObject ghostObjects;
@@ -75,7 +75,7 @@ public class HandleTestParameters : NetworkBehaviour
         ghostObjects = ObjectManager.manager.allGhosts;
         if (ghostObjects == null) return;
 
-        activeInScene = new List<GameObject>();
+        playersActiveInScene = new List<GameObject>();
 
         UpdateParameters();
 
@@ -89,30 +89,30 @@ public class HandleTestParameters : NetworkBehaviour
 
         RetrieveAllPlayersConnected();
 
-        if (activeInScene.Count == 0) //if there is no players connected , remove the text of all UI 
+        if (playersActiveInScene.Count == 0) //if there is no players connected , remove the text of all UI 
         {
             for (int i = 0; i < panelConnected.transform.childCount; i++)
                 RemovePlayerOnDisplay(i);
             return; // dont need to do other things
         }
 
-        DisplayPlayersInUI(activeInScene); // handle the display of the player's name on the UI
+        DisplayPlayersInUI(playersActiveInScene); // handle the display of the player's name on the UI
     }
 
     public void RetrieveAllPlayersConnected()
     {
         var arObjs = GameObject.FindGameObjectsWithTag("PlayerAR");
         var vrObjs = GameObject.FindGameObjectsWithTag("PlayerVR");
-        activeInScene.Clear();
+        playersActiveInScene.Clear();
         if (arObjs.Length > 0)
         {
             for (int i = 0; i < arObjs.Length; i++) // add all ar players connected
-                activeInScene.Add(arObjs[i]);
+                playersActiveInScene.Add(arObjs[i]);
         }
         if (vrObjs.Length > 0)
         {
             for (int i = 0; i < vrObjs.Length; i++) //add all vr players connected
-                activeInScene.Add(vrObjs[i]);
+                playersActiveInScene.Add(vrObjs[i]);
         }
     }
 
@@ -273,7 +273,7 @@ public class HandleTestParameters : NetworkBehaviour
     void SetGhostManipulation(bool _isghost)
     {
         GameObject g;
-        g = activeInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
+        g = playersActiveInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
         if (g == null) return;
 
         g.GetComponent<PlayerStuff>().isGhost = _isghost; 
@@ -286,7 +286,7 @@ public class HandleTestParameters : NetworkBehaviour
     {
         GameObject g;
         RetrieveAllPlayersConnected();
-        g = activeInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
+        g = playersActiveInScene.Find(obj => obj.GetComponent<PlayerStuff>().id == 1);
         if (g == null) return;
 
         g.GetComponent<PlayerStuff>().isGhost = isghost;
@@ -313,7 +313,7 @@ public class HandleTestParameters : NetworkBehaviour
     public void TrialCompleted()
     {
         trialsCompleted[trialIndex] = true;
-        handleLog.SaveResumed(syncParameters.activeTrial, Time.realtimeSinceStartup, activeInScene);
+        handleLog.SaveResumed(syncParameters.activeTrial, Time.realtimeSinceStartup, playersActiveInScene);
         ResetContributionTime();
 
         if (!trialsCompleted.Contains(false))
@@ -394,7 +394,7 @@ public class HandleTestParameters : NetworkBehaviour
     public void OnClickPause()
     {
         if (syncParameters.TESTFINISHED) return;
-        handleLog.StopLogRecording();
+        handleLog.PauseLogRecording();
     }
 
     public void OnClickStartRecording()
@@ -584,8 +584,8 @@ public class HandleTestParameters : NetworkBehaviour
 
     public void ResetContributionTime()
     {
-        if (activeInScene.Count <= 0) return;
-        foreach (var player in activeInScene)
+        if (playersActiveInScene.Count <= 0) return;
+        foreach (var player in playersActiveInScene)
             player.GetComponent<PlayerStuff>().activeTime = 0f;
     }
 
