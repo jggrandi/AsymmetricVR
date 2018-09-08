@@ -564,7 +564,8 @@ public class HandleTestParameters : NetworkBehaviour
         float angle = 0f;
         Vector3 axis = new Vector3();
         spawnRot[i].ToAngleAxis(out angle, out axis);
-        return Quaternion.AngleAxis(angle, -axis);
+        Quaternion newQuat = Quaternion.AngleAxis(angle, -axis);
+        return newQuat * spawnRot[i];
     }
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
