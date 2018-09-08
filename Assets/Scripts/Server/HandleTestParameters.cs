@@ -97,6 +97,7 @@ public class HandleTestParameters : NetworkBehaviour
         }
 
         DisplayPlayersInUI(playersActiveInScene); // handle the display of the player's name on the UI
+
     }
 
     public void RetrieveAllPlayersConnected()
@@ -121,14 +122,14 @@ public class HandleTestParameters : NetworkBehaviour
         groupID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
         int[] order = Utils.selectTaskSequence(groupID, conditionsToPermute);
-        int[] ghostPermutations = Utils.selectTaskSequence(groupID, 2);
+        int[] ghostPermutations = Utils.selectTaskSequence(groupID, 2); // alternate the order or manipulation of ghost pieces. it canoccour in the begining (0) or in the end (1) .. depends on the group id
         ghostOrder = ghostPermutations[0]; 
 
         conditionsOrder.Clear();
 
         for (int i = 0; i < order.Length; i++)
             conditionsOrder.Add(order[i]);
-
+        
         condition0TrialOrder = RandomizeTrialOrder(); //three because we have 3 conditions....
         condition1TrialOrder = RandomizeTrialOrder();
         condition2TrialOrder = RandomizeTrialOrder();
@@ -265,9 +266,12 @@ public class HandleTestParameters : NetworkBehaviour
                 SetGhostManipulation(false);
         }
 
+        if (trialIndex == 0)
+            SetGhostManipulation(false);
         if (trialIndex == 1) // if the training piece index is 1, player 1 train manipulating the ghost piece.
             SetGhostManipulation(true);
-
+        if (trialIndex == 2)
+            SetGhostManipulation(false);
     }
 
     void SetGhostManipulation(bool _isghost)
@@ -420,15 +424,33 @@ public class HandleTestParameters : NetworkBehaviour
 
     void RandomizeTrialsSpawnTransform()
     {
-        CreateTrialsTransform<Vector3>(spawnInfo.pos, spawnPos);
-        CreateTrialsTransform<Quaternion>(spawnInfo.rot, spawnRot);
-        CreateTrialsTransform<float>(spawnInfo.scale, spawnScale);
+
+        List<Vector3> tempSpawnPos = new List<Vector3>();
+        List<Quaternion> tempSpawnRot = new List<Quaternion>();
+        List<float> tempSpawnScale = new List<float>();
+
+        CreateTrialsTransform<Vector3>(qntTraining, spawnInfo.pos, tempSpawnPos); // training spawn info
+        CreateTrialsTransform<Vector3>(qntTrials, spawnInfo.pos, tempSpawnPos); // trials spawn info
+
+        CreateTrialsTransform<Quaternion>(qntTraining, spawnInfo.rot, tempSpawnRot);
+        CreateTrialsTransform<Quaternion>(qntTrials, spawnInfo.rot, tempSpawnRot);
+
+        CreateTrialsTransform<float>(qntTraining, spawnInfo.scale, tempSpawnScale);
+        CreateTrialsTransform<float>(qntTrials, spawnInfo.scale, tempSpawnScale);
+
+        spawnPos.Clear();
+        spawnRot.Clear();
+        spawnScale.Clear();
+        spawnPos = tempSpawnPos;
+        spawnRot = tempSpawnRot;
+        spawnScale = tempSpawnScale;
+        
+
     }
 
-    public void CreateTrialsTransform <T>(List<T> _transform, List<T> stored)
+    public void CreateTrialsTransform <T>(int size, List<T> _transform, List<T> stored)
     {
-        stored.Clear();
-        var list = Utils.FitVectorIntoAnother(qntTrials + qntTraining, _transform.Count);
+        var list = Utils.FitVectorIntoAnother(size, _transform.Count);
         list = Utils.RandomizeList(list);
         foreach (var item in list)
             stored.Add(_transform[item]);
