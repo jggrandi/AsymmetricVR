@@ -43,14 +43,14 @@ public class VisualFeedback : MonoBehaviour {
 
         DisableIcons(icons); // disable all icons. Only show when an action is performed.
 
-        //var vrTransform = this.GetComponent<VRTransformSync>();
+        var vrTransform = this.GetComponent<VRTransformSync>();
 
-        //head.transform.position = Vector3.Lerp(head.transform.position, vrTransform.headPos, 0.4f); // set the virtual avatar pos and rot
-        //head.transform.rotation = vrTransform.headRot;
-        //leftController.transform.position = Vector3.Lerp(leftController.transform.position, vrTransform.leftHPos, 0.4f);
-        //leftController.transform.rotation = vrTransform.leftHRot;
-        //rightController.transform.position = Vector3.Lerp(rightController.transform.position, vrTransform.rightHPos, 0.4f);
-        //rightController.transform.rotation = vrTransform.rightHRot;
+        head.transform.position = Vector3.Lerp(head.transform.position, vrTransform.headPos, 0.4f); // set the virtual avatar pos and rot
+        head.transform.rotation = vrTransform.headRot;
+        leftController.transform.position = Vector3.Lerp(leftController.transform.position, vrTransform.leftHPos, 0.4f);
+        leftController.transform.rotation = vrTransform.leftHRot;
+        rightController.transform.position = Vector3.Lerp(rightController.transform.position, vrTransform.rightHPos, 0.4f);
+        rightController.transform.rotation = vrTransform.rightHRot;
 
         //var selected = player.GetComponent<VisualFeedback>().objSelectedShared;
         if (indexObjSelected == -1) return;
