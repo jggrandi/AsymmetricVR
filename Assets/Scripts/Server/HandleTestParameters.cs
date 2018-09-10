@@ -44,7 +44,7 @@ public class HandleTestParameters : MonoBehaviour
 
     public int conditionIndex;
     public int trialIndex;
-    public int ghostOrder;
+    //public int ghostOrder;
 
     public void Start()
     {
@@ -86,8 +86,8 @@ public class HandleTestParameters : MonoBehaviour
         userID = int.Parse(GameObject.Find("InputFieldGroupID").GetComponent<InputField>().text);
 
         int[] order = Utils.selectTaskSequence(userID, conditionsToPermute);
-        int[] ghostPermutations = Utils.selectTaskSequence(userID, 2); // alternate the order or manipulation of ghost pieces. it canoccour in the begining (0) or in the end (1) .. depends on the group id
-        ghostOrder = ghostPermutations[0]; 
+        //int[] ghostPermutations = Utils.selectTaskSequence(userID, 2); // alternate the order or manipulation of ghost pieces. it canoccour in the begining (0) or in the end (1) .. depends on the group id
+        //ghostOrder = ghostPermutations[0]; 
 
         conditionsOrder.Clear();
 
@@ -99,6 +99,8 @@ public class HandleTestParameters : MonoBehaviour
         condition2TrialOrder = RandomizeTrialOrder();
         conditionIndex = 0;
 
+        LoadInteractionTechnique();
+
         ResetConditionsCompleted();
         ReorderConditionNames();
         UpdateConditionColor();
@@ -106,6 +108,34 @@ public class HandleTestParameters : MonoBehaviour
         UpdateTrials();
         syncParameters.EVALUATIONSTARTED = false;
         syncParameters.TESTFINISHED = false;
+    }
+
+    public void LoadInteractionTechnique()
+    {
+        if(conditionsOrder[conditionIndex] == 0)
+        {
+            playerInScene.GetComponent<PlayerVR>().enabled = false;
+            playerInScene.GetComponent<VRInteractionManager>().enabled = false;
+            playerInScene.GetComponent<VisualFeedback>().enabled = false;
+            playerInScene.GetComponent<VRTransformSync>().enabled = false;
+            foreach (Transform obj in interactableObjects.transform)
+                obj.gameObject.AddComponent<Valve.VR.InteractionSystem.MyThrowable>();
+
+        }
+        else if(conditionsOrder[conditionIndex] == 1)
+        {
+            playerInScene.GetComponent<PlayerVR>().enabled = true;
+            playerInScene.GetComponent<VRInteractionManager>().enabled = true;
+            playerInScene.GetComponent<VisualFeedback>().enabled = true;
+            playerInScene.GetComponent<VRTransformSync>().enabled = true;
+            foreach (Transform obj in interactableObjects.transform)
+            {
+                var throwable = obj.gameObject.GetComponent<Valve.VR.InteractionSystem.MyThrowable>();
+                if(throwable != null)
+                    Destroy(throwable);
+            }
+
+        }
     }
 
     public void OnClickUpdate()
@@ -262,7 +292,7 @@ public class HandleTestParameters : MonoBehaviour
 
         GreyTrialCompleted();
         handleLog.StopLogRecording();
-        
+        LoadInteractionTechnique();
         UpdateConditionColor();
         UpdateTrials();
     }
@@ -287,6 +317,7 @@ public class HandleTestParameters : MonoBehaviour
         if (conditionsCompleted[newIndex] == true) return;
         
         conditionIndex = newIndex;
+        LoadInteractionTechnique();
         UpdateConditionColor();
         UpdateTrials();
     }
@@ -402,23 +433,11 @@ public class HandleTestParameters : MonoBehaviour
             obj.rotation = Quaternion.identity;
         }
 
-        if (ghostOrder == 0)
-        {
-            for (int i = qntTraining; i < halfTrials + qntTraining; i++)
-                StaticGhostPositioning(i, centerTable);
-            for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
-                MovingGhostPositioning(i, centerTable);
-        }
-        else if (ghostOrder == 1)
-        {
-            for (int i = qntTraining; i < halfTrials + qntTraining; i++)
-                MovingGhostPositioning(i, centerTable);
-            for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
-                StaticGhostPositioning(i, centerTable);
-        }
-
+        for (int i = qntTraining; i < halfTrials + qntTraining; i++)
+            StaticGhostPositioning(i, centerTable);
+        for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
+            MovingGhostPositioning(i, centerTable);
         
-        MovingGhostPositioning(1, centerTable);
 
     }
 
@@ -435,25 +454,11 @@ public class HandleTestParameters : MonoBehaviour
         }
         else
         {
-            if (ghostOrder == 0)
-            {
-                if(index < halfTrials)
-                    StaticGhostPositioning(index, centerTable);
-                else
-                    MovingGhostPositioning(index, centerTable);
-            }
-            else if (ghostOrder == 1)
-            {
-                if (index < halfTrials)
-                    MovingGhostPositioning(index, centerTable);
-                else
-                    StaticGhostPositioning(index, centerTable);
-            }
+            if(index < halfTrials)
+                StaticGhostPositioning(index, centerTable);
+            else
+                MovingGhostPositioning(index, centerTable);
         }
-
-        if(index == 1)
-            MovingGhostPositioning(index, centerTable);
-
     }
 
     public void StaticGhostPositioning(int i, Vector3 centertable)
