@@ -524,16 +524,16 @@ public class HandleTestParameters : NetworkBehaviour
         {
             if (ghostOrder == 0)
             {
-                if(index < halfTrials)
+                for (int i = qntTraining; i < halfTrials + qntTraining; i++)
                     StaticGhostPositioning(index, centerTable);
-                else
+                for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
                     MovingGhostPositioning(index, centerTable);
             }
             else if (ghostOrder == 1)
             {
-                if (index < halfTrials)
+                for (int i = qntTraining; i < halfTrials + qntTraining; i++)
                     MovingGhostPositioning(index, centerTable);
-                else
+                for (int i = qntTraining + halfTrials; i < ghostObjects.transform.childCount; i++)
                     StaticGhostPositioning(index, centerTable);
             }
         }
@@ -565,7 +565,7 @@ public class HandleTestParameters : NetworkBehaviour
         Vector3 axis = new Vector3();
         spawnRot[i].ToAngleAxis(out angle, out axis);
         Quaternion newQuat = Quaternion.AngleAxis(angle, -axis);
-        return newQuat * spawnRot[i];
+        return spawnRot[i] * newQuat ;
     }
 
     public void ListToSyncList(ref List<int> list, ref SyncListInt syncList)
