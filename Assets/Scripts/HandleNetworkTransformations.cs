@@ -56,6 +56,7 @@ public class HandleNetworkTransformations : NetworkBehaviour
     [Command]
     void CmdVRTranslate(int index, Vector3 translatestep, bool isghost)
     {
+        tStep = translatestep;
         GameObject g = RetrieveObject(index, isghost);
         g.transform.position += translatestep;
         //g.transform.position = Vector3.Lerp(g.transform.position, g.transform.position + translatestep, 0.7f);
