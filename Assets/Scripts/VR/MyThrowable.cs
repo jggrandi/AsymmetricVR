@@ -111,6 +111,8 @@ namespace Valve.VR.InteractionSystem
                 ghostObject.transform.rotation = gameObject.transform.rotation;
                 hand.AttachObject(ghostObject, attachmentFlags, attachmentPoint);
                 ControllerButtonHints.HideButtonHint(hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger);
+                gameObject.transform.position = ghostObject.transform.position;
+                gameObject.transform.rotation = ghostObject.transform.rotation;
             }
         }
 
@@ -207,6 +209,7 @@ namespace Valve.VR.InteractionSystem
         //-------------------------------------------------
         private void HandAttachedUpdate(Hand hand)
         {
+            Debug.Log("VAI");
             //Trigger got released
             if (!hand.GetStandardInteractionButton())
             {
@@ -235,8 +238,7 @@ namespace Valve.VR.InteractionSystem
                 }
             }
 
-            gameObject.transform.position = ghostObject.transform.position;
-            gameObject.transform.rotation = ghostObject.transform.rotation;
+
         }
 
 

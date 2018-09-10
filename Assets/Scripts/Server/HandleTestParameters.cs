@@ -118,8 +118,8 @@ public class HandleTestParameters : MonoBehaviour
             playerInScene.GetComponent<VRInteractionManager>().enabled = false;
             playerInScene.GetComponent<VisualFeedback>().enabled = false;
             playerInScene.GetComponent<VRTransformSync>().enabled = false;
-            foreach (Transform obj in interactableObjects.transform)
-                obj.gameObject.AddComponent<Valve.VR.InteractionSystem.MyThrowable>();
+            //foreach (Transform obj in interactableObjects.transform)
+            //    obj.gameObject.AddComponent<Grab>();
 
         }
         else if(conditionsOrder[conditionIndex] == 1)
@@ -128,12 +128,12 @@ public class HandleTestParameters : MonoBehaviour
             playerInScene.GetComponent<VRInteractionManager>().enabled = true;
             playerInScene.GetComponent<VisualFeedback>().enabled = true;
             playerInScene.GetComponent<VRTransformSync>().enabled = true;
-            foreach (Transform obj in interactableObjects.transform)
-            {
-                var throwable = obj.gameObject.GetComponent<Valve.VR.InteractionSystem.MyThrowable>();
-                if(throwable != null)
-                    Destroy(throwable);
-            }
+            //foreach (Transform obj in interactableObjects.transform)
+            //{
+            //    var throwable = obj.gameObject.GetComponent<Grab>();
+            //    if(throwable != null)
+            //        Destroy(throwable);
+            //}
 
         }
     }
