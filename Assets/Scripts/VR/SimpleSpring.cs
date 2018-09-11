@@ -11,7 +11,7 @@ public class SimpleSpring : MonoBehaviour {
     public float debugv = 0;
     public GameObject[] stack;
 
-    public const int DEFAULT_K = 150;
+    public const int DEFAULT_K = 1000;
 
     public bool isColliding;
 

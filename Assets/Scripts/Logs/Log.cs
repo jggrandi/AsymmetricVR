@@ -48,7 +48,7 @@ public class Log
 
         var pStuff = player.GetComponent<PlayerStuff>();
 
-        var pTransformStep = player.GetComponent<VRInteractionManager>();
+        var pTransformStep = player.GetComponent<VRDistantInteraction>();
         Vector3 pPos = new Vector3();
         Quaternion pRot = new Quaternion();
         Utils.Hand vrBimanual = Utils.Hand.None;

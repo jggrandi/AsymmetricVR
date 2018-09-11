@@ -115,7 +115,7 @@ public class HandleTestParameters : MonoBehaviour
         if(conditionsOrder[conditionIndex] == 0)
         {
             playerInScene.GetComponent<PlayerVR>().enabled = false;
-            playerInScene.GetComponent<VRInteractionManager>().enabled = false;
+            playerInScene.GetComponent<VRDistantInteraction>().enabled = false;
             playerInScene.GetComponent<VisualFeedback>().enabled = false;
             playerInScene.GetComponent<VRTransformSync>().enabled = false;
             //foreach (Transform obj in interactableObjects.transform)
@@ -125,7 +125,7 @@ public class HandleTestParameters : MonoBehaviour
         else if(conditionsOrder[conditionIndex] == 1)
         {
             playerInScene.GetComponent<PlayerVR>().enabled = true;
-            playerInScene.GetComponent<VRInteractionManager>().enabled = true;
+            playerInScene.GetComponent<VRDistantInteraction>().enabled = true;
             playerInScene.GetComponent<VisualFeedback>().enabled = true;
             playerInScene.GetComponent<VRTransformSync>().enabled = true;
             //foreach (Transform obj in interactableObjects.transform)

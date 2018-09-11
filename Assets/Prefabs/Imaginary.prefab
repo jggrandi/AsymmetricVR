@@ -57,4 +57,4 @@ MonoBehaviour:
   debugv: 0
   stack: []
   isColliding: 0
-  k: 0
+  k: 1000

@@ -17,10 +17,9 @@ public class Grab : MonoBehaviour {
     private Color materialOriginalColor;
     private Color hoverColor, selectColor;
 
+    ButtonSync buttonSync;
+    PlayerStuff playerStuff;
 
-    //-------------------------------------------------
-    void Awake() {
-    }
 
     void Start() {
 
@@ -28,9 +27,8 @@ public class Grab : MonoBehaviour {
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
         //logicObject = GameObject.Find(this.transform.name + " Logic");
-
-
-
+        buttonSync = this.gameObject.GetComponent<ButtonSync>();
+        playerStuff = this.gameObject.GetComponent<PlayerStuff>();
 
     }
 
@@ -60,8 +58,8 @@ public class Grab : MonoBehaviour {
 
         if (hand.GetStandardInteractionButtonDown())
         {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
-            if (hand.currentAttachedObject != gameObject)
-            {
+            //if (hand.currentAttachedObject != gameObject)
+            //{
 
 
                 //Instantiate and imaginary god-object
@@ -107,34 +105,37 @@ public class Grab : MonoBehaviour {
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
-                hand.HoverLock(GetComponent<Interactable>());
+                hand.HoverLock(null);
 
                 // Attach this object to the hand
                 hand.AttachObject(imaginary, attachmentFlags);
 
 
 
-            }
+            //}
         }
         if (hand.GetStandardInteractionButtonUp())// || hand.controller.GetPressUp(Valve.VR.EVRButtonId.k_EButton_Grip) && hand.currentAttachedObject != null)
         {
+            Debug.Log("Aqui tranquera");
 
-
-
+            hand.DetachObject(imaginary);
             Destroy(imaginary);
 
 
 
             // Detach this object from the hand
-            hand.DetachObject(imaginary);
+            
             // Call this to undo HoverLock
-            hand.HoverUnlock(GetComponent<Interactable>());
+            hand.HoverUnlock(null);
 
         }
         
 
     }
-
+    private void HandAttachedUpdate(Hand hand)
+    {
+        Debug.Log("AQUIIIIIIII");
+    }
     //-------------------------------------------------
     // Search for objects stacked on the other hand and detach
     //-------------------------------------------------

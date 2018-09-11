@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
-public class VRInteractionManager : MonoBehaviour {
+public class VRDistantInteraction : MonoBehaviour {
 
     Vector3[] oldPointsForRotation = new Vector3[2];
     float oldScaleMag = 0f;
