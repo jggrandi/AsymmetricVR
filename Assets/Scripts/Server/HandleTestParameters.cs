@@ -117,7 +117,12 @@ public class HandleTestParameters : MonoBehaviour
             playerInScene.GetComponent<PlayerVR>().enabled = false;
             playerInScene.GetComponent<VRDistantInteraction>().enabled = false;
             playerInScene.GetComponent<VisualFeedback>().enabled = false;
-            playerInScene.GetComponent<VRTransformSync>().enabled = false;
+            var vrTransform = playerInScene.GetComponent<VRTransformSync>();
+            vrTransform.player.hands[0].GetComponent<VRCloseInteraction>().enabled = true;
+            vrTransform.player.hands[1].GetComponent<VRCloseInteraction>().enabled = true;
+
+            foreach (Transform obj in interactableObjects.transform)
+                obj.GetComponent<InteractableItem>().enabled = true;
             //foreach (Transform obj in interactableObjects.transform)
             //    obj.gameObject.AddComponent<Grab>();
 
@@ -127,13 +132,13 @@ public class HandleTestParameters : MonoBehaviour
             playerInScene.GetComponent<PlayerVR>().enabled = true;
             playerInScene.GetComponent<VRDistantInteraction>().enabled = true;
             playerInScene.GetComponent<VisualFeedback>().enabled = true;
-            playerInScene.GetComponent<VRTransformSync>().enabled = true;
-            //foreach (Transform obj in interactableObjects.transform)
-            //{
-            //    var throwable = obj.gameObject.GetComponent<Grab>();
-            //    if(throwable != null)
-            //        Destroy(throwable);
-            //}
+            var vrTransform = playerInScene.GetComponent<VRTransformSync>();
+            vrTransform.enabled = true;
+            vrTransform.player.hands[0].GetComponent<VRCloseInteraction>().enabled = false;
+            vrTransform.player.hands[1].GetComponent<VRCloseInteraction>().enabled = false;
+
+            foreach (Transform obj in interactableObjects.transform)
+                obj.GetComponent<InteractableItem>().enabled = false;
 
         }
     }

@@ -13,7 +13,8 @@ public class Grab : MonoBehaviour {
     private GameObject imaginary;
     //private GameObject logicObject;
 
-    private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
+    //private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
+    private Hand.AttachmentFlags attachmentFlags = Hand.AttachmentFlags.DetachFromOtherHand;
     private Color materialOriginalColor;
     private Color hoverColor, selectColor;
 
@@ -98,14 +99,17 @@ public class Grab : MonoBehaviour {
                 if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null)
                 { //if the other hand is grabbing an object
                     //Find this object in the other hand
-                    var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
-                    DetachFromOtherHand(gameObject, otherHandObj);
+                    var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().gameObject;
+                    otherHandObj.transform.parent = hand.transform;
+                    hand.otherHand.DetachObject(imaginary);
+                    hand.otherHand.HoverLock(null);
+                    //DetachFromOtherHand(gameObject, otherHandObj);
                 }
 
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
-                hand.HoverLock(null);
+                hand.HoverLock(this.GetComponent<Interactable>());
 
                 // Attach this object to the hand
                 hand.AttachObject(imaginary, attachmentFlags);

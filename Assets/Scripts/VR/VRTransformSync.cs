@@ -18,7 +18,7 @@ public class VRTransformSync : MonoBehaviour
     public bool isRotating = false;
     public bool isScaling = false;
 
-    Player player;
+    public Player player;
 
     private void Start()
     {

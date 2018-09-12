@@ -8,10 +8,7 @@ public class VRCloseInteraction : MonoBehaviour
     private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
     private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
 
-    //private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
-    //private SteamVR_TrackedObject trackedObj;
-
-    HashSet<InteractableItem> objectsHoveringOver = new HashSet<InteractableItem>();
+    InteractableItem objectHoveringOver = null;
 
     private InteractableItem closestItem;
     private InteractableItem interactingItem;
@@ -38,39 +35,24 @@ public class VRCloseInteraction : MonoBehaviour
         }
         
 
-        if (controller.GetPressDown(gripButton))
+        if (controller.GetPressDown(triggerButton))
         {
-            Debug.Log("PRESSES");
-            float minDistance = float.MaxValue;
+            if (objectHoveringOver == null) return;
 
-            float distance;
-            foreach (InteractableItem item in objectsHoveringOver)
+            if (objectHoveringOver)
             {
-                distance = (item.transform.position - transform.position).sqrMagnitude;
-
-                if (distance < minDistance)
+                if (objectHoveringOver.IsInteracting())
                 {
-                    minDistance = distance;
-                    closestItem = item;
-                }
-            }
-
-            interactingItem = closestItem;
-
-            if (interactingItem)
-            {
-                if (interactingItem.IsInteracting())
-                {
-                    interactingItem.EndInteraction(this);
+                    objectHoveringOver.EndInteraction(this);
                 }
 
-                interactingItem.BeginInteraction(this);
+                objectHoveringOver.BeginInteraction(this);
             }
         }
 
-        if (controller.GetPressUp(gripButton) && interactingItem != null)
+        if (controller.GetPressUp(triggerButton) && objectHoveringOver != null)
         {
-            interactingItem.EndInteraction(this);
+            objectHoveringOver.EndInteraction(this);
         }
     }
 
@@ -79,17 +61,16 @@ public class VRCloseInteraction : MonoBehaviour
         InteractableItem collidedItem = collider.GetComponent<InteractableItem>();
         if (collidedItem)
         {
-            objectsHoveringOver.Add(collidedItem);
+            objectHoveringOver = collidedItem;
         }
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        Debug.Log("Exit trigger");
         InteractableItem collidedItem = collider.GetComponent<InteractableItem>();
         if (collidedItem)
         {
-            objectsHoveringOver.Remove(collidedItem);
+            objectHoveringOver = null;
         }
     }
 }

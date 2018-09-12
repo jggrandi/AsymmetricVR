@@ -27,21 +27,23 @@ public class InteractableItem : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update() {
-	    if (attachedWand && currentlyInteracting) {
+	void FixedUpdate() {
+        if (attachedWand && currentlyInteracting)
+        {
             posDelta = attachedWand.transform.position - interactionPoint.position;
             this.rigidbody.velocity = posDelta * velocityFactor * Time.fixedDeltaTime;
 
             rotationDelta = attachedWand.transform.rotation * Quaternion.Inverse(interactionPoint.rotation);
             rotationDelta.ToAngleAxis(out angle, out axis);
 
-            if (angle > 180) {
+            if (angle > 180)
+            {
                 angle -= 360;
             }
 
             this.rigidbody.angularVelocity = (Time.fixedDeltaTime * angle * axis) * rotationFactor;
         }
-	}
+    }
 
     public void BeginInteraction(VRCloseInteraction controller) {
         attachedWand = controller;
