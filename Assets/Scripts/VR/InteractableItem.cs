@@ -37,9 +37,7 @@ public class InteractableItem : MonoBehaviour {
             rotationDelta.ToAngleAxis(out angle, out axis);
 
             if (angle > 180)
-            {
                 angle -= 360;
-            }
 
             this.rigidbody.angularVelocity = (Time.fixedDeltaTime * angle * axis) * rotationFactor;
         }

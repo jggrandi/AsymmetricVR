@@ -10,10 +10,6 @@ public class VRCloseInteraction : MonoBehaviour
 
     InteractableItem objectHoveringOver = null;
 
-    private InteractableItem closestItem;
-    private InteractableItem interactingItem;
-
-    // Use this for initialization
 
     SteamVR_Controller.Device controller;
     Hand hand;
@@ -28,11 +24,9 @@ public class VRCloseInteraction : MonoBehaviour
     void Update()
     {
         controller = hand.controller;
-        if ( controller == null)
-        {
-            Debug.Log("Controller not initialized");
+        if ( controller == null)    
             return;
-        }
+        
         
 
         if (controller.GetPressDown(triggerButton))
@@ -42,9 +36,7 @@ public class VRCloseInteraction : MonoBehaviour
             if (objectHoveringOver)
             {
                 if (objectHoveringOver.IsInteracting())
-                {
                     objectHoveringOver.EndInteraction(this);
-                }
 
                 objectHoveringOver.BeginInteraction(this);
             }
@@ -53,24 +45,22 @@ public class VRCloseInteraction : MonoBehaviour
         if (controller.GetPressUp(triggerButton) && objectHoveringOver != null)
         {
             objectHoveringOver.EndInteraction(this);
+            objectHoveringOver = null;
         }
+            
     }
 
     private void OnTriggerEnter(Collider collider)
     {
         InteractableItem collidedItem = collider.GetComponent<InteractableItem>();
         if (collidedItem)
-        {
             objectHoveringOver = collidedItem;
-        }
     }
 
     private void OnTriggerExit(Collider collider)
     {
         InteractableItem collidedItem = collider.GetComponent<InteractableItem>();
         if (collidedItem)
-        {
             objectHoveringOver = null;
-        }
     }
 }

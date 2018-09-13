@@ -146,7 +146,7 @@ public class VisualFeedback : MonoBehaviour {
         line.LineColor = c;
     }
 
-    void ClearLines()
+    public void ClearLines()
     {
         for (int i = linesUsed; i < lines.transform.childCount; i++)
         {
@@ -157,7 +157,7 @@ public class VisualFeedback : MonoBehaviour {
         linesUsed = 0;
     }
 
-    void DisableIcons(Transform icons)
+    public void DisableIcons(Transform icons)
     {
         for (int i = 0; i < icons.transform.childCount; i++)
             icons.transform.GetChild(i).gameObject.SetActive(false);

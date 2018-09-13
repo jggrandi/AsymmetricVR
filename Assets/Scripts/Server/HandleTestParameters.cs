@@ -116,15 +116,21 @@ public class HandleTestParameters : MonoBehaviour
         {
             playerInScene.GetComponent<PlayerVR>().enabled = false;
             playerInScene.GetComponent<VRDistantInteraction>().enabled = false;
-            playerInScene.GetComponent<VisualFeedback>().enabled = false;
+            var visualFB = playerInScene.GetComponent<VisualFeedback>();
+            var icons = playerInScene.transform.GetChild(3);
+            visualFB.ClearLines();
+            visualFB.DisableIcons(icons);
+            visualFB.enabled = false;
+
+            foreach (Transform obj in interactableObjects.transform)
+                obj.GetComponent<InteractableItem>().enabled = true;
+
             var vrTransform = playerInScene.GetComponent<VRTransformSync>();
             vrTransform.player.hands[0].GetComponent<VRCloseInteraction>().enabled = true;
             vrTransform.player.hands[1].GetComponent<VRCloseInteraction>().enabled = true;
 
-            foreach (Transform obj in interactableObjects.transform)
-                obj.GetComponent<InteractableItem>().enabled = true;
-            //foreach (Transform obj in interactableObjects.transform)
-            //    obj.gameObject.AddComponent<Grab>();
+
+
 
         }
         else if(conditionsOrder[conditionIndex] == 1)
@@ -158,6 +164,7 @@ public class HandleTestParameters : MonoBehaviour
         ResetContributionTime();
         SetObjectsTransform();
         SetGhostsTransform();
+        ResetAllObjPhysics();
         SetCurrentTrialIndex(trialIndex);
     }
 
@@ -342,6 +349,7 @@ public class HandleTestParameters : MonoBehaviour
         SetCurrentTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
         ResetContributionTime();
+        //ResetAllObjPhysics();
         UpdateTrialColor();
     }
 
@@ -515,6 +523,18 @@ public class HandleTestParameters : MonoBehaviour
     {
         if (playerInScene == null) return;
         playerInScene.GetComponent<PlayerStuff>().activeTime = 0f;
+    }
+
+    public void ResetAllObjPhysics()
+    {
+        foreach(Transform obj in interactableObjects.transform)
+        {
+            var objRB = obj.gameObject.GetComponent<Rigidbody>();
+            objRB.mass = 10f;
+            objRB.drag = 0f;
+            objRB.angularDrag = 0.05f;
+            objRB.useGravity = true;
+        }
     }
 
 }

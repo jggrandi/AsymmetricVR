@@ -67,7 +67,13 @@ public class VRDistantInteraction : MonoBehaviour {
 
 
         if (interactingHands.Count == 0)
+        {
+           // ResetPhysics(selected);
             return;
+
+        }
+
+        //ChangePhysics(selected);
 
         tStep = CalcTranslation(selected, interactingHands);
         rStep = CalcRotation(selected, interactingHands);
@@ -183,4 +189,23 @@ public class VRDistantInteraction : MonoBehaviour {
         }
         return scaleStep;
     }
+
+    void ChangePhysics(ObjSelected obj)
+    {
+        var objRB = obj.gameobject.GetComponent<Rigidbody>();
+        objRB.mass = 10000f;
+        objRB.drag = 10000f;
+        objRB.angularDrag = 10000f;
+        objRB.useGravity = false;
+    }
+
+    void ResetPhysics(ObjSelected obj)
+    {
+        var objRB = obj.gameobject.GetComponent<Rigidbody>();
+        objRB.mass = 1f;
+        objRB.drag = 0f;
+        objRB.angularDrag = 0.05f;
+        objRB.useGravity = true;
+    }
+
 }
