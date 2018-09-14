@@ -349,7 +349,7 @@ public class HandleTestParameters : MonoBehaviour
         SetCurrentTrialIndex(newIndex);
         handleLog.previousTime = Time.realtimeSinceStartup;
         ResetContributionTime();
-        //ResetAllObjPhysics();
+        ResetAllObjPhysics();
         UpdateTrialColor();
     }
 
@@ -530,7 +530,7 @@ public class HandleTestParameters : MonoBehaviour
         foreach(Transform obj in interactableObjects.transform)
         {
             var objRB = obj.gameObject.GetComponent<Rigidbody>();
-            objRB.mass = 10f;
+            objRB.mass = 5f;
             objRB.drag = 0f;
             objRB.angularDrag = 0.05f;
             objRB.useGravity = true;

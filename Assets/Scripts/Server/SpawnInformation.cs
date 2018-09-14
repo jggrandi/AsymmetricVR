@@ -27,7 +27,7 @@ public class SpawnInformation : MonoBehaviour
 
     void CreatePositions()
     {
-        var height = 1.0f;
+        var height = 0.8f;
         var xDist = 0.6f;
         var zDist = 0.2f;
 

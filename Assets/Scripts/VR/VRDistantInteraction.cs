@@ -68,12 +68,12 @@ public class VRDistantInteraction : MonoBehaviour {
 
         if (interactingHands.Count == 0)
         {
-           // ResetPhysics(selected);
+            ResetPhysics(selected);
             return;
 
         }
 
-        //ChangePhysics(selected);
+        ChangePhysics(selected);
 
         tStep = CalcTranslation(selected, interactingHands);
         rStep = CalcRotation(selected, interactingHands);
@@ -202,7 +202,7 @@ public class VRDistantInteraction : MonoBehaviour {
     void ResetPhysics(ObjSelected obj)
     {
         var objRB = obj.gameobject.GetComponent<Rigidbody>();
-        objRB.mass = 1f;
+        objRB.mass = 5f;
         objRB.drag = 0f;
         objRB.angularDrag = 0.05f;
         objRB.useGravity = true;
