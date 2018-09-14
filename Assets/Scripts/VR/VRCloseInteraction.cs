@@ -14,7 +14,8 @@ public class VRCloseInteraction : MonoBehaviour
     Hand hand;
 
     GameObject VRPlayer;
-
+    TransformStep steps;
+    CloseInteractionsSteps closeIntSteps;
     void Start()
     {
         hand = this.gameObject.GetComponent<Hand>();
@@ -22,6 +23,8 @@ public class VRCloseInteraction : MonoBehaviour
         //trackedObj = GetComponent<SteamVR_TrackedObject>();
         VRPlayer = GameObject.FindGameObjectWithTag("PlayerVR");
         if (VRPlayer == null) { Debug.Log("Nao achou PlayerVR"); return; }
+        closeIntSteps = VRPlayer.GetComponent<CloseInteractionsSteps>();
+        steps = this.gameObject.GetComponent<TransformStep>();
 
     }
 
@@ -49,8 +52,10 @@ public class VRCloseInteraction : MonoBehaviour
         if(controller.GetPress(triggerButton) && objectHoveringOver != null)
         {
             var sStep = CalcScale();
-
             objectHoveringOver.ApplyScale(sStep);
+            closeIntSteps.tStep = steps.positionStep;
+            closeIntSteps.rStep = steps.rotationStep;
+            closeIntSteps.sStep = sStep;
 
         }
 

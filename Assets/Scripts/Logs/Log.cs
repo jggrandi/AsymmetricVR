@@ -12,8 +12,11 @@ public class Log
     StreamWriter logResumed;
     List<int> playerOrder = new List<int>();
 
+    int testCondition;
+
     public Log(int uId, int condition)
     {
+        testCondition = condition;
         Debug.Log(Application.persistentDataPath);
         logFull = File.CreateText(Application.persistentDataPath + "/User-" + uId + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Verbose.csv");
         logResumed = File.CreateText(Application.persistentDataPath + "/User-" + uId + "-Condition-" + condition + "---" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-Resumed.csv");
@@ -47,8 +50,12 @@ public class Log
         String line = "";
 
         var pStuff = player.GetComponent<PlayerStuff>();
-
-        var pTransformStep = player.GetComponent<VRDistantInteraction>();
+        VRDistantInteraction pTransformStep = null;
+        CloseInteractionsSteps pTransformCloseStep = null;
+        if (testCondition == 0)
+            pTransformCloseStep = player.GetComponent<CloseInteractionsSteps>();
+        else
+            pTransformStep = player.GetComponent<VRDistantInteraction>();
         Vector3 pPos = new Vector3();
         Quaternion pRot = new Quaternion();
         Utils.Hand vrBimanual = Utils.Hand.None;
@@ -65,7 +72,11 @@ public class Log
 
         line += ";" + pStuff.id + ";" + pStuff.type;
         line += ";" + pPos.x + ";" + pPos.y + ";" + pPos.z + ";" + pRot.x + ";" + pRot.y + ";" + pRot.z + ";" + pRot.w;
-        line += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
+        if (testCondition == 0)
+            line += ";" + pTransformCloseStep.tStep.x + ";" + pTransformCloseStep.tStep.y + ";" + pTransformCloseStep.tStep.z + ";" + pTransformCloseStep.rStep.x + ";" + pTransformCloseStep.rStep.y + ";" + pTransformCloseStep.rStep.z + ";" + pTransformCloseStep.rStep.w + ";" + pTransformCloseStep.sStep;
+
+        if (testCondition == 1)
+            line += ";" + pTransformStep.tStep.x + ";" + pTransformStep.tStep.y + ";" + pTransformStep.tStep.z + ";" + pTransformStep.rStep.x + ";" + pTransformStep.rStep.y + ";" + pTransformStep.rStep.z + ";" + pTransformStep.rStep.w + ";" + pTransformStep.sStep;
         line += ";" + vrBimanual + ";" + vrLockCombo;
 
         logFull.WriteLine(line);

@@ -112,7 +112,7 @@ public class HandleTestParameters : MonoBehaviour
 
     public void LoadInteractionTechnique()
     {
-        if(conditionsOrder[conditionIndex] == 0)
+        if(conditionsOrder[conditionIndex] == 0) //CLOSE
         {
             playerInScene.GetComponent<PlayerVR>().enabled = false;
             playerInScene.GetComponent<VRDistantInteraction>().enabled = false;
@@ -128,12 +128,12 @@ public class HandleTestParameters : MonoBehaviour
             var vrTransform = playerInScene.GetComponent<VRTransformSync>();
             vrTransform.player.hands[0].GetComponent<VRCloseInteraction>().enabled = true;
             vrTransform.player.hands[1].GetComponent<VRCloseInteraction>().enabled = true;
-
+            playerInScene.GetComponent<CloseInteractionsSteps>().enabled = true;
 
 
 
         }
-        else if(conditionsOrder[conditionIndex] == 1)
+        else if(conditionsOrder[conditionIndex] == 1) // DISTANT
         {
             playerInScene.GetComponent<PlayerVR>().enabled = true;
             playerInScene.GetComponent<VRDistantInteraction>().enabled = true;
@@ -145,7 +145,7 @@ public class HandleTestParameters : MonoBehaviour
 
             foreach (Transform obj in interactableObjects.transform)
                 obj.GetComponent<InteractableItem>().enabled = false;
-
+            playerInScene.GetComponent<CloseInteractionsSteps>().enabled = false;
         }
     }
 
