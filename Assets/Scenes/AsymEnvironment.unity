@@ -773,6 +773,7 @@ GameObject:
   - component: {fileID: 127361668}
   - component: {fileID: 127361670}
   - component: {fileID: 127361673}
+  - component: {fileID: 127361675}
   m_Layer: 0
   m_Name: VRPlayer
   m_TagString: PlayerVR
@@ -901,6 +902,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &127361675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 127361667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd263941ba9708459e6323ca89dac69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tStep: {x: 0, y: 0, z: 0}
+  rStep: {x: 0, y: 0, z: 0, w: 0}
+  sStep: 0
 --- !u!1 &128243161
 GameObject:
   m_ObjectHideFlags: 0
@@ -7273,7 +7288,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.1, y: 1, z: 1.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1169048288
 MeshRenderer:
