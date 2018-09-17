@@ -486,7 +486,7 @@ public class HandleTestParameters : MonoBehaviour
         var obj = ghostObjects.transform.GetChild(activeTrialOrder[i]);
         var intObj = interactableObjects.transform.GetChild(activeTrialOrder[i]);
         var centerPos = new Vector3(-(intObj.transform.position.x - centertable.x) + 0.2f, 1.0f, -(intObj.transform.position.z - centertable.z) - 0.2f);
-        obj.position = centerPos;
+        obj.position = centertable;
         obj.rotation = CreateGhostRotation(i);
     }
 
